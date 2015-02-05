@@ -1,4 +1,5 @@
 (function($) {
+    
 var Floxim = function() {
     
 };
@@ -51,4 +52,4 @@ Floxim.prototype.ajax = function(params) {
 
 window.Floxim = new Floxim();
 
-}) ( $fxj || jQuery );
+}) ( window.$fxj || window.jQuery );
