@@ -50,6 +50,23 @@ Floxim.prototype.ajax = function(params) {
     return xhr;
 };
 
+Floxim.prototype.reload = function($node, callback, data) {
+    $node = $node.closest('.fx_infoblock');
+    return this.ajax({
+        infoblock_id:$node.data('fx_infoblock').id,
+        data: data,
+        dataType:'html',
+        success: function(html) {
+            var $new_ib = $(html);
+            $node.before($new_ib);
+            $node.remove();
+            if (callback) {
+                callback($new_ib);
+            }
+        }
+    });
+};
+
 window.Floxim = new Floxim();
 
 }) ( window.$fxj || window.jQuery );
