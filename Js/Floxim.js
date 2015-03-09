@@ -60,6 +60,7 @@ Floxim.prototype.reload = function($node, callback, data) {
             var $new_ib = $(html);
             $node.before($new_ib);
             $node.remove();
+            $new_ib.trigger('fx_infoblock_loaded');
             if (callback) {
                 callback($new_ib);
             }
