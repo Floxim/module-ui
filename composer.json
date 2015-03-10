@@ -1,0 +1,5 @@
+{
+  "name" : "floxim/module-ui",
+  "description" : "Floxim UI module.",
+  "type" : "floxim-module"
+}
