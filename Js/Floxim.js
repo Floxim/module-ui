@@ -35,6 +35,14 @@ Floxim.prototype.ajax = function(params) {
         }
     }
     
+    if (params.params) {
+        data._ajax_controller_params = params.params;
+    }
+    
+    if (params.template) {
+        data._ajax_template = params.template;
+    }
+    
     if (params.data) {
         $.extend(data, params.data);
     }
