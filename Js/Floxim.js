@@ -103,6 +103,18 @@ Floxim.prototype.load = function (params) {
     return xhr;
 };
 
+Floxim.prototype.getMode = function() {
+    var $fx = window.$fx;
+    if (!$fx || !$fx.front) {
+        return 'view';
+    }
+    return $fx.front.mode;
+};
+
+Floxim.prototype.isView = function() {
+    return this.getMode() === 'view';
+};
+
 Floxim.prototype.handleAjaxAssets = function(xhr) {
     var js_assets_json = xhr.getResponseHeader('fx_assets_js'),
         js_assets = js_assets_json ? $.parseJSON(js_assets_json) : [],
