@@ -1,0 +1,31 @@
+.slider {
+    .clearfix();
+    overflow:hidden;
+    position:relative;
+    max-height:500px;
+    &__slides {
+        position: absolute;
+        left:0;
+    }
+    &__slide {
+        //width:100%;
+        float:left;
+        position: relative;
+    }
+    
+        
+    
+    &__arrows {}
+    
+    &__arrow {
+        position: absolute;
+        z-index:2;
+        &_back span:after {
+            content:'\2190';
+        }
+        &_next span:after {
+            content:'\2192';
+        }
+    }
+}
+
