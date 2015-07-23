@@ -20,8 +20,8 @@
 
 <div fx:template="slide" fx:e="slide" fx:b="slide">
     <div fx:e="image">
-        {*<div fx:e="image-overlay"></div>*}
         <img fx:e="image-img" src="{$item[$slide_image_field] | 'width:1200px; max-height:600px;'}" />
+        <div fx:e="image-underlay"></div>
     </div>
     <div fx:e="data">{$item | :slide_data /}</div>
 </div>
