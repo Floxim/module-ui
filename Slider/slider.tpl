@@ -1,4 +1,4 @@
-<div fx:template="slider" fx:of="floxim.main.page:list" fx:b="slider">
+<div fx:template="slider" fx:of="floxim.main.page:list" fx:b="slider" fx:size="wide,high">
     {default $slide_image_field = 'image' /}
     {js}
         @floxim_js/jquery.bem.js
