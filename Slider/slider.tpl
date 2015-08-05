@@ -1,5 +1,17 @@
-<div fx:template="slider" fx:of="floxim.main.page:list" fx:b="slider" fx:size="wide,high">
+<div 
+    fx:template="slider" 
+    fx:of="floxim.main.page:list" 
+    fx:b="slider" 
+    fx:size="wide,high"
+    {if $autoplay}
+        data-autoplay="true"
+        data-pause_time="{$pause_time*1000}"
+    {/if}
+    data-move_time="{$move_time*1000}">
     {default $slide_image_field = 'image' /}
+    {@autoplay label="Слайдшоу" type="checkbox" default="0"}
+    {@pause_time label="Пауза, сек." type="number" parent="autoplay" default="3"}
+    {@move_time label="Скорость, сек." type="number" default="0.5"}
     {js}
         @floxim_js/jquery.bem.js
         slider.js
