@@ -41,5 +41,5 @@
 {template id="slide_data"}
     <div fx:e="title"><a href="{$url}">{$name}</a></div>
     <div fx:e="description">{$description}</div>
-    <div fx:e="link"><a href="{$url}">{$%more}Узнать больше{/$}</a></div>
+    <div fx:e="link"><a href="{$url}">{$%more label="Текст ссылки"}Узнать больше{/$}</a></div>
 {/template}
