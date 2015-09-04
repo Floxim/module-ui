@@ -85,8 +85,15 @@ Floxim.prototype.reload = function($node, callback, data) {
 
 Floxim.prototype.load = function (params) {
     var callback = function(res) {
-        var $target = params.target ? $(params.target) : $('body'),
-            $res = $(res);
+        var $target;
+        if (typeof params.target === 'function' ) {
+            $target = params.target(res);
+        } else if (params.target) {
+            $target = $(params.target);
+        } else {
+            $target = $('body');
+        }
+        var $res = $(res);
         $target.append($res);
         window.Floxim.loaded($res);
         if (params.success) {
