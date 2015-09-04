@@ -7,6 +7,9 @@
         data-autoplay="true"
         data-pause_time="{$pause_time*1000}"
     {/if}
+	{if $max_height}
+		style="max-height: {$max_height}px"
+	{/if}
     data-move_time="{$move_time*1000}">
     {default $slide_image_field = 'image' /}
     {@autoplay label="Слайдшоу" type="checkbox" default="0"}
