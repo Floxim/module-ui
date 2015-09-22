@@ -1,0 +1,38 @@
+.tiles_nth_reset(@n, @margin) when (@margin > 0) {
+    &:nth-child(@{n}n) {
+        margin-right:0;
+    }
+}
+
+.tiles_loop(@margin, @count) when (@count > 0) {
+    .tiles_loop(@margin, @count - 1);
+    
+    &.tiles_cols_@{count} .tile
+    {
+        width:(100% - @margin * (@count - 1 )) / @count;
+        .tiles_nth_reset(@count, @margin);
+    }
+}
+
+.tiles(@margin) {
+    &:after {
+        content:'';
+        display:block;
+        clear:both;
+    }
+    .tiles_loop(@margin, 5);
+    .tile {
+        float:left;
+        margin-right:@margin;
+        margin-bottom:@margin;
+        img {
+            width:100%;
+        }
+    }
+}
+
+.tiles {
+    .tiles(@tiles_margin);
+}
+
+@tiles_margin:2%;

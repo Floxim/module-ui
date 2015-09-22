@@ -1,7 +1,7 @@
 <div 
     fx:template="slider" 
     fx:of="floxim.main.page:list" 
-    fx:b="slider" 
+    fx:b="slider {$class}" 
     fx:size="wide,high"
     {if $autoplay}
         data-autoplay="true"

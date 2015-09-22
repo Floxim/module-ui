@@ -7,5 +7,6 @@ class Module extends \Floxim\Floxim\Component\Module\Entity {
     public function init()
     {
         fx::template()->import('floxim.ui.slider');
+        fx::template()->import('floxim.ui.tiles');
     }
 }

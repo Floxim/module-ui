@@ -164,6 +164,59 @@ Floxim.prototype.loaded = function($node) {
     $node.trigger('fx_infoblock_loaded');
 };
 
+
+Equalizer = function($nodes, prop, value) {
+    if (typeof $nodes === 'string') {
+        $nodes = $($nodes);
+    }
+    if (typeof value === 'undefined') {
+        value = 'max';
+    }
+    
+    var hash = (prop+'_'+value).replace(/[^a-z0-9_-]+/, '_');
+    var that = this;
+    
+    this.count = function() {
+        if (value !== 'min' && value !== 'max') {
+            return value;
+        }
+        var cv = null;
+        $nodes.filter(':visible').each(function() {
+            var nv = parseInt($(this).css(prop));
+            if (cv === null || Math[value](nv, cv) === nv)  {
+                cv = nv;
+            }
+        });
+        return cv;
+    };
+    
+    this.update = function() {
+        this.reset();
+        var new_value = this.count();
+        $nodes.css(prop, new_value);
+    };
+    
+    this.reset  = function() {
+        $nodes.css(prop, '');
+    };
+    
+    this.detach = function() {
+        $nodes.off('input.'+hash);
+    };
+    
+    
+    $nodes.off('input.'+hash).on('input.'+hash, function() {
+        that.update();
+    });
+};
+
+Floxim.prototype.equalize = function($nodes, prop, value) {
+    var Eq = new Equalizer($nodes, prop, value);
+    Eq.update();
+    return Eq;
+    
+};
+
 window.Floxim = new Floxim();
 
 }) ( window.$fxj || window.jQuery );

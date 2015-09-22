@@ -36,15 +36,17 @@ Floxim.handle('.slider', function() {
                     res_height = Math.min(res_height, $(this).height());
                 }
             });
-            if (!res_height !== Slider.height) {
+            
+            if (res_height !== Slider.height) {
                 Slider.height = res_height;
+                
                 Slider.$node.css('height', res_height);
                 Slider.$slides.css('height', res_height);
+                
             }
         };
         
         this.init = function() {
-            
             this.getSlides();
             this.$current = this.$slides.first();
             this.$arrows = $node.elem('arrow');
@@ -54,15 +56,20 @@ Floxim.handle('.slider', function() {
                 Slider.recountHeight();
             });
             
+            this.$container.css('width', 1);
+            
             this.$node.css({width:'auto',height:'auto'});
             this.width = $node.parent().width();
+            
             this.height = parseInt($node.css('height')) || parseInt($node.css('max-height')) || 300;
             this.$slides.css('width', this.width);
             this.$node.css({
                 width:this.width
             });
+            
             this.recountHeight();
             this.$container.css('width', this.width * this.$slides.length*2);
+            
             this.$arrows.off('click').on('click', function() {
                 var dir = $(this).data('dir');
                 Slider.stop();
@@ -115,7 +122,6 @@ Floxim.handle('.slider', function() {
             } else {
                 Slider.$current = Slider.$slides.first();
             }
-            console.log('now curr', Slider.$current.find('.slide__title').text());
             
             this.$container.addClass('fx_is_moving').animate({
                 left: new_left
