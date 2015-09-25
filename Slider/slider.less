@@ -1,5 +1,9 @@
 .slider {
-    .clearfix();
+    &:after {
+        content:'';
+        display:block;
+        clear:both;
+    }
     overflow:hidden;
     position:relative;
     //max-height:680px;
