@@ -29,21 +29,23 @@ Floxim.handle('.slider', function() {
         this.$container = $node.elem('slides');
         
         this.recountHeight = function () {
+            if (this.$imgs.length === 0) {
+                return;
+            }
             // default height
             var res_height = Slider.height;
             this.$imgs.each(function() {
                 if (this.complete) {
-                    res_height = Math.min(res_height, $(this).height());
+                    var pic_height = $(this).height();
+                    res_height = res_height === null ? pic_height : Math.min(res_height, pic_height);
                 }
             });
             
-            if (res_height !== Slider.height) {
+            //if (res_height !== Slider.height) {
                 Slider.height = res_height;
-                
                 Slider.$node.css('height', res_height);
                 Slider.$slides.css('height', res_height);
-                
-            }
+            //}
         };
         
         this.init = function() {
@@ -61,7 +63,8 @@ Floxim.handle('.slider', function() {
             this.$node.css({width:'auto',height:'auto'});
             this.width = $node.parent().width();
             
-            this.height = parseInt($node.css('height')) || parseInt($node.css('max-height')) || 300;
+            //this.height = parseInt($node.css('height')) || parseInt($node.css('max-height')) || 300;
+            this.height = parseInt($node.css('max-height')) || null;
             this.$slides.css('width', this.width);
             this.$node.css({
                 width:this.width
