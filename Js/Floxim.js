@@ -21,6 +21,14 @@ Floxim.prototype.handle = function(selector, callback) {
     return Floxim;
 };
 
+Floxim.prototype.block = function(selector, callback) {
+    var builder = function() {
+        var $item = $(this);
+        $item.data('floxim_block', new callback(this));
+    };
+    this.handle(selector, builder);
+};
+
 Floxim.prototype.ajax = function(params) {
     var data = {
         _ajax_base_url: params.base_url || document.location.href
