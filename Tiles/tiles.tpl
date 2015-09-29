@@ -53,9 +53,9 @@
         <div fx:e="row extra">
             <span fx:e="date">
                 {if $item.isInstanceOf('floxim.corporate.project')}
-                    {$date | 'F d, Y'}
+                    {$date | '%Month% Y'}
                 {elseif $item.isInstanceOf('floxim.blog.publication')}
-                    {$publish_date | 'F d, Y'}
+                    {$publish_date | 'j %month:gen% Y'}
                 {/if}
             </span>
         </div>
