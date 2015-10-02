@@ -34,6 +34,9 @@
 </div>
 
 <div fx:template="slide" fx:e="slide" fx:b="slide">
+    {if !$item[$slide_image_field]}
+        {set $slide_image_field = '%image' /}
+    {/if}
     <div fx:e="image">
         <img fx:e="image-img" src="{$item[$slide_image_field] | 'width:1200px; max-height:600px;'}" />
         <div fx:e="image-underlay"></div>
