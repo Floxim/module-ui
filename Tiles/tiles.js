@@ -43,7 +43,10 @@ Floxim.handle('.tiles', function() {
     $pics.on('load', function(e) {
         recountHeights();
     });
-    $container.on('resize', function() {
-        //recountHeights();
+    $container.on('fx_after_show_adder_placeholder', function() {
+        recountHeights();
+    });
+    $('html').on('fx_set_front_mode', function() {
+        recountHeights();
     });
 });
