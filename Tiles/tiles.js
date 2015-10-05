@@ -30,7 +30,7 @@ Floxim.handle('.tiles', function() {
         $row.each(function(index, item) {
             var $item = $(item);
             if (size_ratio) {
-                c_height = $item.width() / size_ratio;
+                c_height = Math.floor($item.width() / size_ratio) - 1;
             } else {
                 c_height = Math.max( $(item).height(), c_height);
             }
