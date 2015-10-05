@@ -1,7 +1,8 @@
 Floxim.handle('.tiles', function() {
     var $container = $(this),
         cols = $container.attr('class').match(/tiles_cols_(\d+)/),
-        $pics = $('img', $container);
+        $pics = $('img', $container),
+        size_ratio = $container.data('size_ratio')*1;
         
     if (!cols) {
         console.log($container.attr('class'));
@@ -27,7 +28,12 @@ Floxim.handle('.tiles', function() {
     function recountRow($row) {
         var c_height = 0;
         $row.each(function(index, item) {
-            c_height = Math.max( $(item).height(), c_height);
+            var $item = $(item);
+            if (size_ratio) {
+                c_height = $item.width() / size_ratio;
+            } else {
+                c_height = Math.max( $(item).height(), c_height);
+            }
         });
         $row.css('height', c_height);
     }

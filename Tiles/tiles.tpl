@@ -1,4 +1,7 @@
 <div
+    {default $image_ratio = 1.4 /}
+    {default $force_size_ratio = false /}
+    {if $force_size_ratio}data-size_ratio="{$image_ratio /}"{/if}
     fx:b="
         tiles 
         cols_{$cols}
@@ -9,12 +12,11 @@
     fx:name="Плитки"
     fx:size="high"
     fx:of="page:list">
-    
     {@cols type="select" label="Число колонок" type="select" values="`range(1,5)`" default="4"}
     
     {default $show_images = true /}
     {default $image_width = 1200 / $cols /}
-    {default $image_height = $image_width / 1.4 /}
+    {default $image_height = $image_width / $image_ratio /}
     {set $image_size = $image_width . '*' . $image_height /}
     
     {js}
@@ -38,9 +40,14 @@
     {$item /}
 {/template}
     
-<div fx:template="tile[$item.isInstanceOf('floxim.main.page')]" fx:e="body">
+<div 
+    fx:template="tile[$item.isInstanceOf('floxim.main.page')]" 
     {if $show_images}
         {set $image_field = $.hasField('image') ? 'image' : '%image' /}
+        {set $img_mod = $item[$image_field] ? 'with-image' : 'no-image' /}
+    {/if}
+    fx:e="body {$img_mod}">
+    {if $show_images}
         <div fx:e="row image">
             <a href="{$url}">
                 <img fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
