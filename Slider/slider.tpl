@@ -7,11 +7,21 @@
         data-autoplay="true"
         data-pause_time="{$pause_time*1000}"
     {/if}
-	{if $max_height}
-		style="max-height: {$max_height}px"
-	{/if}
+    {if $max_height}
+            style="max-height: {$max_height}px"
+    {/if}
+    {if $slide_height}
+        data-slide_height="{$slide_height}"
+    {/if}
+    {if $slide_width}
+        data-slide_width="{$slide_width /}"
+    {/if}
+    {if $slide_offset}
+        data-slide_offset="{$slide_offset /}"
+    {/if}
     data-move_time="{$move_time*1000}">
     {default $slide_image_field = 'image' /}
+    {default $slide_image_size = 'width:1200px; max-height:600px;' /}
     {@autoplay label="Слайдшоу" type="checkbox" default="0"}
     {@pause_time label="Пауза, сек." type="number" parent="autoplay" default="3"}
     {@move_time label="Скорость, сек." type="number" default="0.5"}
@@ -38,7 +48,7 @@
         {set $slide_image_field = '%image' /}
     {/if}
     <div fx:e="image">
-        <img fx:e="image-img" src="{$item[$slide_image_field] | 'width:1200px; max-height:600px;'}" />
+        <img fx:e="image-img" src="{$item[$slide_image_field] | fx::image : $slide_image_size}" />
         <div fx:e="image-underlay"></div>
     </div>
     <div fx:e="data">{$item | :slide_data /}</div>

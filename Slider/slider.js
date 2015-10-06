@@ -14,6 +14,10 @@ Floxim.handle('.slider', function() {
         this.autoplay = $node.data('autoplay');
         this.pause_time = $node.data('pause_time') || 3000;
         this.duration = $node.data('move_time') || 300;
+        this.offset = $node.data('slide_offset') || 0;
+        this.recount_height = $node.data('slide_height') === 'auto' ? false : true;
+        this.width_multiplier = $node.data('slide_width') || 1;
+        
         this.getSlides = function() {
             this.$slides = $node.elem('slide').filter(function() {
                 var $el = $(this),
@@ -30,6 +34,9 @@ Floxim.handle('.slider', function() {
         this.$container = $node.elem('slides');
         
         this.recountHeight = function () {
+            if (!this.recount_height) {
+                return;
+            }
             if (this.$imgs.length === 0) {
                 return;
             }
@@ -51,10 +58,20 @@ Floxim.handle('.slider', function() {
             //}
         };
         
+        this.getSlideWidth = function() {
+            return Math.round(this.width * this.width_multiplier);
+        };
+        
+        this.getDefaultLeft = function() {
+            return Math.round(this.getSlideWidth() * this.offset / 2);
+        };
+        
         this.init = function() {
             this.getSlides();
-            //this.$current = this.$slides.first();
-            this.setCurrent( this.$slides.first() );
+            
+            if (!this.$current) {
+                this.setCurrent( this.$slides.first() );
+            }
             this.$arrows = $node.elem('arrow');
             
             if (this.$slides.length < 2) {
@@ -71,21 +88,29 @@ Floxim.handle('.slider', function() {
                 Slider.recountHeight();
             });
             
+            
             this.$container.css('width', 1);
             
             this.$node.css({width:'auto',height:'auto'});
+            
             this.width = $node.parent().width();
             
             //this.height = parseInt($node.css('height')) || parseInt($node.css('max-height')) || 300;
             this.height = parseInt($node.css('max-height')) || null;
-            this.$slides.css('width', this.width);
+            this.$slides.each(function() {
+                var $slide = $(this);
+                $slide.css('width', Slider.getSlideWidth($slide));
+            });
+            
+            //debugger;
+            //this.$slides.css('width', this.width);
             this.$node.css({
                 width:this.width
             });
             
             this.recountHeight();
-            this.$container.css('width', this.width * this.$slides.length*2);
             
+            this.$container.css('width', this.width * this.$slides.length*2);
             if (this.$slides.length < 2) {
                 return;
             }
@@ -115,12 +140,9 @@ Floxim.handle('.slider', function() {
         
         this.setCurrent = function($slide) {
             this.$current = $slide;
-            /*
-            if (!$slider.is('.slider_reviews')) {
-                //console.trace();
-                console.log('Current: '+$slide.ctx('slide').elem('title').text());
-            }
-            */
+            this.$slides.removeClass('slide_current');
+            $slide.addClass('slide_current');
+            console.log('scur');
         };
         
         this.is_moving = false;
@@ -143,23 +165,26 @@ Floxim.handle('.slider', function() {
             }
             
             dir = dir && /^(next|back)$/.test(dir) ? dir : 'next';
-            var c_left = parseInt(Slider.$container.css('left')),
-                new_left;
+            var default_left = Slider.getDefaultLeft(),
+                c_left = parseInt(Slider.$container.css('left')) + default_left,
+                new_left,
+                delta = this.getSlideWidth();
             
             if (dir === 'back') {
-                new_left = '+=' + (this.width - c_left);
+                new_left = '+=' + (delta - c_left);
                 Slider.$slides.first().before(Slider.$slides.last()); 
-                Slider.$container.css('left', '-='+Slider.width );
+                Slider.$container.css('left', '-='+delta);
                 Slider.getSlides();
             } else {
-                new_left = '-=' + (this.width + c_left);
+                new_left = '-=' + (delta + c_left);
             }
+                        
             this.is_moving = true;
             
             if (dir === 'next') {
-                Slider.setCurrent(Slider.$slides.eq(1));
+                Slider.setCurrent(Slider.$slides.eq(Slider.offset + 1));
             } else {
-                Slider.setCurrent(Slider.$slides.first());
+                Slider.setCurrent(Slider.$slides.eq(Slider.offset));
             }
             
             this.$container.addClass('fx_is_moving').animate({
@@ -170,10 +195,10 @@ Floxim.handle('.slider', function() {
                 complete:function() {
                     if (dir === 'next') {
                         Slider.$container.append( Slider.$slides.first() );
-                        Slider.$container.css('left', 0);
+                        Slider.$container.css('left', Slider.getDefaultLeft()*-1);
                         Slider.getSlides();
-                        //Slider.$current = Slider.$slides.first();
                     }
+                    //Slider.setCurrent(Slider.$slides.eq(Slider.offset));
                     Slider.is_moving = false;
                     Slider.$container.removeClass('fx_is_moving');
                     if (callback) {
@@ -226,7 +251,6 @@ Floxim.handle('.slider', function() {
                 ok++;
                 this.$slides.last().after(this.$slides.first());
                 this.getSlides();
-                console.log('doo');
             }
         };
         
@@ -240,6 +264,12 @@ Floxim.handle('.slider', function() {
         this.init();
         
         this.$real_first = this.$slides.first();
+        
+        for (var i = 0; i < this.offset; i++) {
+            this.$slides.first().before(this.$slides.last()); 
+        }
+        this.getSlides();
+        this.$container.css('left', '-'+this.getDefaultLeft()+'px');
         
         this.$node
             .off('.slider')
@@ -262,7 +292,6 @@ Floxim.handle('.slider', function() {
                 }
             })
             .on('fx_start_sorting', function() {
-                console.log('statso');
                 Slider.setInitialOrder();
                 var slide_width = $slider.parent().width() / Slider.$slides.length;
                 Slider.$slides.css({
