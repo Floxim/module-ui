@@ -13,7 +13,7 @@ Floxim.handle('.slider', function() {
         this.min_height = 200;
         this.autoplay = $node.data('autoplay');
         this.pause_time = $node.data('pause_time') || 3000;
-        this.duration = $node.data('move_time') || 300;
+        this.duration = $node.data('move_time') || 1300;
         this.offset = $node.data('slide_offset') || 0;
         this.recount_height = $node.data('slide_height') === 'auto' ? false : true;
         this.width_multiplier = $node.data('slide_width') || 1;
@@ -32,6 +32,23 @@ Floxim.handle('.slider', function() {
             return this.$slides;
         };
         this.$container = $node.elem('slides');
+        
+        this.logSlides = function(marker){
+            var res = [],
+                curr = this.$current[0];
+            this.$slides.each(function(){
+                var t = $(this).ctx('slide').elem('title').text();
+                if (this === curr) {
+                    t = '>> '+t;
+                }
+                res.push(t);
+            });
+            if (marker) {
+                console.log(marker, res);
+            } else {
+                return res;
+            }
+        };
         
         this.recountHeight = function () {
             if (!this.recount_height) {
@@ -142,7 +159,11 @@ Floxim.handle('.slider', function() {
             this.$current = $slide;
             this.$slides.removeClass('slide_current');
             $slide.addClass('slide_current');
-            console.log('scur');
+            //console.log('Curr:' + $slide.ctx('slide').elem('title').text(), this.logSlides());
+        };
+        
+        this.getCurrentOffset = function() {
+            return this.$slides.index(this.$current);
         };
         
         this.is_moving = false;
@@ -181,10 +202,12 @@ Floxim.handle('.slider', function() {
                         
             this.is_moving = true;
             
+            var c_offset = Slider.getCurrentOffset();
+            //Slider.logSlides();
             if (dir === 'next') {
-                Slider.setCurrent(Slider.$slides.eq(Slider.offset + 1));
+                Slider.setCurrent(Slider.$slides.eq( c_offset + 1));
             } else {
-                Slider.setCurrent(Slider.$slides.eq(Slider.offset));
+                Slider.setCurrent(Slider.$slides.eq( c_offset - 1 ));
             }
             
             this.$container.addClass('fx_is_moving').animate({
@@ -213,7 +236,7 @@ Floxim.handle('.slider', function() {
             clearTimeout(automove_timeout);
             this.is_moving = false;
         };
-        var t_speed = 200;
+        var t_speed = 1200;
         this.moveTo = function($slide, callback_final) {
             var $slides = this.getSlides();
             if (typeof $slide === 'number') {
@@ -226,7 +249,18 @@ Floxim.handle('.slider', function() {
                 return;
             }
             
-            var dir = $slides.index($slide) / $slides.length < 0.5 ? 'next' : 'back';
+            var c_index = $slides.index(Slider.$current),
+                target_index = $slides.index($slide),
+                dir;
+            
+            if (c_index > target_index) {
+                dir = 'back';
+            } else {
+                dir =  target_index / $slides.length < 0.5 ? 'next' : 'back';
+            }
+            
+            //this.logSlides();
+            //console.log($slides.index($slide), $slides.length, dir);
             
             this.stop();
             function callback_move() {
@@ -274,13 +308,48 @@ Floxim.handle('.slider', function() {
         this.$node
             .off('.slider')
             .on('fx_after_show_adder_placeholder.slider', function(e) {
+                var prev_offset = Slider.getCurrentOffset(),
+                    $prev_current = Slider.$current,
+                    $placeholder = $(e.target);
+                    
                 Slider.init();
-                Slider.is_moving_to_placeholder = true;
-                Slider.moveTo($(e.target), function() {
-                    Slider.is_moving_to_placeholder = false;
+                //Slider.logSlides();
+                
+                var new_offset = Slider.getCurrentOffset();
+                
+                // placeholder added before current slide
+                var placeholder_pos = prev_offset < new_offset ? 'before' : 'after';
+                if (placeholder_pos === 'before') {
+                    Slider.setCurrent($placeholder);
+                } else {
+                    Slider.is_moving_to_placeholder = true;
+                    Slider.moveTo($placeholder, function() {
+                        Slider.is_moving_to_placeholder = false;
+                    });
+                }
+                $placeholder.off('.slider').on('fx_after_hide_adder_placeholder.slider', function(e) {
+                    if (placeholder_pos === 'before') {
+                        Slider.setCurrent($prev_current);
+                        Slider.getSlides();
+                        //Slider.logSlides();
+                    } else {
+                        setTimeout(
+                            function() {
+                                var $c_slides = Slider.getSlides();
+                                Slider.setCurrent($c_slides.first());
+                                //Slider.logSlides('before back');
+                                Slider.is_moving_to_placeholder = true;
+                                Slider.moveTo($prev_current, function() {
+                                    Slider.is_moving_to_placeholder = false;
+                                });
+                            },
+                            100
+                        );
+                    }
                 });
             })
             .on('fx_select.slider', '.slide', function(e) {
+                return;
                 if (Slider.is_moving_to_placeholder) {
                     return;
                 }
