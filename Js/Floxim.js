@@ -31,7 +31,7 @@ Floxim.prototype.block = function(selector, callback) {
 
 Floxim.prototype.ajax = function(params) {
     var data = {
-        _ajax_base_url: params.base_url || document.location.href
+        _ajax_base_url: params.base_url ? document.baseURI+params.base_url : document.location.href
     };
     
     if (params.infoblock_id) {
