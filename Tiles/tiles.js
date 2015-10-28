@@ -26,6 +26,11 @@ Floxim.handle('.tiles', function() {
     }
     
     function recountRow($row) {
+        
+        var event = $.Event('fx_tiles_recount_row');
+        event.$items = $row;
+        $container.trigger(event);
+        
         var c_height = 0;
         $row.each(function(index, item) {
             var $item = $(item);
@@ -35,7 +40,7 @@ Floxim.handle('.tiles', function() {
                 c_height = Math.max( $(item).height(), c_height);
             }
         });
-        $row.css('height', c_height);
+        $row.css('height', c_height); 
     }
     
     recountHeights();
