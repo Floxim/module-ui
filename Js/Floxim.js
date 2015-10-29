@@ -4,6 +4,20 @@ var Floxim = function() {
     
 };
 
+Floxim.prototype.on = function($node, event_name, selector, callback) {
+    $node.on(event_name, selector, function(e) {
+        if (window.Floxim.isView() || e.ctrlKey || e.fxForced) {
+            return callback.apply(this, arguments);
+        }
+        var $el = $(this);
+        $el.addClass('fx_click_handler');
+        $el.data('fx_click_handler', function() {
+            e.fxForced = true;
+            $el.trigger(e);
+        });
+    });
+};
+
 Floxim.prototype.handle = function(selector, callback) {
     $('html').on('fx_infoblock_loaded', function(e) {
         var $nodes = $([]),
