@@ -27,6 +27,7 @@
     {@move_time label="Скорость, сек." type="number" default="0.5"}
     {js}
         @floxim_js/jquery.bem.js
+        @module/Floxim/Ui/Js/Floxim.js
         slider.js
     {/js}
     {css}
