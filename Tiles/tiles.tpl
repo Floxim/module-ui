@@ -1,11 +1,14 @@
 <div
     {default $image_ratio = 1.4 /}
     {default $force_size_ratio = false /}
+    {default $short_type = $infoblock.short_type /}
+    {default $layout = 'default' /}
     {if $force_size_ratio}data-size_ratio="{$image_ratio /}"{/if}
     fx:b="
         tiles 
         cols_{$cols}
-        type_{$infoblock.short_type}
+        type_{$short_type}
+        layout_{$layout}
         {$class}
         {if !$show_images} no_images{/if}"
     fx:template="tiles"
@@ -20,20 +23,18 @@
     {set $image_size = $image_width . '*' . $image_height /}
     
     {js}
+        @module/Floxim/Ui/Js/Floxim.js
         tiles.js
     {/js}
     {css extend="1"}
         tiles.less
     {/css}
+    {$items_prepend || :tile_block /}
+    {$items || :tile_block /}
+</div>
     
-    <div fx:each="$items_prepend" fx:e="tile" fx:b="tile">
-        {apply tile /}
-    </div>
-    <div 
-        fx:each="$items" 
-        fx:e="tile" fx:b="tile">
-        {apply tile /}
-    </div>
+<div fx:template="tile_block" fx:e="tile" fx:b="tile">
+    {apply tile /}
 </div>
     
 {template id="tile" test="is_string($item)" priority="2"}
@@ -43,7 +44,7 @@
 <div 
     fx:template="tile[$item.isInstanceOf('floxim.main.page')]" 
     {if $show_images}
-        {set $image_field = $.hasField('image') ? 'image' : '%image' /}
+        {set $image_field = $.hasField('image') ? 'image' : $.hasField('photo') ? 'photo' : '%image' /}
         {set $img_mod = $item[$image_field] ? 'with-image' : 'no-image' /}
     {/if}
     fx:e="body {$img_mod}">
