@@ -44,10 +44,10 @@
 <div 
     fx:template="tile[$item.isInstanceOf('floxim.main.page')]" 
     {if $show_images}
-        {set $image_field = $.hasField('image') ? 'image' : $.hasField('photo') ? 'photo' : '%image' /}
+        {set $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
         {set $img_mod = $item[$image_field] ? 'with-image' : 'no-image' /}
     {/if}
-    fx:e="body {$img_mod}">
+    fx:e="body {$img_mod} img_{$image_field}">
     {if $show_images}
         <div fx:e="row image">
             <a href="{$url}">
