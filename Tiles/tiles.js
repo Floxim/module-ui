@@ -5,14 +5,13 @@ Floxim.handle('.tiles', function() {
         size_ratio = $container.data('size_ratio')*1;
         
     if (!cols) {
-        console.log($container.attr('class'));
         return;
     }
     cols = cols[1]*1;
     
     function recountHeights() {
         var $row = $([]),
-            $tiles = $('.tile:visible', $container);
+            $tiles = $('.tile', $container);
         
         $tiles.css('height', 'auto');
         $tiles.each(function () {
@@ -26,18 +25,18 @@ Floxim.handle('.tiles', function() {
     }
     
     function recountRow($row) {
-        
+        /*
         var event = $.Event('fx_tiles_recount_row');
         event.$items = $row;
         $container.trigger(event);
-        
+        */
         var c_height = 0;
-        $row.each(function(index, item) {
-            var $item = $(item);
+        $row.each(function() {
+            var rect = this.getBoundingClientRect();
             if (size_ratio) {
-                c_height = Math.floor($item.width() / size_ratio) - 1;
+                c_height = Math.floor(rect.width / size_ratio) - 1;
             } else {
-                c_height = Math.max( $(item).height(), c_height);
+                c_height = Math.max( rect.height, c_height);
             }
         });
         $row.css('height', c_height); 
@@ -45,9 +44,12 @@ Floxim.handle('.tiles', function() {
     
     recountHeights();
     
+    /*
     $pics.on('load', function(e) {
-        recountHeights();
+        //console.log('trig rh');
+        //recountHeights();
     });
+    */
     $container.on('fx_after_show_adder_placeholder', function() {
         recountHeights();
     });
