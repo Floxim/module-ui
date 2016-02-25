@@ -1,0 +1,36 @@
+//= foo
+.menu_style_main {
+    .menu__link {
+        display: block;
+        padding:15px 45px;
+        font-size:17px;
+        font-weight:500;
+        .color_transparent('main');
+        text-transform: uppercase;
+        &_active, &:hover {
+            .color_transparent('alt');
+        }
+    }
+    &.menu_layout_horizontal {
+        .menu__item {
+            border-left:1px solid #EEE;
+            padding-top: 3px;
+            .on_dark({
+                border-left:transparent;
+            });
+            &_active {
+                border-top:3px solid @color_alt;
+                .on_dark({
+                    border-top:3px solid @color_alt_inverted;
+                });
+                padding-top:0;
+            }
+            &:last-child {
+                border-right: 1px solid #EEE;
+                .on_dark({
+                    border-right:transparent;
+                });
+            }
+        }
+    }
+}
