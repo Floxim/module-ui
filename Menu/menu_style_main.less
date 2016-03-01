@@ -1,8 +1,9 @@
 //= foo
 .menu_style_main {
+    @border_color:#D7D7D7;
     .menu__link {
         display: block;
-        padding:15px 45px;
+        padding:15px @layout_padding_horizontal;
         font-size:17px;
         font-weight:500;
         .color_transparent('main');
@@ -13,24 +14,30 @@
     }
     &.menu_layout_horizontal {
         .menu__item {
-            border-left:1px solid #EEE;
-            padding-top: 3px;
-            .on_dark({
-                border-left:transparent;
-            });
-            &_active {
-                border-top:3px solid @color_alt;
-                .on_dark({
-                    border-top:3px solid @color_alt_inverted;
-                });
-                padding-top:0;
-            }
-            &:last-child {
-                border-right: 1px solid #EEE;
+            &:last-child .menu__link {
+                border-right: 1px solid @border_color;
                 .on_dark({
                     border-right:transparent;
                 });
             }
+        }
+        .menu__link {
+            border-left:1px solid @border_color;
+            .on_dark({
+                border-left:transparent;
+            });
+        }
+        .menu__item_level_1 .menu__link_active:before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 0;
+            width: 100%;
+            border-top: 3px solid @color_alt;
+            z-index: 10;
+            .on_dark({
+                border-top:3px solid @color_alt_inverted;
+            });
         }
     }
 }

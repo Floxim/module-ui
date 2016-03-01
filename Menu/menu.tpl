@@ -20,6 +20,7 @@
                     <span fx:e="link-name">{$name}</span>
                 </a>
                 
+                
                 {if count($submenu)}
                     {call recursive_menu with $items = $submenu, $lv = $lv+1 /}
                 {/if}

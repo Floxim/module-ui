@@ -1,0 +1,45 @@
+.list_style_1 {
+    .list__item {
+        background:@color_main_inverted;
+        transition: all 0.2s ease;
+        &:hover {
+            -webkit-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2);
+            -moz-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2);
+            .list__title {
+                color: @color_alt;
+            }
+        }
+        margin-bottom:40px;
+    }
+    .list__data {
+        padding:20px 30px;
+    }
+    
+    .list__title {
+        font-size:24px;
+        font-weight:bold;
+        transition: all 0.2s ease;
+    }
+    
+    .list__image {
+        width:40%;
+        padding:20px 30px;
+    }
+    
+    .list_data_with_pic({
+        width:60%;
+    });
+    
+    .list_item_pic_left({
+        .list__image {
+            padding-right:0;
+        }
+    });
+    
+    .list_item_pic_right({
+        .list__image {
+            padding-left:0;
+        }
+    });
+}
