@@ -1,0 +1,16 @@
+.header_style_underdash {
+    .header__text {
+        position:relative;
+        display:inline-block;
+        padding-bottom:15px;
+        font-size:40px;
+        &:after {
+            content:'';
+            width:40px;
+            position:absolute;
+            bottom:0;
+            left:0;
+            border-top:3px solid @color_alt;
+        }
+    }
+}
