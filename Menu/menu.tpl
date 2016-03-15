@@ -8,6 +8,7 @@
         {@menu_style type="style" mask="menu_style_*" /}
         
         {apply recursive_menu with $lv = 1 /}
+        <div fx:e="sandwich"></div>
         <ul fx:template="recursive_menu" fx:e="level">
             <li 
                 fx:each="$items"
