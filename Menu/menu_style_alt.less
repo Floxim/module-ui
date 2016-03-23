@@ -1,3 +1,27 @@
 .menu_style_alt {
-    
+    &.menu_layout_horizontal {
+        .menu__item {
+            margin:10px 15px 10px 0;
+            &:last-child {
+                margin-right:0;
+            }
+        }
+    }
+    .menu__link {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 3px;
+        border:1px solid @color_alt;
+        background:@color_main_inverted;
+        transition:all 0.3s ease;
+        
+        &:hover, &.menu__link_active {
+            background:#EEE;
+            border-color:#EEE;
+            color:@color_light;
+        }
+        &.menu__link_active {
+            cursor:text;
+        }
+    }
 }

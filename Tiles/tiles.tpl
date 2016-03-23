@@ -14,7 +14,7 @@
     fx:template="tiles"
     fx:name="Плитки"
     fx:size="high"
-    fx:of="page:list">
+    fx:of="floxim.main.page:list">
     {@cols type="select" label="Число колонок" type="select" values="`range(1,5)`" default="4"}
     
     {default $show_images = true /}
@@ -69,3 +69,12 @@
         </div>
     </a>
 </div>
+            
+{preset id="tiles#image" of="floxim.media.photo:list"}
+    {use as="tile"}
+        <div fx:e="image">
+            Picc!
+            <img src="{$image | 'max-width:200' /}" />
+        </div>
+    {/use}
+{/preset}
