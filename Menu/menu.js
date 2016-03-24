@@ -1,7 +1,19 @@
 Floxim.block('.menu', function(menu) {
-    var $menu = $(menu);
+    var $menu = $(menu),
+        $body = $('body'),
+        body_style = $body.attr('style');
+    
     $('.menu__sandwich', $menu).click(function() {
         $menu.toggleClass('menu_expanded');
+        if ($menu.hasClass('menu_expanded')) {
+            body_style = $body.attr('style') || '';
+            $body.css({
+                overflow:'hidden'
+            });
+        } else {
+            $body.attr('style', body_style);
+            console.log('set stl', body_style);
+        }
     });
     if ($menu.is('.menu_dropdown')) {
         
