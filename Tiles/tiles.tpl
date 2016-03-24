@@ -73,7 +73,6 @@
 {preset id="tiles#image" of="floxim.media.photo:list"}
     {use as="tile"}
         <div fx:e="image">
-            Picc!
             <img src="{$image | 'max-width:200' /}" />
         </div>
     {/use}
