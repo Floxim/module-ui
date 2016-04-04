@@ -10,12 +10,16 @@
     &__image {
         overflow:hidden;
         position: relative;
-        background:#000;
+        &_darken {
+            background:#000;
+        }
     }
     
     &__image-img {
         width:100%;
         position: relative;
+    }
+    &__image_darken &__image-img {
         opacity:0.6;
     }
 }

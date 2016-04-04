@@ -48,7 +48,7 @@
     {if !$item[$slide_image_field]}
         {set $slide_image_field = '%image' /}
     {/if}
-    <div fx:e="image">
+    <div fx:e="image darken">
         <img fx:e="image-img" src="{$item[$slide_image_field] | fx::image : $slide_image_size}" />
         <div fx:e="image-underlay"></div>
     </div>
@@ -60,3 +60,13 @@
     <div fx:e="description">{$description}</div>
     <div fx:e="link"><a href="{$url}">{$%more label="Текст ссылки"}Узнать больше{/$}</a></div>
 {/template}
+
+{preset id="slider#photo" of="floxim.media.photo:list"}
+    {use as="slide"}
+        <div fx:e="slide" fx:b="slide">
+            <div fx:e="image" fx:omit>
+                <img fx:e="image-img" src="{$image | fx::image : $slide_image_size}" />
+            </div>
+        </div>
+    {/use}
+{/preset}

@@ -23,32 +23,28 @@
     /}
     
     <div fx:each="$items" fx:e="item">
-        <a href="{$url}" fx:e="item-link" fx:omit="!$url">
-            {set $list_pre_extra}
+        <fx:a fx:e="item-link">
+            <div fx:e="item-pre-extra" fx:hide-empty>
                 {apply list_pre_extra /}
-            {/set}
-            {set $image_side}
+            </div>
+            <div fx:e="image" fx:hide-empty>
                 {apply list_image_side /}
-            {/set}
-            <div fx:e="item-pre-extra" fx:if="$list_pre_extra">{$list_pre_extra /}</div>
-            <div fx:e="image" fx:aif="trim($image_side) != ''">
-                {$image_side /}
             </div>
             <div fx:e="data">
                 {apply list_data /}
             </div>
-        </a>
+        </fx:a>
     </div>
+            
     {apply floxim.main.content:pagination with $pagination /}
 </div>
 
 {template id="list_image_side"}
     {set $image_field = $item.hasField('image') ? 'image' : '%image'  /}
     <img fx:e="image-img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size}" />
-    {set $image_side_extra}
+    <div fx:e="image-side-extra" fx:hide-empty>
         {apply list_image_side_extra /}
-    {/set}
-    <div fx:e="image-side-extra" fx:if="trim($image_side_extra)">{$image_side_extra /}</div>
+    </div>
 {/template}
 
 {template id="list_data"}
@@ -56,22 +52,19 @@
     <div fx:e="description">
         {$description}
     </div>
-    
     <div fx:e="extra">
         {apply list_extra /}
     </div>
 {/template}
 
-{template id="list_image_side_extra"}{/template}
-
-<div fx:template="list_extra[$item && $item.isInstanceOf('floxim_saas.content.service')]">
+{template id="list_extra" test="$item.isInstanceOf('floxim_saas.content.service')"}
     {apply floxim_saas.content.service:price /}
-</div>
+{/template}
     
-<div fx:template="list_extra[$item && $item.isInstanceOf('floxim.blog.publication')]">
+{template id="list_extra" test="$item.isInstanceOf('floxim.blog.publication')"}
     <span fx:e="date">{$publish_date | 'd.m.Y'}</span>
-</div>
+{/template}
 
-<div fx:template="list_extra[$item && $item.isInstanceOf('floxim_saas.content.reviews')]">        
+{template id="list_extra" test="$item.isInstanceOf('floxim_saas.content.reviews')"}
     <div fx:e="date">{$date | fx::date : 'd.m.Y' /}</div>
-</div>
+{/template}

@@ -71,9 +71,10 @@
 </div>
             
 {preset id="tiles#image" of="floxim.media.photo:list"}
+    {js}lightbox.js{/js}
     {use as="tile"}
-        <div fx:e="image">
-            <img src="{$image | 'max-width:200' /}" />
+        <div fx:e="image" data-lightbox_image="{$image}" data-lightbox_title="{$description | htmlspecialchars}">
+            <img src="{$image | '400*300' /}" />
         </div>
     {/use}
 {/preset}

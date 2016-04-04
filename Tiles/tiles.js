@@ -44,12 +44,18 @@ Floxim.handle('.tiles', function() {
     
     recountHeights();
     
-    /*
+    
     $pics.on('load', function(e) {
         //console.log('trig rh');
-        //recountHeights();
+        recountHeights();
     });
-    */
+    
+    $(window).on('resize', function(e) {
+        if (e.target === window) {
+            recountHeights();
+        }
+    });
+    
     $container.on('fx_after_show_adder_placeholder', function() {
         recountHeights();
     });
