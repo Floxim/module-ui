@@ -50,13 +50,13 @@
     fx:e="body {$img_mod} img_{$image_field}">
     {if $show_images}
         <div fx:e="row image">
-            <a href="{$url}">
+            <fx:a>
                 <img fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
-            </a>
+            </fx:a>
         </div>
     {/if}
 	
-    <a href="{$url}" fx:e="data">
+    <fx:a fx:e="data">
         <div fx:e="row name"><span fx:e="name">{$name}</span></div>
         <div fx:e="row extra">
             <span fx:e="date">
@@ -67,7 +67,7 @@
                 {/if}
             </span>
         </div>
-    </a>
+    </fx:a>
 </div>
             
 {preset id="tiles#image" of="floxim.media.photo:list"}
