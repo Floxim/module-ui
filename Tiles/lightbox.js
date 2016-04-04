@@ -13,7 +13,7 @@ Floxim.handle('.tiles_type_photo', function() {
                 width:'100%',
                 background:'rgba(0,0,0,0.5)'
             });
-            $container.append($overlay);
+            $('body').append($overlay);
             $container.data('lightbox_overlay', $overlay);
             $overlay.click(function() {
                 hide_box();
@@ -92,9 +92,12 @@ Floxim.handle('.tiles_type_photo', function() {
             height:1
         });
         $content.append($img);
-        $container.append($content);
+        $('body').append($content);
         get_overlay().show();
         $img.on('load', function() {
+            if ($fx) {
+                $fx.front.deselect_item();
+            }
             hide_box();
             show_overlay($content);
             place_image($(this));
@@ -111,6 +114,7 @@ Floxim.handle('.tiles_type_photo', function() {
             }
             $img.click(function() {
                 show_image($images.eq(next_index));
+                return false;
             });
             $('html').off('keydown.lightbox').on('keydown.lightbox', function(e) {
                 if (e.which === 39) {
@@ -126,9 +130,14 @@ Floxim.handle('.tiles_type_photo', function() {
         return $('*[data-lightbox_image]');
     }
     
-    $(this).on('click', '*[data-lightbox_image]', function() {
+    $(this).on('click', '*[data-lightbox_image]', function(e) {
         var $item = $(this);
+        if ($item.closest('.fx_hilight_hover').length && !e.ctrlKey) {
+            return;
+        }
         show_image($item);
+        e.stopImmediatePropagation();
+        return false;
     });
     
     get_images().css({cursor:'pointer'});
