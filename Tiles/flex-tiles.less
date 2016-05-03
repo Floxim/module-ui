@@ -1,0 +1,39 @@
+.tiles_loop(@count) when (@count > 0) {
+    .tiles_loop(@count - 1);
+    
+    .tiles_cols_@{count} .tile {
+        width: (100% / @count);
+    }
+    
+    .tiles_padding_on.tiles_cols_@{count} .tile
+    {
+        width:~"calc(" (100% / @count) ~" - " (@layout_padding_horizontal * 1) ~")";
+    }
+}
+
+.tiles_loop(5);
+
+.tiles {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    &_padding_on {
+        margin-left:@layout_padding_horizontal / 2 * -1;
+        margin-right:@layout_padding_horizontal / 2 * -1;
+    }
+    &_padding_on .tile {
+        margin:@layout_padding_horizontal / 2;
+    }
+}
+
+.tile {
+    &__image {
+        line-height:0;
+    }
+    &__img { 
+        max-width:100%;
+    }
+    &__body {
+        display:block;
+    }
+}

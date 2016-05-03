@@ -2,6 +2,7 @@
     fx:template="slider" 
     fx:of="floxim.main.page:list" 
     fx:b="slider {$class}" 
+    fx:styled
     fx:size="wide,high"
     {if $autoplay}
         data-autoplay="true"
@@ -56,7 +57,7 @@
 </div>
 
 {template id="slide_data"}
-    <div fx:e="title"><a href="{$url}">{$name}</a></div>
+    <fx:a fx:e="title">{$name}</fx:a>
     <div fx:e="description">{$description}</div>
     <div fx:e="link"><a href="{$url}">{$%more label="Текст ссылки"}Узнать больше{/$}</a></div>
 {/template}

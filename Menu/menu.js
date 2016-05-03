@@ -12,14 +12,22 @@ Floxim.block('.menu', function(menu) {
             });
         } else {
             $body.attr('style', body_style);
-            console.log('set stl', body_style);
         }
     });
     if ($menu.is('.menu_dropdown')) {
         
+        /*function name($item)
+        {
+            return $item.find('.menu__link').first().text();
+        }*/
+        
         function expand($item) {
-            if (!$item.length) {
+            if (!$item.length || !$item.is('.menu__item_has-children')) {
                 return;
+            }
+            var $current_expanded = $item.parent().find('> .menu__item_expanded');
+            if ($current_expanded.length) {
+                collapse($current_expanded);
             }
             expand($item.parent().closest('.menu__item'));
             $item.addClass('menu__item_expanded');
@@ -33,7 +41,6 @@ Floxim.block('.menu', function(menu) {
                 return;
             }
             $item.removeClass('menu__item_expanded');
-            //collapse($item.parent().closest('.menu__item'));
         };
         function collapse_delayed($item) {
             $item.data(
@@ -61,12 +68,14 @@ Floxim.block('.menu', function(menu) {
                 var $item = $(this);
                 clearTimeout($item.data('collapse_timeout'));
                 expand($item);
+                return false;
             })
             .on('fx_select', '.menu__item', function(e) {
                 expand($(this));
             })
-            .on('mouseleave', '.menu__item', function(e) {
+            .on('mouseleave', '.menu__item_expanded', function(e) {
                 handle_mouseleave(e, $(this));
+                return false;
             })
             .on('fx_deselect', '.menu__item', function(e) {
                 collapse_delayed($(this));

@@ -1,15 +1,15 @@
 <nav
     fx:template="menu" 
+    fx:styled
     fx:abstract
     fx:of="floxim.main.page:list"
     fx:b="menu layout_{$menu_layout} style_{$menu_style} dropdown">
         {js}menu.js{/js}
         {css}menu.less{/css}
-        {@menu_style type="style" mask="menu_style_*" /}
         
         {apply recursive_menu with $lv = 1 /}
         <div fx:e="sandwich"></div>
-        <ul fx:template="recursive_menu" fx:e="level">
+        <ul fx:template="recursive_menu" fx:e="level level_{$lv}">
             <li 
                 fx:each="$items"
                 fx:e="item 
