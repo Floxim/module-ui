@@ -62,7 +62,7 @@
 {/template}
     
 {template id="list_extra" test="$item.isInstanceOf('floxim.blog.publication')"}
-    <span fx:e="date">{$publish_date | 'd.m.Y'}</span>
+    <span fx:e="date">{apply floxim.ui.date:date with $date = $publish_date /}</span>
 {/template}
 
 {template id="list_extra" test="$item.isInstanceOf('floxim_saas.content.reviews')"}
