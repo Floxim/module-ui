@@ -15,12 +15,11 @@ Floxim.block('.menu', function(menu) {
         }
     });
     if ($menu.is('.menu_dropdown')) {
-        
-        /*function name($item)
-        {
+        /*
+        function name($item) {
             return $item.find('.menu__link').first().text();
-        }*/
-        
+        }
+        */
         function expand($item) {
             if (!$item.length || !$item.is('.menu__item_has-children')) {
                 return;
@@ -66,7 +65,9 @@ Floxim.block('.menu', function(menu) {
         $menu
             .on('mouseenter', '.menu__item', function(e) {
                 var $item = $(this);
-                clearTimeout($item.data('collapse_timeout'));
+                $item.parents('.menu__item').each(function() {
+                    clearTimeout($(this).data('collapse_timeout'));
+                });
                 expand($item);
                 return false;
             })
