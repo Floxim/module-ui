@@ -95,7 +95,7 @@ Floxim.handle('.tiles_type_photo', function() {
         $('body').append($content);
         get_overlay().show();
         $img.on('load', function() {
-            if ($fx) {
+            if (window.$fx) {
                 $fx.front.deselect_item();
             }
             hide_box();
