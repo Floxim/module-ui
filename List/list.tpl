@@ -57,8 +57,8 @@
     </div>
 {/template}
 
-{template id="list_extra" test="$item.isInstanceOf('floxim_saas.content.service')"}
-    {apply floxim_saas.content.service:price /}
+{template id="list_extra" test="$item.isInstanceOf('floxim.corporate.service')"}
+    <div fx:e="price" fx:aif="$price">{$price /}</div>
 {/template}
     
 {template id="list_extra" test="$item.isInstanceOf('floxim.blog.publication')"}
@@ -68,3 +68,13 @@
 {template id="list_extra" test="$item.isInstanceOf('floxim_saas.content.reviews')"}
     <div fx:e="date">{$date | fx::date : 'd.m.Y' /}</div>
 {/template}
+
+{preset id="list#factoid" of="floxim.main.factoid:list" replace="1"}
+    {use as="list_data"}
+        <div fx:e="title">{$name /}</div>
+        <div fx:e="description">{$description /}</div>
+        <div fx:if="$url" fx:e="more">
+            <span fx:e="more-link">{$%link_text}Подробнее{/%}</span>
+        </div>
+    {/use}
+{/preset}

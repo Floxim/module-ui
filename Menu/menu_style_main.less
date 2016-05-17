@@ -11,6 +11,7 @@
         font-size:17px;
         font-weight:500;
         text-transform: uppercase;
+        font-family:@font_nav;
         #_active, &:hover {
             color:@color_alt;
         }
@@ -18,14 +19,12 @@
     .lightness(@color; @border) {
         #__item_level_1 {
             & when not(@border = none) {
-                border-top:@border;
-                border-left:#F00;
-                border-bottom:@border;
+                //border-right:#F00;
             }
             #__link {
                 color:@color;
                 & when not (@border = none) {
-                    border-left:@border;
+                    //border-left:@border;
                     border-right:@border;
                 }
             }
@@ -39,7 +38,11 @@
     }
     
     .light({
-        .lightness(@color_main; 1px solid @border_color);
+        //.lightness(@color_main; 1px solid @border_color);
+        .lightness(@color_main; none);
+        #__item_level_1 > #__link {
+            text-shadow:0px 0px 4px rgba(255,255,255,0.8);
+        }
     });
     
     .dark({
@@ -60,22 +63,29 @@
         }
         #__item_level_1 {
             display:flex;
-            & > #__link_active:before {
-                content: '';
-                position: absolute;
-                top: -4px;
-                left: 0;
-                width:100%;
-                border-top: 3px solid @color_alt;
-                z-index: 10;
+            & > #__link_active > #__link-name { 
+                position:relative;
+                &:after {
+                    content: '';
+                    position: absolute;
+                    //top: -4px;
+                    bottom:-5px;
+                    left: 0;
+                    width:100%;
+                    border-top: 3px solid @color_alt;
+                    z-index: 10;
+                }
             }
             & > #__link {
                 display:flex;
+                font-weight:bold;
+                font-size:19px;
                 #__link-name {
                     margin:auto;
                 }
             }
         }
+        
         #__level_level_2 {
             top:100%;
             left:0;
@@ -86,16 +96,13 @@
         }
         #__item_has-children {
             & > #__link {
-                padding-right: @layout_padding_horizontal + 15px;
+                //padding-right: ~"calc(" @layout_padding_horizontal ~" + 20px)";
                 &:after {
                     content:'';
                     display:block;
-                    position:absolute;
-                    right:20px;
-                    top:50%;
+                    margin: auto 0 auto 15px;
                     border-left: 5px solid transparent;
                     border-right: 5px solid transparent;
-                    margin-top:-4px;
                 }
             }
             #_active > #__link:after, & > #__link:hover:after {

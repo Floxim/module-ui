@@ -1,9 +1,7 @@
 <div
-    {default $image_ratio = 1.4 /}
     {default $force_size_ratio = false /}
     {default $short_type = $infoblock.short_type /}
     {default $layout = 'default' /}
-    {if $force_size_ratio}data-size_ratio="{$image_ratio /}"{/if}
     fx:b="
         tiles 
         cols_{$cols}
@@ -17,6 +15,7 @@
     fx:name="Плитки"
     fx:size="high"
     fx:of="floxim.main.page:list">
+    {@image_ratio type="number" min="0.5" max="3" step="0.1" default="1.4" label="Пропорции картинки" /}
     {@cols type="select" label="Число колонок" type="select" values="`range(1,5)`" default="4"}
     {@pads type='checkbox' label='Отступы' defalt="1" /}
     
@@ -24,12 +23,7 @@
     {default $image_width = 1200 / $cols /}
     {default $image_height = $image_width / $image_ratio /}
     {set $image_size = $image_width . '*' . $image_height /}
-    {*
-    {js}
-        @module/Floxim/Ui/Js/Floxim.js
-        tiles.js
-    {/js}
-    *}
+    
     {css}flex-tiles.less{/css}
     {$items_prepend || :tile_block /}
     {$items || :tile_block /}
@@ -68,7 +62,7 @@
     {js}lightbox.js{/js}
     {use as="tile"}
         <div fx:e="image" data-lightbox_image="{$image editable="false"}" data-lightbox_title="{$description | htmlspecialchars}">
-            <img fx:e="img" src="{$image | '400*300' /}" />
+            <img fx:e="img" src="{$image | fx::image : $image_size /}" />
         </div>
     {/use}
 {/preset}
@@ -76,5 +70,11 @@
 {preset id="tiles#news" of="floxim.blog.news:list" replace="1"}
     {use as="extra"}
         {apply floxim.ui.date:date with $date = $item.publish_date /}
+    {/use}
+{/preset}
+
+{preset id="tiles#service" of="floxim.corporate.service:list" replace="1"}
+    {use as="extra"}
+        <div fx:aif="$price" fx:e="price">{$price /}</div>
     {/use}
 {/preset}

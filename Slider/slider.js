@@ -1,4 +1,5 @@
 Floxim.handle('.slider', function() {
+    //return;
     var $slider = $(this);
     new Slider($slider);
     
@@ -51,6 +52,7 @@ Floxim.handle('.slider', function() {
         };
         
         this.recountHeight = function () {
+            return;
             if (!this.recount_height) {
                 return;
             }
@@ -105,7 +107,9 @@ Floxim.handle('.slider', function() {
                 Slider.recountHeight();
             });
             
+            this.width = this.$container.width();
             
+            /*
             this.$container.css('width', 1);
             
             this.$node.css({width:'auto',height:'auto'});
@@ -131,7 +135,7 @@ Floxim.handle('.slider', function() {
             if (this.$slides.length < 2) {
                 return;
             }
-            
+            */
             this.$arrows.show().off('click').on('click', function() {
                 var dir = $(this).data('dir');
                 Slider.stop();
@@ -173,7 +177,7 @@ Floxim.handle('.slider', function() {
             }
             var duration = Slider.duration,
                 easing = 'swing';
-            
+        
             if (typeof speed === 'number') {
                 duration = speed;
             } else if (speed) {

@@ -1,32 +1,36 @@
 .header_style_overdash {
     @pad:15px;
     #__text {
+        max-width:80%;
         position:relative;
         display:inline-block;
-        padding-right:@pad;
-        background:#FFF;
         .color_transparent();
-        z-index:1;
-        .dark({
-            background:@color_main;
+    }
+    
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    
+    &:before {
+        .left({
+            display:none;
         });
-        .centered({
-            padding-left:@pad;
-        });
+        margin-right:@pad;
+    }
+    &:after {
+        margin-left:@pad;
         .right({
-            padding-right:0;
-            padding-left:@pad;
+            display:none;
         });
     }
-    position:relative;
-    &:after {
+    
+    &:after, &:before {
         content:'';
-        width:100%;
-        position:absolute;
-        top:50%;
-        left:0;
+        flex-grow:1;
         border-top:3px solid @color_alt;
+        .dark({
+            border-color:@color_main_inverted;
+        });
         margin-top:-1px;
-        z-index:0;
     }
 }

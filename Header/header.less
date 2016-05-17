@@ -1,15 +1,38 @@
 .header {
     font-size:23px;
-    #_level_1 {
-        font-size:40px;
+    #_size_auto {
+        #_level_1 {
+            font-size:40px;
+        }
+        #_level_2 {
+            font-size:29px;
+        }
     }
-    #_level_2 {
-        font-size:29px;
+    #_size {
+        &_1 {
+            font-size:40px;
+        }
+        &_2 {
+            font-size:35px;
+        }
+        &_3 {
+            font-size:29px;
+        }
+        &_4 {
+            font-size:24px;
+        }
+        &_5 {
+            font-size:19px;
+        }
     }
+    
     width:100%;
     .text-align();
     a#__text {
         .color_transparent('alt');
         text-decoration:none;
+    }
+    #__text {
+        font-family:@font_headers;
     }
 }
