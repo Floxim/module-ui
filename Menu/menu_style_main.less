@@ -1,53 +1,58 @@
-/*{
-    'name':'Main'
-}*/
-.menu_style_main {
+/*
+{
+    "name":"Главное меню",
+    "vars": {
+        "color_link": {"label":"Цвет пункта","type":"palette"},
+        "color_link_active": {"label":"Цвет активного","type":"palette"},
+        "text_transform": {"type":"string"}
+    }
+}
+*/
+
+/*
+name: Главное меню
+vars:
+  color_link:
+    label: Цвет пункта
+    type: palette
+  color_link_active:
+    label: Цвет активного
+    type: palette
+  text_transform:
+    type:string
+*/
+.menu_style_main(
+    @color_link: main 1; 
+    @color_link_active: alt 2;
+    @text_transform:uppercase;
+) {
     
-    @border_color:rgba(215,215,215,0.5);
+    //@border_color:rgba(215,215,215,0.5);
     
     #__link {
         display: block;
         padding:15px @layout_padding_horizontal;
         font-size:17px;
         font-weight:500;
-        text-transform: uppercase;
+        text-transform: @text_transform;
         font-family:@font_nav;
         #_active, &:hover {
-            color:@color_alt;
-        }
-    }
-    .lightness(@color; @border) {
-        #__item_level_1 {
-            & when not(@border = none) {
-                //border-right:#F00;
-            }
-            #__link {
-                color:@color;
-                & when not (@border = none) {
-                    //border-left:@border;
-                    border-right:@border;
-                }
-            }
-            #_active > #__link, & > #__link:hover {
-                color:@color_alt;
-            }
-            #_has-children #__link:after {
-                border-top: 5px solid @color;
-            }
+            .tcolor(@color_link_active);
         }
     }
     
-    .light({
-        //.lightness(@color_main; 1px solid @border_color);
-        .lightness(@color_main; none);
-        #__item_level_1 > #__link {
-            text-shadow:0px 0px 4px rgba(255,255,255,0.8);
+    #__item_level_1 {
+        #__link {
+            .tcolor(@color_link);
         }
-    });
-    
-    .dark({
-        .lightness(@color_main_inverted; none);
-    });
+        #_active > #__link, & > #__link:hover {
+            .tcolor(@color_link_active);
+        }
+        #_has-children #__link:after {
+            border-top: 5px solid;
+            .tcolor(@color_link, border-top-color);
+        }
+    }
     
     #_layout_horizontal {
         display:flex;
@@ -56,10 +61,6 @@
         }
         #__level_level_1 {
             display:flex;
-            //margin-bottom:-1px;
-        }
-        #__link {
-            //margin-left:-1px;
         }
         #__item_level_1 {
             display:flex;
@@ -68,11 +69,11 @@
                 &:after {
                     content: '';
                     position: absolute;
-                    //top: -4px;
                     bottom:-5px;
                     left: 0;
                     width:100%;
-                    border-top: 3px solid @color_alt;
+                    border-top: 2px solid;
+                    .tcolor(@color_link, border-top-color);
                     z-index: 10;
                 }
             }
@@ -96,7 +97,6 @@
         }
         #__item_has-children {
             & > #__link {
-                //padding-right: ~"calc(" @layout_padding_horizontal ~" + 20px)";
                 &:after {
                     content:'';
                     display:block;
@@ -106,7 +106,8 @@
                 }
             }
             #_active > #__link:after, & > #__link:hover:after {
-                border-top: 5px solid @color_alt;
+                border-top: 5px solid;
+                .tcolor(@color_link_active, border-top-color);
             }
         }
         #__item_expanded #__level {
@@ -117,20 +118,25 @@
         }
         #__item_level_2 {
             #__link {
-                border-right:1px solid @border_color;
+                //border-right:1px solid @border_color;
                 text-transform:none;
                 white-space:nowrap;
-                color:@color_main;
+                font-family:@font_text;
+                .color(main);
                 &_active, &:hover {
-                    color:@color_alt;
+                    .color(@color_link_active);
                 }
             }
             &:last-child, #__item:last-child {
-                border-bottom:1px solid @border_color;
+                //border-bottom:1px solid @border_color;
             }
             &:first-child {
-                border-top:1px solid @border_color;
+                //border-top:1px solid @border_color;
             }
         }
     }
+}
+
+.menu_style_main {
+    .menu_style_main();
 }

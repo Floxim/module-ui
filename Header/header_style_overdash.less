@@ -4,7 +4,7 @@
         max-width:80%;
         position:relative;
         display:inline-block;
-        .color_transparent();
+        .tcolor();
     }
     
     display:flex;
@@ -27,10 +27,11 @@
     &:after, &:before {
         content:'';
         flex-grow:1;
-        border-top:3px solid @color_alt;
+        border-top:3px solid;
+        .color(alt, 2, border-top-color);
         .dark({
-            border-color:@color_main_inverted;
+            .color(main, 5, border-top-color);
         });
-        margin-top:-1px;
+        margin-top:3px;
     }
 }

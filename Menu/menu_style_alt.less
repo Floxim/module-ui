@@ -1,7 +1,8 @@
 .menu_style_alt {
     &.menu_layout_horizontal {
         .menu__item {
-            margin:10px 15px 10px 0;
+            //margin:10px 15px 10px 0;
+            margin-right:@x;
             &:last-child {
                 margin-right:0;
             }
@@ -9,16 +10,20 @@
     }
     &.menu_layout_vertical {
         .menu__item {
-            margin-bottom:@layout_padding_vertical;
+            margin-bottom:@layout_padding_vertical * 0.7;
+            &:last-child {
+                margin-bottom:0;
+            }
         }
     }
     .menu__link {
         display: inline-block;
-        padding: 3px 10px;
+        padding: @x * 0.5 @x;
         border-radius: 3px;
         border:1px solid @color_alt;
         background:@color_main_inverted;
         transition:all 0.3s ease;
+        font-size:17px;
         
         &:hover, &.menu__link_active {
             background:#EEE;

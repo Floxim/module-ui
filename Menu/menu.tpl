@@ -1,6 +1,6 @@
 <nav
     fx:template="menu" 
-    fx:styled
+    fx:styled="Стиль меню"
     fx:abstract
     fx:of="floxim.main.page:list"
     fx:b="menu layout_{$menu_layout} style_{$menu_style} dropdown">
@@ -20,8 +20,7 @@
                 <a href="{$url}" fx:e="link {if $is_active}active{/if}">
                     <span fx:e="link-name">{$name}</span>
                 </a>
-                
-                
+
                 {if count($submenu)}
                     {call recursive_menu with $items = $submenu, $lv = $lv+1 /}
                 {/if}

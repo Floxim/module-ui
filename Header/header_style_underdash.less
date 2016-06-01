@@ -3,14 +3,15 @@
         position:relative;
         display:inline-block;
         padding-bottom:15px;
-        .color_transparent();
+        .tcolor();
         &:after {
             content:'';
             width:40px;
             position:absolute;
             bottom:0;
             left:0;
-            border-top:3px solid @color_alt;
+            border-top:3px solid;
+            .tcolor(alt 2; border-top-color);
             .centered({
                 left:50%;
                 margin-left:-20px;
