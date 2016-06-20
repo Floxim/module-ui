@@ -1,41 +1,53 @@
 /*
-{
-    "name":"Главное меню",
-    "vars": {
-        "color_link": {"label":"Цвет пункта","type":"palette"},
-        "color_link_active": {"label":"Цвет активного","type":"palette"},
-        "text_transform": {"type":"string"}
-    }
-}
-*/
-
-/*
 name: Главное меню
 vars:
-  color_link:
-    label: Цвет пункта
-    type: palette
-  color_link_active:
-    label: Цвет активного
-    type: palette
-  text_transform:
-    type:string
+    color_link:
+        label: Цвет пункта
+        type: palette
+        transparent: true
+    color_link_active:
+        label: Цвет активного
+        type: palette
+        transparent: true
+    text_transform:
+        type: css-text-transform
+    font_family:
+        type: livesearch
+        label: Шрифт
+        values:
+            nav: Для навигации
+            text: Обычный
+            headers: Для заголовков
+    font_size:
+        type: number
+        min: 13
+        max: 23
+        step: 1
+        units: px
+    font_style:
+        type: css-font-style
 */
+
+
 .menu_style_main(
     @color_link: main 1; 
     @color_link_active: alt 2;
     @text_transform:uppercase;
-) {
+    @font_size: 17px;
+    @font_family: nav;
+    @font_style: bold;
+ ) {
     
     //@border_color:rgba(215,215,215,0.5);
     
+
     #__link {
         display: block;
         padding:15px @layout_padding_horizontal;
-        font-size:17px;
+        font-size: 17px;
         font-weight:500;
         text-transform: @text_transform;
-        font-family:@font_nav;
+        .font-family(@font_family);
         #_active, &:hover {
             .tcolor(@color_link_active);
         }
@@ -73,14 +85,15 @@ vars:
                     left: 0;
                     width:100%;
                     border-top: 2px solid;
-                    .tcolor(@color_link, border-top-color);
+                    .tcolor(@color_link_active, border-top-color);
                     z-index: 10;
                 }
             }
             & > #__link {
                 display:flex;
-                font-weight:bold;
-                font-size:19px;
+                //font-weight:bold;
+                .font-style(@font_style);
+                font-size:@font_size;
                 #__link-name {
                     margin:auto;
                 }

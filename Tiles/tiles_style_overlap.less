@@ -5,7 +5,7 @@
         &__body_no-image {
             height:100%;
             padding-bottom:calc(100% / 1.4);
-            color:@color_main;
+            .color();
             img {
                 position:absolute;
                 top:0;
@@ -22,7 +22,7 @@
         #__body {
             background:#000;
             #_with-image {
-                color:@color_main_inverted;
+                .color(main 5);
                 #__row_image {
                     opacity:0.5;
                 }

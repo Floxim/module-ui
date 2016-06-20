@@ -23,7 +23,7 @@
     /}
     
     <div fx:each="$items" fx:e="item">
-        <fx:a fx:e="item-link">
+        <fx:a fx:e="item-link" fx:omit>
             <div fx:e="item-pre-extra" fx:hide-empty>
                 {apply list_pre_extra /}
             </div>
@@ -48,7 +48,7 @@
 {/template}
 
 {template id="list_data"}
-    <div fx:e="title">{$name}</div>
+    <div fx:e="title"><fx:a fx:e="item-link">{$name}</fx:a></div>
     <div fx:e="description">
         {$description}
     </div>
