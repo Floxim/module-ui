@@ -3,7 +3,7 @@
     fx:styled="Стиль меню"
     fx:abstract
     fx:of="floxim.main.page:list"
-    fx:b="menu layout_{$menu_layout} style_{$menu_style} dropdown">
+    fx:b="menu layout_{$menu_layout} dropdown">
         {js}menu.js{/js}
         {css}menu.less{/css}
         

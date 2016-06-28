@@ -9,74 +9,76 @@ vars:
         label: Цвет активного
         type: palette
         transparent: true
-    text_transform:
-        type: css-text-transform
-    font_family:
-        type: livesearch
+    font:
+        type: css-font
         label: Шрифт
+    active_style:
+        type: select
+        label: Активный пункт
         values:
-            nav: Для навигации
-            text: Обычный
-            headers: Для заголовков
-    font_size:
-        type: number
-        min: 13
-        max: 23
-        step: 1
-        units: px
-    font_style:
-        type: css-font-style
+            underline: Подчеркнуть
+            top-line: Линия сверху
+    active_bg:
+        type: palette
+        label: Фон активного
+    padding:
+        type: measures
+        prop: padding
+        step: 0.25
+        lock: 1-3--2-4
 */
 
 
 .menu_style_main(
     @color_link: main 1; 
     @color_link_active: alt 2;
-    @text_transform:uppercase;
-    @font_size: 17px;
-    @font_family: nav;
-    @font_style: bold;
+    @font: nav 17px bold normal uppercase none;
+    @active_style: underline;
+    @padding: 0.5rem;
+    @active_bg: none;
  ) {
-    
-    //@border_color:rgba(215,215,215,0.5);
-    
 
     #__link {
         display: block;
-        padding:15px @layout_padding_horizontal;
-        font-size: 17px;
-        font-weight:500;
-        text-transform: @text_transform;
-        .font-family(@font_family);
-        #_active, &:hover {
-            .tcolor(@color_link_active);
-        }
+        padding:@padding;
     }
     
     #__item_level_1 {
-        #__link {
+        & > #__link {
+            .font(@font);
             .tcolor(@color_link);
         }
-        #_active > #__link, & > #__link:hover {
-            .tcolor(@color_link_active);
-        }
-        #_has-children #__link:after {
+        
+        position: relative;
+        
+        #_has-children > #__link:after {
             border-top: 5px solid;
-            .tcolor(@color_link, border-top-color);
+            .tcolor(@color_link; border-top-color);
         }
-    }
-    
-    #_layout_horizontal {
-        display:flex;
-        .layout__section_header & {
-            flex-grow:1;
+        
+        & when (@active_style = top-line) {       
+            &:before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 50%;
+                width:0;
+                border-top: 2px solid;
+                .tcolor-on(@color_link_active; @active_bg; border-top-color);
+                transition:all 0.15s ease;
+            }
         }
-        #__level_level_1 {
-            display:flex;
-        }
-        #__item_level_1 {
-            display:flex;
-            & > #__link_active > #__link-name { 
+        
+        :not(:hover)&#_active, &:hover {
+            & > #__link {
+                .color(@active_bg, background-color);
+                .tcolor-on(@color_link_active; @active_bg);
+            }
+            #_has-children > #__link:after {
+                .tcolor-on(@color_link_active; @active_bg; border-top-color);
+            }
+            
+            & > #__link > #__link-name { 
                 position:relative;
                 &:after {
                     content: '';
@@ -84,16 +86,38 @@ vars:
                     bottom:-5px;
                     left: 0;
                     width:100%;
-                    border-top: 2px solid;
-                    .tcolor(@color_link_active, border-top-color);
+                    & when (@active_style = underline) {
+                        border-top: 2px solid;
+                        .tcolor-on(@color_link_active; @active_bg; border-top-color);
+                    }
+                    & when not(@active_style = underline) {
+                        display:none;
+                    }
                     z-index: 10;
                 }
             }
+            
+            & when (@active_style = top-line) {
+                &:before {
+                    width: 100%;
+                    left:0;
+                }
+            }
+        }
+    }
+    
+    #_layout_horizontal {
+        display:flex;
+        .fx-content_parent-height_grow& {
+            flex-grow:1;
+        }
+        #__level_level_1 {
+            display:flex;
+        }
+        #__item_level_1 {
+            display: flex;
             & > #__link {
                 display:flex;
-                //font-weight:bold;
-                .font-style(@font_style);
-                font-size:@font_size;
                 #__link-name {
                     margin:auto;
                 }
@@ -118,10 +142,12 @@ vars:
                     border-right: 5px solid transparent;
                 }
             }
+            /*
             #_active > #__link:after, & > #__link:hover:after {
                 border-top: 5px solid;
                 .tcolor(@color_link_active, border-top-color);
             }
+            */
         }
         #__item_expanded #__level {
             display:block;
