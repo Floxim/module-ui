@@ -1,31 +1,43 @@
 /*
 name: Главное меню
+tabs:
+    common: Основное
+    active: Активный пункт
 vars:
-    color_link:
-        label: Цвет пункта
-        type: palette
-        transparent: true
-    color_link_active:
-        label: Цвет активного
-        type: palette
-        transparent: true
     font:
         type: css-font
         label: Шрифт
-    active_style:
-        type: select
-        label: Активный пункт
-        values:
-            underline: Подчеркнуть
-            top-line: Линия сверху
-    active_bg:
+        tab: common
+    color_link:
+        label: Цвет текста
         type: palette
-        label: Фон активного
+        transparent: true
+        tab: common
     padding:
+        label: Отступы
         type: measures
         prop: padding
         step: 0.25
         lock: 1-3--2-4
+        tab: common
+    color_link_active:
+        label: Цвет текста
+        type: palette
+        transparent: true
+        tab: active
+    active_style:
+        type: select
+        label: Выделение
+        tab: active
+        values:
+            none: - нет -
+            underline: Подчеркнуть
+            top-line: Линия сверху
+            bottom-line: Линия снизу
+    active_bg:
+        type: palette
+        label: Фон
+        tab: active
 */
 
 
@@ -47,6 +59,7 @@ vars:
         & > #__link {
             .font(@font);
             .tcolor(@color_link);
+            transition:0.15s all ease;
         }
         
         position: relative;
@@ -56,13 +69,19 @@ vars:
             .tcolor(@color_link; border-top-color);
         }
         
-        & when (@active_style = top-line) {       
+        & when (@active_style = top-line), (@active_style = bottom-line) {
             &:before {
                 content: '';
                 position: absolute;
-                top: 0;
+                & when (@active_style = top-line) {
+                    top: 0;
+                }
+                & when (@active_style = bottom-line) {
+                    bottom: 0;
+                }
                 left: 50%;
                 width:0;
+                opacity:0.3;
                 border-top: 2px solid;
                 .tcolor-on(@color_link_active; @active_bg; border-top-color);
                 transition:all 0.15s ease;
@@ -97,10 +116,11 @@ vars:
                 }
             }
             
-            & when (@active_style = top-line) {
+            & when (@active_style = top-line), (@active_style = bottom-line) {
                 &:before {
                     width: 100%;
                     left:0;
+                    opacity:1;
                 }
             }
         }
@@ -142,12 +162,6 @@ vars:
                     border-right: 5px solid transparent;
                 }
             }
-            /*
-            #_active > #__link:after, & > #__link:hover:after {
-                border-top: 5px solid;
-                .tcolor(@color_link_active, border-top-color);
-            }
-            */
         }
         #__item_expanded #__level {
             display:block;
@@ -157,7 +171,6 @@ vars:
         }
         #__item_level_2 {
             #__link {
-                //border-right:1px solid @border_color;
                 text-transform:none;
                 white-space:nowrap;
                 font-family:@font_text;
