@@ -17,7 +17,7 @@
                       {if $is_active}active{/if}
                       {if count($submenu)}has-children{/if}">
                 
-                <a href="{$url}" fx:e="link {if $is_active}active{/if}">
+                <a {if $url} href="{$url}" {/if} fx:e="link {if $is_active}active{/if}">
                     <span fx:e="link-name">{$name}</span>
                 </a>
 
