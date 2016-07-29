@@ -4,13 +4,12 @@
     fx:of="floxim.main.page:list#2" 
     {set $list_type = str_replace(".", "-", $infoblock.controller) /}
     fx:b="list image-position_{$image_position} style_{$list_style /} type_{$list_type} {$list_mods}" 
+    fx:styled="Стиль списка"
     fx:size="wide,high">
     {default $image_size = '340*240' /}
     {css}
         list.less
     {/css}
-    
-    {@list_style type="style" mask="list_style_*" /}
     
     {@image_position 
         values="`array(
@@ -23,17 +22,12 @@
     /}
     
     <div fx:each="$items" fx:e="item">
-        <fx:a fx:e="item-link" fx:omit>
-            <div fx:e="item-pre-extra" fx:hide-empty>
-                {apply list_pre_extra /}
-            </div>
-            <div fx:e="image" fx:hide-empty>
-                {apply list_image_side /}
-            </div>
-            <div fx:e="data">
-                {apply list_data /}
-            </div>
-        </fx:a>
+        <div fx:e="image" fx:hide-empty>
+            {apply list_image_side /}
+        </div>
+        <div fx:e="data">
+            {apply list_data /}
+        </div>
     </div>
             
     {apply floxim.main.content:pagination with $pagination /}
@@ -63,6 +57,12 @@
     
 {template id="list_extra" test="$item.isInstanceOf('floxim.blog.publication')"}
     <span fx:e="date">{apply floxim.ui.date:date with $date = $publish_date /}</span>
+{/template}
+
+{template id="list_extra" test="$item.isInstanceOf('floxim.corporate.person')"}
+    <span fx:e="date" fx:aif="$birthday">{apply floxim.ui.date:date with $date = $birthday /}</span>
+    &bull;
+    {%occup}Должность: {/%}<span fx:e="position">{$occupation /}</span>
 {/template}
 
 {template id="list_extra" test="$item.isInstanceOf('floxim_saas.content.reviews')"}

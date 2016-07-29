@@ -1,12 +1,12 @@
 .tiles_loop(@count) when (@count > 0) {
     .tiles_loop(@count - 1);
     
-    .tiles_cols_@{count} .tile {
+    .@{namespace}tiles_cols_@{count} .@{namespace}tile {
         width: (100% / @count);
         max-width: (100% / @count) + 0.05%;
     }
     
-    .tiles_padding_on.tiles_cols_@{count} .tile
+    .tiles_padding_on.tiles_cols_@{count} .@{namespace}tile
     {
         width:~"calc(" (100% / @count) ~" - " (@layout_padding_horizontal * 1) ~")";
         max-width:~"calc(" (100% / @count) ~" - " (@layout_padding_horizontal * 1) ~" + 0.05%)";
@@ -15,7 +15,7 @@
 
 .tiles_loop(5);
 
-.tiles {
+.@{namespace}tiles {
     display: flex;
     flex-wrap: wrap;
     width:100%;
@@ -29,7 +29,7 @@
     }
 }
 
-.tile {
+.@{namespace}tile {
     flex-grow:1;
     &__image {
         line-height:0;

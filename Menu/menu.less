@@ -1,11 +1,11 @@
-.menu {
+.@{namespace}menu {
     &__level, &__item {
         list-style-type:none;
         margin:0;
         padding:0;
     }
     
-    &__item {
+    #__item {
         position: relative;
     }
     
@@ -17,16 +17,12 @@
     
     &_layout_horizontal {
         .clearfix();
-        .menu__item_level_1 {
+        #__item_level_1 {
             float:left;
         }
     }
     
-    &_layout_vertical {
-        
-    }
-    
-    &_dropdown .menu__item_level_1 &__level {
+    &_dropdown #__item_level_1 &__level {
         position: absolute;
         display:none;
     }

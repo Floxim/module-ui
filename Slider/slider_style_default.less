@@ -1,116 +1,105 @@
 /*
-name: Текст над картинкой
+name: Default
+vars:
+    count_slides:
+        label: Число слайдов
+        type: number
+        min: 1
+        max: 5
+        tip: Сколько слайдов показывать одновременно
+    ratio:
+        label: Пропорции
+        type: ratio
+        min: 1
+    margin:
+        label: Отступ
+        type: number
+        min: 0
+        max: 4
+        step: 0.25
+export:
+    image_ratio: 1 * @ratio / @count_slides
+    slide_width: 1 / @count_slides
 */
-.slider_style_default() {
-    .slide {
-        background: linear-gradient(to bottom, #000, #666);
-        
-        #__data {
-            padding:@layout_padding_vertical 0;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            top:0;
-            width:100%;
-            //height:100%;
-            flex-grow:1;
-            text-align:center;
-            position:relative;
-        }
-        #__image {
-            opacity:1;
-            position:absolute;
-            top:0;
-            left:0;
-            height:100%;
-            width:100%;
-            opacity:0.4;
-        }
-        
-        #__title, #__description {
-            .color(main 5);
-            width:80%;
-            max-width:600px;
-        }
-        #__title {
-            display:block;
-            font-size:35px;
-            text-decoration: none;
-            font-weight:bold;
-            margin-bottom:@layout_padding_vertical * 0.5;
-        }
-        #__description {
-            font-size:18px;
-            margin-bottom:@layout_padding_vertical;
-            &:last-child {
-                margin-bottom:0;
-            }
-            p:first-child {
-                margin-top:0;
-            }
-            p:last-child {
-                margin-bottom:0;
-            }
-        }
-        #__link {
-            border:2px solid;
-            .color(main 5; border-color);
-            border-radius:2px;
-            font-size:21px;
-            padding:6px 25px;
-            display:inline-block;
-            a {
-                .color(main 5);
-                text-decoration:none;
-            }
-        }
-    }
-    
-    #__arrows {
-        top:50%;
+.slider_style_default(
+    @count_slides:1;
+    @ratio:3;
+    @margin:1rem;
+) 
+{
+    position:relative;
+    overflow:hidden;
+    width:100%;
+    #__slides-wrapper {
         width:100%;
-        left: 0;
-        margin-top:-25px;
+        max-height:100vh;
+        position:relative;
+        padding-bottom: 100% / @ratio;
+    }
+    #__slides {
+        left:0;
+        display:flex;
+        position:absolute;
+        top:0;
+        height:100%;
+        width:100%;
+    }
+    #__slide {
+        @slide_width: ( 100% / @count_slides );
+        
+        & when (@count_slides = 1) {
+            min-width:@slide_width;
+        }
+        
+        & when (@count_slides > 1) {
+            min-width: ~"calc( " @slide_width ~" - " @margin * (1 - 1/@count_slides) ~")";
+        }
+            
+        margin-right: @margin;
+        position: relative;
+        display:flex;
+        align-items:stretch;
+        flex-direction:row-reverse;
+    }
+    #__arrows {
+        position: absolute;
+        z-index:2;
     }
     
     #__arrow {
-        background:rgba(0,0,0,0.3);
-        opacity:0.8;
-        cursor:pointer;
-        display:inline-block;
-        padding:10px;
-        position:absolute;
-        border-radius:50px;
-        span {
-            display:block;
-            width:30px;
-            height:30px;
-            background:url('arrows.png') no-repeat 0 4px;
+        transition:opacity 0.2s ease;
+        opacity:1;
+        &_disabled {
+            opacity:0.3 !important;
         }
-        #_back {
-            left:@layout_padding_horizontal;
-        }
-        #_next {
-            right:@layout_padding_horizontal;
-            span {
-                background-position:-36px 4px;
-            }
-        }
-        
     }
     
-    #_type_photo .slide {
-        #__data {
-            justify-content:flex-end;
-            padding-bottom:@layout_padding_vertical * 0.5;
-            p {
-                margin:@layout_padding_vertical * 0.25 0;
-            }
+    #_is-sorted #__arrows {
+        display:none;
+    }
+    
+    #__points {
+        position:absolute;
+        width:100%;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        left:0;
+        bottom:20px;
+    }
+    
+    #__point {
+        background:rgba(200, 200, 200, 0.4);
+        width:13px;
+        height:13px;
+        margin:7px;
+        border-radius:13px;
+        cursor:pointer;
+        transition:all 0.5s ease;
+        #_active {
+            width:17px;
+            height:17px;
+            background:rgba(200, 200, 200, 0.8);
         }
     }
-}
-
-.slider_style_default {
-    .slider_style_default();
 }

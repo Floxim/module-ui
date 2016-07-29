@@ -10,7 +10,6 @@
         {$class}
         padding_{if $pads}on{else}off{/if}
         {if !$show_images} no_images{/if}"
-    fx:styled
     fx:template="tiles"
     fx:name="Плитки"
     fx:size="high"
@@ -29,7 +28,7 @@
     {$items || :tile_block /}
 </div>
     
-<div fx:template="tile_block" fx:e="tile" fx:b="tile">
+<div fx:template="tile_block" fx:e="tile" fx:b="tile" fx:styled>
     {apply tile /}
 </div>
     

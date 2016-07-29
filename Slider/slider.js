@@ -1,386 +1,394 @@
-Floxim.handle('.slider', function() {
-    //return;
-    var $slider = $(this);
-    new Slider($slider);
+function Slider($node) {
+    var bl = 'floxim--ui--slider--slider';
+    var Slider = this;
     
-    function Slider($node) {
-        var Slider = this;
-        
+    $node.data('slider', this);
+
+    this.update_slides = function() {
+        this.$slides = $node.find('.'+bl+'__slide').filter(function() {
+            var $el = $(this),
+                res = true;
+            if ($el.is('.fx_entity_hidden')) {
+                res = $fx && $fx.front && $fx.front.mode !== 'view' && $fx.front.mode !== 'design';
+            } else {
+                res = !$el.hasClass('fx_entity_adder_placeholder') || $el.hasClass('fx_entity_adder_placeholder_active');
+            }
+            return res;
+        });
+        return this.$slides;
+    };
+    
+    this.init = function() {
+        this.loop = false;
+        this.$container = $node.find('.'+bl+'__slides');
         this.$node = $node;
-        $node.data('slider', this);
-        this.width = null;
-        this.height = null;
-        this.slides = null;
-        this.min_height = 200;
+        this.update_slides();
+        this.$slides.each(function(index) {
+            $(this).data('original_index', index);
+        });
+        this.init_arrows();
+        this.init_nav();
         this.autoplay = $node.data('autoplay');
         this.pause_time = $node.data('pause_time') || 3000;
         this.duration = $node.data('move_time') || 1300;
-        this.offset = $node.data('slide_offset') || 0;
-        this.recount_height = $node.data('slide_height') === 'auto' ? false : true;
-        this.width_multiplier = $node.data('slide_width') || 1;
         
-        this.getSlides = function() {
-            this.$slides = $node.elem('slide').filter(function() {
-                var $el = $(this),
-                    res = true;
-                if ($el.is('.fx_entity_hidden')) {
-                    res = $fx && $fx.front && $fx.front.mode !== 'view' && $fx.front.mode !== 'design';
-                } else {
-                    res = !$el.hasClass('fx_entity_adder_placeholder') || $el.hasClass('fx_entity_adder_placeholder_active');
-                }
-                return res;
-            });
-            return this.$slides;
-        };
-        this.$container = $node.elem('slides');
-        
-        this.logSlides = function(marker){
-            var res = [],
-                curr = this.$current[0];
-            this.$slides.each(function(){
-                var t = $(this).ctx('slide').elem('title').text();
-                if (this === curr) {
-                    t = '>> '+t;
-                }
-                res.push(t);
-            });
-            if (marker) {
-                console.log(marker, res);
-            } else {
-                return res;
-            }
-        };
-        
-        this.recountHeight = function () {
-            return;
-            if (!this.recount_height) {
-                return;
-            }
-            if (this.$imgs.length === 0) {
-                return;
-            }
-            // default height
-            var res_height = Slider.height;
-            this.$imgs.each(function() {
-                if (this.complete) {
-                    var pic_height = $(this).height();
-                    res_height = res_height === null ? pic_height : Math.min(res_height, pic_height);
-                }
-            });
-            
-            //if (res_height !== Slider.height) {
-            if (res_height > Slider.min_height) {
-                Slider.height = res_height;
-                Slider.$node.css('height', res_height);
-                Slider.$slides.css('height', res_height);
-            }
-            //}
-        };
-        
-        this.getSlideWidth = function() {
-            return Math.round(this.width * this.width_multiplier);
-        };
-        
-        this.getDefaultLeft = function() {
-            return Math.round(this.getSlideWidth() * this.offset / 2);
-        };
-        
-        this.init = function() {
-            this.getSlides();
-            
-            if (!this.$current) {
-                this.setCurrent( this.$slides.first() );
-            }
-            this.$arrows = $node.elem('arrow');
-            
-            if (this.$slides.length < 2) {
-                this.$arrows.hide();
-            }
-            
-            if (this.$slides.length === 0) {
-                return;
-            }
-            
-            this.$imgs = this.$slides.ctx('slide').elem('image-img');
-
-            this.$imgs.on('load', function() {
-                Slider.recountHeight();
-            });
-            
-            this.width = this.$container.width();
-            
-            /*
-            this.$container.css('width', 1);
-            
-            this.$node.css({width:'auto',height:'auto'});
-            
-            this.width = $node.parent().width();
-            
-            //this.height = parseInt($node.css('height')) || parseInt($node.css('max-height')) || 300;
-            this.height = parseInt($node.css('max-height')) || null;
-            this.$slides.each(function() {
-                var $slide = $(this);
-                $slide.css('width', Slider.getSlideWidth($slide));
-            });
-            
-            //debugger;
-            //this.$slides.css('width', this.width);
-            this.$node.css({
-                width:this.width
-            });
-            
-            this.recountHeight();
-            
-            this.$container.css('width', this.width * this.$slides.length*2);
-            if (this.$slides.length < 2) {
-                return;
-            }
-            */
-            this.$arrows.show().off('click').on('click', function() {
-                var dir = $(this).data('dir');
-                Slider.stop();
-                Slider.move(dir);
-            });
-            if (this.autoplay) {
-                this.autoMove(this.pause_time);
-            }
-            window.slider = this;
-        };
-        var automove_timeout = null;
-        this.autoMove = function(pause_time) {
-            clearTimeout(automove_timeout);
-            automove_timeout = setTimeout(
-                function() {
-                    Slider.move('next', null, function() {
-                        Slider.autoMove(pause_time);
-                    });
-                }, 
-                pause_time
-            );
-        };
-        
-        this.setCurrent = function($slide) {
-            this.$current = $slide;
-            this.$slides.removeClass('slide_current');
-            $slide.addClass('slide_current');
-            //console.log('Curr:' + $slide.ctx('slide').elem('title').text(), this.logSlides());
-        };
-        
-        this.getCurrentOffset = function() {
-            return this.$slides.index(this.$current);
-        };
-        
-        this.is_moving = false;
-        this.move = function(dir, speed, callback) {
-            if (Slider.$slides.length === 0) {
-                return;
-            }
-            var duration = Slider.duration,
-                easing = 'swing';
-        
-            if (typeof speed === 'number') {
-                duration = speed;
-            } else if (speed) {
-                if (speed.duration) {
-                    duration = speed.duration;
-                }
-                if (speed.easing) {
-                    easing = speed.easing;
-                }
-            }
-            
-            dir = dir && /^(next|back)$/.test(dir) ? dir : 'next';
-            var default_left = Slider.getDefaultLeft(),
-                c_left = parseInt(Slider.$container.css('left')) + default_left,
-                new_left,
-                delta = this.getSlideWidth();
-            
-            if (dir === 'back') {
-                new_left = '+=' + (delta - c_left);
-                Slider.$slides.first().before(Slider.$slides.last()); 
-                Slider.$container.css('left', '-='+delta);
-                Slider.getSlides();
-            } else {
-                new_left = '-=' + (delta + c_left);
-            }
-                        
-            this.is_moving = true;
-            
-            var c_offset = Slider.getCurrentOffset();
-            //Slider.logSlides();
-            if (dir === 'next') {
-                Slider.setCurrent(Slider.$slides.eq( c_offset + 1));
-            } else {
-                Slider.setCurrent(Slider.$slides.eq( c_offset - 1 ));
-            }
-            
-            this.$container.addClass('fx_is_moving').animate({
-                left: new_left
-            }, {
-                duration:duration,
-                easing:easing,
-                complete:function() {
-                    if (dir === 'next') {
-                        Slider.$container.append( Slider.$slides.first() );
-                        Slider.$container.css('left', Slider.getDefaultLeft()*-1);
-                        Slider.getSlides();
-                    }
-                    //Slider.setCurrent(Slider.$slides.eq(Slider.offset));
-                    Slider.is_moving = false;
-                    Slider.$container.removeClass('fx_is_moving');
-                    if (callback) {
-                        callback();
-                    }
-                }
-            });
-        };
-        
-        this.stop = function() {
-            this.$container.stop();
-            clearTimeout(automove_timeout);
-            this.is_moving = false;
-        };
-        var t_speed = 1200;
-        this.moveTo = function($slide, callback_final) {
-            var $slides = this.getSlides();
-            if (typeof $slide === 'number') {
-                $slide = $slides.eq($slide);
-            }
-            if (!$slide.is($slides)) {
-                return;
-            }
-            if ($slides.length === 0) {
-                return;
-            }
-            
-            var c_index = $slides.index(Slider.$current),
-                target_index = $slides.index($slide),
-                dir;
-            
-            if (c_index > target_index) {
-                dir = 'back';
-            } else {
-                dir =  target_index / $slides.length < 0.5 ? 'next' : 'back';
-            }
-            
-            //this.logSlides();
-            //console.log($slides.index($slide), $slides.length, dir);
-            
-            this.stop();
-            function callback_move() {
-                if (Slider.$current[0] === $slide[0]) {
-                    Slider.$container.animate({
-                        left:0
-                    }, t_speed);
-                    if (callback_final) {
-                        callback_final();
-                    }
-                    return;
-                }
-                Slider.move(dir, {duration:t_speed, easing:'linear'}, callback_move);
-            };
-            callback_move();
-        };
-        
-        var ok = 0;
-        
-        this.setInitialOrder = function() {
-            while (this.$slides[0] !== this.$real_first[0] && ok < 100) {
-                ok++;
-                this.$slides.last().after(this.$slides.first());
-                this.getSlides();
-            }
-        };
-        
-        $(window).resize(function(e) {
-            if (e.target !== window) {
-                return;
-            }
-            Slider.init();
-        });
-        
-        this.init();
-        
-        this.$real_first = this.$slides.first();
-        
-        for (var i = 0; i < this.offset; i++) {
-            this.$slides.first().before(this.$slides.last()); 
+        if (this.autoplay) {
+            this.auto_move();
         }
-        this.getSlides();
-        this.$container.css('left', '-'+this.getDefaultLeft()+'px');
-        
-        this.$node
+    };
+    
+    this.init_arrows = function() {
+        var $arrows = $('.'+bl+'__arrow', this.$node);
+        if (this.$slides.length < 2) {
+            $arrows.hide();
+        }
+        $arrows
+            .show()
             .off('.slider')
-            .on('fx_after_show_adder_placeholder.slider', function(e) {
-                var prev_offset = Slider.getCurrentOffset(),
-                    $prev_current = Slider.$current,
-                    $placeholder = $(e.target);
-                    
-                Slider.init();
-                //Slider.logSlides();
-                
-                var new_offset = Slider.getCurrentOffset();
-                
-                // placeholder added before current slide
-                var placeholder_pos = prev_offset < new_offset ? 'before' : 'after';
-                if (placeholder_pos === 'before') {
-                    Slider.setCurrent($placeholder);
-                } else {
-                    Slider.is_moving_to_placeholder = true;
-                    Slider.moveTo($placeholder, function() {
-                        Slider.is_moving_to_placeholder = false;
-                    });
-                }
-                $placeholder.off('.slider').on('fx_after_hide_adder_placeholder.slider', function(e) {
-                    if (placeholder_pos === 'before') {
-                        Slider.setCurrent($prev_current);
-                        Slider.getSlides();
-                        //Slider.logSlides();
-                    } else {
-                        setTimeout(
-                            function() {
-                                var $c_slides = Slider.getSlides();
-                                Slider.setCurrent($c_slides.first());
-                                //Slider.logSlides('before back');
-                                Slider.is_moving_to_placeholder = true;
-                                Slider.moveTo($prev_current, function() {
-                                    Slider.is_moving_to_placeholder = false;
-                                });
-                            },
-                            100
-                        );
-                    }
-                });
-            })
-            .on('fx_select.slider', '.slide', function(e) {
-                return;
-                if (Slider.is_moving_to_placeholder) {
+            .on('click.slider', function() {
+                var $arrow = $(this),
+                class_disabled = bl+'__arrow_disabled';
+                if ($arrow.hasClass(class_disabled)) {
                     return;
                 }
-                Slider.moveTo( $(this) );
-            })
-            .on('fx_deselect.slider', '.slide', function(e) {
-                if (Slider.autoplay) {
-                    Slider.autoMove(Slider.pause_time);
-                }
-            })
-            .on('fx_start_sorting', function() {
-                Slider.setInitialOrder();
-                var slide_width = $slider.parent().width() / Slider.$slides.length;
-                Slider.$slides.css({
-                    width:slide_width,
-                    height:''
-                }).addClass('slide_is-sorted');
-                $slider.addClass('slider_is-sorted');
-            })
-            .on('fx_stop_sorting', function() {
-                Slider.init();
-                Slider.$slides.removeClass('slide_is-sorted');
-                $slider.removeClass('slider_is-sorted');
-                $fx.front.deselect_item();
+                var dir = $arrow.data('dir');
+                $arrow.addClass(class_disabled);
+                Slider.move(dir);
+                // prevent double-click
+                setTimeout(function() {
+                    $arrow.removeClass(class_disabled);
+                }, 400);
             });
-        $('html').off('.slider').on('fx_set_front_mode.slider', function() {
-            Slider.init();
+    };
+    
+    this.update_current_target = function() {
+        var delta = 0,
+            $target;
+        for (var i = 0; i < this.move_stack.length; i++) {
+            var cs = this.move_stack[i];
+            delta += cs.dir === 'back' ? -1 : 1;
+            if (cs.dir === 'back' && cs.flipped) {
+                delta += 1;
+            }
+        }
+        if (delta < 0) {
+            $target = this.$slides.eq( this.$slides.length + delta);
+        } else {
+            $target = this.$slides.eq(delta);
+        }
+        
+        var $c_point = $target.data('point');
+        if ($c_point) {
+            this.$points.filter('.'+bl+'__point_active').removeClass(bl+'__point_active');
+            $target.data('point').addClass(bl+'__point_active');
+        }
+    };
+    
+    this.paused = false;
+    
+    this.pause = function() {
+        this.stop();
+        clearTimeout(this.automove_timeout);
+        this.paused = true;
+    };
+    
+    this.play = function() {
+        this.paused = false;
+        this.next_move();
+    };
+    
+    this.init_nav = function() {
+        var $points =  $('.'+bl+'__point', this.$node);
+        this.$points = $points;
+        $points.each(function(index) {
+            var $point = $(this),
+                $slide = Slider.$slides.eq(index);
+            $point.data('slide', $slide);
+            $slide.data('point', $point);
+            if (index === 0) {
+                $point.addClass('slider__point_active');
+            }
         });
-    }
+        this.$node
+            .off('click.slider_points')
+            .on('click.slider_points', '.'+bl+'__point', function() {
+                var $point = $(this),
+                    $slide = $point.data('slide');
+                Slider.move_to($slide);
+            });
+    };
+    
+    this.move_to = function($slide, callback) {
+        var target_index = this.$slides.index( $slide ),
+            c_step = this.get_current_step(),
+            current_index = 0,
+            len = this.$slides.length;
+    
+        var $current_slide = this.$slides.eq(current_index),
+            
+            dir = 'next';
+        
+        if (c_step) {
+            if (c_step.dir === 'next') {
+                if (target_index === 0) {
+                    target_index = len - 1;
+                } else {
+                    target_index -= 1;
+                }
+            }
+        }
+        
+        this.move_stack = c_step ? [c_step] : [];
+        
+        if (target_index === len / 2) {
+            dir = $current_slide.data('original_index') > $slide.data('original_index') ? 'back' : 'next';
+        } else if (target_index > len / 2) {
+            var current_index = current_index + len;
+            dir = 'back';
+        }
+        var count = Math.abs(target_index - current_index);
+        
+        callback = typeof callback === 'function' ? callback : function() {};
+        
+        if (count === 0) {
+            if (c_step) {
+                c_step.callback = callback;
+            } else {
+                callback();
+            }
+        } else {
+            for (var i = 0; i < count; i++) {
+                this.move(dir, i === count - 1 ? callback : null);
+            }
+        }
+        this.update_current_target();
+    };
+
+    this.move_stack = [];
+
+    this.get_current_step = function() {
+        if (this.move_stack.length > 0) {
+            return this.move_stack[0];
+        }
+    };
+
+    this.push_step = function(step) {
+        this.move_stack.push(step);
+        this.recount_speed();
+    };
+
+    this.pop_step = function(){
+        this.move_stack.pop();
+        this.recount_speed();
+    };
+
+    this.shift_step = function() {
+        var res = this.move_stack.shift();
+        return res;
+    };
+
+    this.recount_speed = function() {
+        var len = this.move_stack.length;
+        for (var i = 0; i < len; i++) {
+            var cs = this.move_stack[i];
+            cs.multiplier = len;
+        }
+    };
+    
+    this.automove_timeout = null;
+    this.auto_move = function() {
+        clearTimeout(this.automove_timeout);
+        this.automove_timeout = setTimeout(
+            function() {
+                Slider.move('next');
+            }, 
+            Slider.pause_time
+        );
+    };
+
+    this.move = function(dir, callback) {
+
+        if (this.move_stack.length > 1) {
+            var last_dir = this.move_stack[ this.move_stack.length - 1 ].dir;
+            if (dir !== last_dir) {
+                this.pop_step();
+                this.update_current_target();
+                return;
+            }
+        }
+
+        var new_step = {
+            dir:dir,
+            callback: callback,
+            multiplier: 1
+        };
+
+        var current_step = this.get_current_step();
+        if (current_step) {
+            this.stop();
+            if (this.move_stack.length === 1 && current_step.dir !== dir) {
+                this.shift_step();
+                if (dir === 'back') {
+                    new_step.flipped = true;
+                }
+            }
+        }
+
+        this.push_step(new_step);
+
+        this.update_current_target();
+        
+        ///if (!current_step) {
+        this.next_move();
+        //}
+    };
+
+    this.stop = function() {
+        this.$container.stop();
+    };
+
+    this.next_move = function() {
+        if (this.paused) {
+            return;
+        }
+        var step = this.get_current_step();
+        if (!step) {
+            this.stop();
+            if (this.autoplay) {
+                this.auto_move();
+            }
+            return;
+        }
+        clearTimeout(this.automove_timeout);
+        this.move_step(step);
+    };
+
+    this.flip = function(step) {
+        if (step.flipped) {
+            return;
+        }
+        var dir = step.dir;
+            
+        
+        if (dir === 'next') {
+            var $moved_slide = Slider.$slides.first(),
+                moved_left = $moved_slide[0].getBoundingClientRect().left,
+                $next_slide = $moved_slide.next(),
+                next_left = $next_slide[0].getBoundingClientRect().left,
+                delta = next_left - moved_left;
+            
+            Slider.$container.append( $moved_slide );
+            Slider.$container.css('left', '+=' + delta);
+        } else {
+            var $moved_slide = Slider.$slides.last(),
+                moved_left = $moved_slide[0].getBoundingClientRect().left,
+                $prev_slide = $moved_slide.prev(),
+                prev_left = $prev_slide[0].getBoundingClientRect().left,
+                delta = moved_left - prev_left;
+            Slider.$slides.first().before($moved_slide); 
+            Slider.$container.css('left', '-='+ delta );
+        }
+        Slider.update_slides();
+        step.flipped = true;
+    };
+
+    this.move_step = function(step) {
+        var dir = step.dir;
+
+        if (dir === 'back') {
+            this.flip(step);
+        }
+
+        var $target_slide = this.$slides.eq(dir === 'next' ? 1 : 0);
+        if ($target_slide.length === 0) {
+            return;
+        }
+
+        var container_left = Slider.$container[0].getBoundingClientRect().left,
+            target_left = $target_slide[0].getBoundingClientRect().left,
+            new_left = (target_left - container_left) * -1;
+
+        step.start = parseInt(this.$container.css('left'));
+        step.end = new_left;
+
+        var delta = Math.abs( step.start - step.end ),
+            duration = (this.duration / 1000) * delta / step.multiplier;
+
+        step.complete = function() {
+            var callbacks = step.callback;
+            if (! (callbacks instanceof Array ) ) {
+                callbacks = [callbacks];
+            }
+            for (var i = 0; i< callbacks.length; i++) {
+                var cb = callbacks[i];
+                if (typeof cb === 'function') {
+                    cb();
+                }
+            }
+            if (dir === 'next') {
+                Slider.flip(step);
+            }
+            Slider.shift_step();
+            Slider.stop();
+            Slider.next_move();
+            Slider.$container.removeClass('fx_is_moving');
+        };
+
+        var easing = Slider.move_stack.length > 0 ? 'linear' : 'swing';
+
+        Slider.$container.addClass('fx_is_moving');
+        
+        Slider.$container.animate({
+            left: step.end
+        }, {
+            duration:duration,
+            easing: easing,
+            progress: function(prop, progress, value) {
+                step.progress = progress;
+                step.value = value;
+            },
+            complete: step.complete
+        });
+    };
+    
+    this.init();
+}
+
+
+Floxim.handle('.floxim--ui--slider--slider', function() {
+    var bl = 'floxim--ui--slider--slider';
+    var $slider = $(this);
+    var slider = new Slider($slider);
+    
+    $slider.on('fx_select.slider', '.'+bl+'__slide', function(e) {
+        if (slider.is_moving_to_placeholder) {
+            return;
+        }
+        slider.move_to( $(this) , function() {
+            slider.pause();
+        });
+    })
+    .on('fx_deselect.slider', '.'+bl+'__slide', function(e) {
+        slider.play();
+        if (slider.autoplay) {
+            slider.auto_move();
+        }
+    })
+    .on('fx_after_show_adder_placeholder', function(e) {
+        var $new_slide = $(e.target);
+        if (!$new_slide.is('.'+bl+'__slide')) {
+            return;
+        }
+        slider.update_slides();
+        slider.is_moving_to_placeholder = true;
+        slider.move_to($new_slide, function() {
+            slider.pause();
+            slider.is_moving_to_placeholder = false;
+        });
+    })
+    .on('fx_after_hide_adder_placeholder', function(e) {
+        slider.update_slides();
+        slider.update_current_target();
+        slider.play();
+    });
 });

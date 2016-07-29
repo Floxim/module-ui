@@ -6,10 +6,15 @@ use Floxim\Floxim\System\Fx as fx;
 class Module extends \Floxim\Floxim\Component\Module\Entity {
     public function init()
     {
-        fx::template()->import('floxim.ui.slider');
-        fx::template()->import('floxim.ui.tiles');
-        fx::template()->import('floxim.ui.menu');
-        fx::template()->import('floxim.ui.list');
+        fx::template()->register(
+            array(
+                'floxim.ui.slider',
+                'floxim.ui.tiles',
+                'floxim.ui.menu',
+                'floxim.ui.list',
+                'floxim.ui.box'
+            )
+        );
     }
     
     public function getDateFormats()

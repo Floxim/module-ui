@@ -1,7 +1,8 @@
-.list {
+.@{namespace}list {
     align-self:stretch;
     &__item {
-        .clearfix();
+        display:flex;
+        flex-direction: row;
     }
     &__image {
         line-height:0;
@@ -13,31 +14,6 @@
     &__image-img {
         width:100%;
     }
-    
-    &__item-link {
-        display:block;
-        text-decoration: none;
-        .color(main);
-        .clearfix();
-    }
-    
-    .list_item_pic_left({
-        .list__data {
-            float:left;
-        }
-        .list__image {
-            float:left;
-        }
-    });
-    
-    .list_item_pic_right({
-        .list__data {
-            float:left
-        }
-        .list__image {
-            float:right;
-        }
-    });
 }
 
 .list_data_with_pic(@rules) {
