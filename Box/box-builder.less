@@ -1,0 +1,54 @@
+.floxim-ui-box-builder {
+    display:flex;
+    width:400px;
+    &__value {
+        width: 600px !important;
+        font-size: 10px !important;
+        position: absolute;
+        margin-top: -50px !important;
+    }
+    &__group {
+        padding:5px;
+        border:1px dotted #CCC;
+        display:flex;
+        margin-top:-1px;
+    }
+    &__field {
+        background:#FFF;
+        white-space: nowrap;
+        box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);
+        font-size: 12px;
+        padding: 3px 5px;
+        border: 1px solid #CCC;
+        border-radius: 2px;
+        margin-right: 5px;
+        cursor:pointer;
+    }
+    
+    &__field-kill {
+        color:#D44;
+        width: 13px;
+        display: inline-block;
+        text-align: center;
+        
+        &:hover {
+            color:#F00;
+        }
+        &:after {
+            content:"\00d7";
+        }
+    }
+    
+    &__avail {
+        margin-left:15px;
+    }
+    
+    &__avail &__field {
+        display:inline-block;
+        margin-bottom:5px;
+    }
+    
+    &__avail &__field-kill, &__avail &__field-settings  {
+        display:none;
+    }
+}

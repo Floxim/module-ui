@@ -4,6 +4,7 @@
     
     {@date_format
         type="select"
+        label="Формат даты"
         values="`fx::module('floxim.ui')->getDateFormats()`"
         /}
     
