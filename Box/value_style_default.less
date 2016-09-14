@@ -1,0 +1,30 @@
+/*
+name: По умолчанию
+vars:
+    value_font:
+        label: Шрифт значения
+        type: css-font
+    value_color:
+        label: Цвет значения
+        type: palette
+        transparent: true
+    label_color:
+        label: Цвет подписи
+        type: palette
+        transparent: true
+*/
+
+.value_style_default (
+    @value_font: text;
+    @value_color:main 0;
+    @label_color:main 2;
+) 
+{
+    #__value {
+        .font(@value_font);
+        .tcolor(@value_color);
+    }
+    #__label {
+        .tcolor(@label_color);
+    }
+}

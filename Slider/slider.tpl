@@ -72,7 +72,10 @@
         
     </div>
     <div fx:e="data">
+        {*
         {$item | :slide_data /}
+        *}
+        {apply floxim.ui.box:box with $box_id = 'slidebox' /}
     </div>
 </div>
 

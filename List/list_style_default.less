@@ -1,57 +1,75 @@
+/*
+name: Список
+vars:
+    pic_width: 
+        label: Ширина картинки
+        type: number
+        min: 10
+        max: 90
+    pic_position:
+        label: Позиция картинки
+        type: select
+        values:
+            left: Слева
+            right: Справа
+            left-right: Слева-справа
+            right-left: Справа-слева
+    pic_margin:
+        label: Отступ картинки
+        type: number
+        max: 20
+    item_margin:
+        label: Отступ между элементами
+        type: number
+        max: 20
+*/
 .list_style_default(
     @pic_width:30%;
+    @pic_margin:2em;
+    @item_margin: 2em;
+    @pic_position:left;
 )
 {
+    #__item:not(:last-child) {
+        margin-bottom:@item_margin;
+    }
     #__data {
-        padding:20px 30px;
         flex-grow:1;
         flex-basis: 100% - @pic_width;
     }
+    #__listbox {
+        min-height:100%;
+    }
     #__image {
         flex-basis:@pic_width;
-    }
-    
-    #__item {
-        transition: all 0.2s ease;
-        &:hover {
-            -webkit-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2);
-            -moz-box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2);
-            box-shadow: 0 0 30px 0 rgba(0, 0, 0, 0.2);
-            .list__title {
-                color: @color_alt;
-            }
+        
+        & when (@pic_position = left) {
+            margin-right:@pic_margin;
         }
-        margin-bottom:40px;
+        
+        & when (@pic_position = right) {
+            order:2;
+            margin-left:@pic_margin;
+        }
     }
     
-    
-    #__title {
-        font-size:24px;
-        font-weight:bold;
-        transition: all 0.2s ease;
-        font-family:@font_headers;
+    & when (@pic_position = left-right) {
+        #__item:nth-child(2n-1) #__image {
+            margin-right: @pic_margin;
+        }
+        #__item:nth-child(2n) #__image {
+            order:2;
+            margin-left:@pic_margin;
+        }
     }
-    
-    #__description {
-        margin:20px 0;
-        .text();
-    }
-    
-    #__date {
-        .tcolor(main, 3);
-    }
-    
-    #__price {
-        font-size:18px;
-        font-weight:bold;
-    }
-    
-    #__more-link {
-        border:2px solid @color_alt;
-        color:@color_alt;
-        border-radius:3px;
-        text-decoration:none;
-        display:inline-block;
-        padding:5px 15px;
+
+    & when (@pic_position = right-left) {
+        #__item:nth-child(2n-1) #__image {
+            order:2;
+            margin-left:@pic_margin;
+        }
+        #__item:nth-child(2n) #__image {
+            margin-right:@pic_margin;
+        }
     }
 }

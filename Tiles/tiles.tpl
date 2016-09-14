@@ -36,7 +36,7 @@
     {$item /}
 {/template}
     
-<fx:a 
+<div
     fx:template="tile[$item.isInstanceOf('floxim.main.page')]" 
     {if $show_images}
         {set $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
@@ -50,12 +50,9 @@
     {/if}
 	
     <div fx:e="data">
-        <div fx:e="row name"><span fx:e="name">{$name}</span></div>
-        <div fx:e="row extra" fx:hide-empty>
-            {apply extra /}
-        </div>
+        {apply floxim.ui.box:box with $box_id = 'tilebox' /}
     </div>
-</fx:a>
+</div>
             
 {preset id="tiles#image" of="floxim.media.photo:list"}
     {js}lightbox.js{/js}

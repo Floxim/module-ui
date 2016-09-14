@@ -1,56 +1,63 @@
 <div 
     {default $box_id = 'box' /}
-    fx:b="box" 
-    fx:scope="{$box_id}"
-    fx:template="box" 
-    fx:styled="id:{$box_id /}">
     {set $box = \Floxim\Ui\Box\Box::start($this) /}
-    {set $all_fields = $item.getFields() /}
+    fx:e="{$box_element}{$box_id /}{/$}"
+    fx:b="box" 
+    fx:template="box" 
+    fx:styled-inline>
+    
     <div 
-        fx:each="$box.getGroups() as $group_num => $group" 
-        fx:scope="groups.{$group_num}"
-        fx:e="group">
+        fx:each="$groups as $group" 
+        fx:scope
+        fx:e="group"
+        fx:b="group"
+        fx:styled-inline>
         <div 
-            fx:each="$group.fields as $field_num => $field_view" 
+            fx:each="$fields as $field_view" 
+            fx:scope
             fx:e="field"
-            fx:scope="fields.{$field_num}"
-            fx:b="field">
+            fx:hide-empty>
+            
             {apply 
                 $field_view.template 
                 with 
-                    $field_view,
-                    $field = $all_fields[$field_view.keyword],
+                    $field = $item.getField($field_view.keyword),
                     $value = $item[$field_view.keyword] /}
         </div>
     </div>
     {= $box.stop() /}
 </div>
         
-<div fx:template="value" fx:aif="$value">
-    {if $field.type === 'datetime'}
-        {apply floxim.ui.date:date with $date = $value /}
-    {else}
-        {$value /}
+<div fx:template="value" fx:aif="$value" fx:b="value" fx:styled="label:Стиль поля">
+    {@show_label label="Подпись?" type="checkbox" default="0" /}
+    
+    <div fx:if="$show_label" fx:e="label">
+        {%value_label}{$field.name /}{/%}
+    </div>
+    {if $field.type === 'string'}
+        {@field_link label="Ссылка?" type="checkbox" default="0" /}
     {/if}
+    <div fx:e="value">
+        <a href="{$url}" fx:omit="!$field_link">
+            {if $field.type === 'datetime'}
+                {apply floxim.ui.date:date with $date = $value /}
+            {else}
+                {$value /}
+            {/if}
+        </a>
+    </div>
 </div>
 
 <a fx:template="link_value" fx:aif="$value" fx:omit="!$url" href="{$url}">
     {$value /}
 </a>
-
-<div fx:template="value_labeled">
-    <span>{%name}Это{/%}</span>:
-    {apply value /}
-</div>
         
+<!--
 <div fx:template="test" fx:of="floxim.corporate.person:list">
     {set $box_groups format="yaml"}
-        -
-            - keyword: name
-              template: value_labeled
-        -
-            - keyword: birthday
-              template: value_labeled
+        - 
+            - name
+            - birthday
         -
             - description
     {/set}
@@ -58,3 +65,4 @@
         {apply box with $groups = $box_groups /}
     </div>
 </div>
+-->

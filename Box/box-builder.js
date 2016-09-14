@@ -6,7 +6,7 @@ $t.add(
     'input',
     function(_c, _o) {
         return  '<div class="'+cl+'">'+
-                    '<input type="text" class="'+cl+'__value" name="'+ _c.name+'" />'+
+                    '<input type="hidden" data-json-val="true" class="'+cl+'__value" name="'+ _c.name+'" />'+
                     '<div class="'+cl+'__canvas"></div>'+
                     '<div class="'+cl+'__avail"></div>'+
                 '</div>';
@@ -20,6 +20,16 @@ $t.add(
     }
 );
 
+$.valHooks.input = {
+  get: function( elem ) {
+      if (elem.getAttribute('data-json-val') !== 'true') {
+          return undefined;
+      }
+      var res = JSON.parse(elem.value);
+      return res;
+  }
+};
+
 function box_builder($node, params) {
     
     var that = this;
@@ -27,17 +37,30 @@ function box_builder($node, params) {
     this.$node = $node;
     this.params = params;
     
-    this.drawGroup = function(group) {
+    $node.data('box-builder', this);
+    
+    this.drawGroup = function(group, index) {
         var $group = $('<div class="'+cl+'__group"></div>');
+        if (index !== undefined) {
+            $group.attr('data-index', index);
+        }
         if (group.fields) {
             for (var i = 0; i < group.fields.length; i++) {
-                this.drawField(group.fields[i], $group);
+                this.drawField(group.fields[i], $group, index + '-' + i);
             }
         }
+        var group_data = {};
+        $.each(group, function(k, v) {
+            if (k !== 'fields') {
+                group_data[k] = v;
+            }
+        });
+        $group.data('vals', group_data);
         this.$canvas.append($group);
+        return $group;
     };
     
-    this.drawField = function(field, $target) {
+    this.drawField = function(field, $target, index) {
         var $field = $(
             '<div class="'+cl+'__field">'+
                 '<span class="'+cl+'__field-label">'+field.keyword+'</span>'+
@@ -45,14 +68,28 @@ function box_builder($node, params) {
                 '<span class="'+cl+'__field-kill"></span>'+
             '</div>'
         );
-        $field.data('field', field);
+        if (index !== undefined) {
+            $field.attr('data-index', index);
+        }
+        $field.data('vals', field);
         $target.append($field);
     };
     
     this.draw = function(value) {
         this.drawGroup({});
+        
+        this.$canvas.attr('data-index', 'root');
+        
+        var box_vals = {};
+        $.each(value, function(i, v) {
+            if (typeof params.params[i] !== 'undefined') {
+                box_vals[i] = v;
+            }
+        });
+        this.$canvas.data('vals', box_vals);
+        
         for (var i = 0; i < value.groups.length; i++) {
-            this.drawGroup(value.groups[i]);
+            this.drawGroup(value.groups[i], i);
             this.drawGroup({});
         }
         this.$node.find('.'+cl+'__group').sortable(
@@ -65,62 +102,125 @@ function box_builder($node, params) {
                 }
             }
         );
+        $.each(this.params.params, function(path, data) {
+            path = path.split('.');
+            var base = path[0],
+                index = path[1];
+            
+            if (base !== 'groups') {
+                index = 'root';
+            } else {
+                if (path.length > 4) {
+                    index += '-'+path[3];
+                }
+            }
+            var param_name = path [ path.length - 1 ];
+            
+            var $el = that.$node.find('div[data-index="'+index+'"]'),
+                el_params = $el.data('params');
+                
+            if (!el_params) {
+                el_params = {};
+            }
+            el_params[param_name] = data;
+            $el.data('params', el_params);
+        });
     };
     
     this.updateValue = function() {
         var res = {
+            is_stored:true,
             groups: []
         };
+        res = $.extend(res, this.$canvas.data('vals'));
+        
         this.$node.find('.'+cl+'__group').each(function() {
-            var fields = [];
-            $(this).find('.'+cl+'__field').each(function() {
-                fields.push( $(this).data('field') );
+            var fields = [],
+                $group = $(this);
+            
+            $group.find('.'+cl+'__field').each(function() {
+                fields.push( $(this).data('vals') );
             });
             if (fields.length > 0) {
-                res.groups.push({
+                var group_data = $group.data('vals');
+                res.groups.push( $.extend(group_data, {
                     fields: fields
-                });
+                }) );
             }
         });
         this.$input.val(JSON.stringify(res)).trigger('change');
     };
     
-    this.showFieldSettings = function($f) {
-        var data = $f.data('field');
+    this.showSettings = function($el) {
+        var params = $el.data('params'),
+            data = $el.data('vals'),
+            index = $el.data('index');
+    
+        if (!params) {
+            console.log('no params');
+            return;
+        }
         
         var fields = [];
         
-        $.each(data.params, function(field_key, field) {
+        $.each(params, function(field_key, field) {
             field.name = field_key;
             fields.push(field);
         });
         
-        $fx.front_panel.show_form(
-            {
-                fields: fields
-            },
-            {
-                style:'alert',
-                onready: function($f) {
-                    console.log('form ready', $f);
-                    $f.on('change', function() {
-                        var new_data = {};
-                            
-                        $.each( $f.serializeArray(), function() {
-                            new_data[this.name] = this.value;
-                        });
-                        data = $.extend(data, new_data);
-                        $f.data('field', data);
-                        that.updateValue();
-                        //console.log(data, new_data);
-                    });
-                },
-                onsubmit: function(e) {
-                    console.log('subm', arguments);
-                    return false;
-                }
+        
+        $fx.front.prepare_infoblock_visual_fields([fields], function(res) {
+            fields = res[0];
+            
+            $.each(fields, function(index, field) {
+                 if (field.type === 'group' && field.fields) {
+                     for (var i = 0; i < field.fields.length; i++) {
+                         var cf = field.fields[i];
+                         cf.name = field.name+'['+cf.name+']';
+                     }
+                 }
+            });
+            
+            function update_data($form) {
+                var $el = $('div[data-index="'+index+'"]'),
+                    $builder  = $el.closest('.'+cl),
+                    builder = $builder.data('box-builder'), 
+                    new_data = $form.formToHash(
+                        function(f) {
+                            return f.name !== 'fx_form_target' && f.name !== 'pressed_button';
+                        }
+                    );
+                
+                data = $.extend($el.data('vals'), new_data);
+                
+                $el.data('vals', data);
+                builder.updateValue();
             }
-        );
+           
+            $fx.front_panel.show_form(
+                {
+                    header: 
+                        data && data.keyword ? 
+                            'Настраиваем поле &laquo;'+data.keyword+'&raquo;' :
+                            'Настраиваем строку №'+(index*1 + 1),
+                    fields: fields,
+                    form_buttons: ['cancel']
+                },
+                {
+                    view:'horizontal',
+                    onready: function($form) {
+                        $form.on('change', function() {
+                            update_data($form);
+                        });
+                    },
+                    onsubmit: function(e) {
+                        update_data($(e.target));
+                        $fx.front_panel.hide();
+                        return false;
+                    }
+                }
+            );
+        });
     };
     
     this.init = function () {
@@ -136,12 +236,10 @@ function box_builder($node, params) {
                 that.updateValue();
                 return false;
             })
-            .on('click', '.'+cl+'__field', function() {
-                var $f = $(this),
-                    data =  $f.data('field');
-                if (data.params) {
-                    that.showFieldSettings($(this));
-                }
+            .on('click', '.'+cl+'__field, .'+cl+'__group', function(e) {
+                that.showSettings($(this));
+                e.stopImmediatePropagation();
+                return false;
             });
         
         for (var i = 0; i < this.params.avail.length; i++) {
@@ -154,6 +252,11 @@ function box_builder($node, params) {
                 that.updateValue();
             }
         });
+        setTimeout(function() {
+            $node.closest('.field').find('label').on('click', function() {
+                that.showSettings(that.$canvas);
+            });
+        }, 200);
     };
     
     this.init();

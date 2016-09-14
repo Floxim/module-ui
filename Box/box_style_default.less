@@ -1,10 +1,31 @@
-.box_style_default() {
-    padding:20px 0;
-    border-bottom:1px solid #CCC;
-    #__group {
-        display:flex;
-    }
-    #__field {
-        margin-right: 2em;
-    }
+/*
+name: box
+vars:
+    margin:
+        type: measures
+        prop: margin
+        label: Внешний отступ
+    padding:
+        type: measures
+        prop: padding
+        label: Внутренний отступ
+    background:
+        type: css-background
+        label: Фон
+container:
+    lightness: background
+*/
+
+
+
+
+.box_style_default(
+    @margin:0rem;
+    @padding:0rem;
+    @background: none;
+) {
+    //border:5px solid #FFA;
+    padding:@padding;
+    margin:@margin;
+    .background(@background);
 }

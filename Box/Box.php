@@ -18,13 +18,15 @@ class Box {
     protected $containing_loop = null;
     
     protected $avail = array();
-
+    
+    protected $params = array();
+    
     public static function start($template)
     {
         $ctx = $template->context;
         
         $loop = $ctx->get('loop');
-        $box_id = $box_id = $ctx->get('box_id');
+        $box_id = $ctx->get('box_id');
         
         if (!$loop) {
             $box = new self($ctx, $box_id);
@@ -41,9 +43,11 @@ class Box {
         return $box;
     }
     
+    
     public function __construct($context, $box_id, $loop = null)
     {
         if (fx::isAdmin()) {
+
             $path = fx::path('@module/Floxim/Ui/Box');
             fx::page()->addJsFile($path.'/box-builder.js');
             fx::page()->addCssBundle(
@@ -55,14 +59,15 @@ class Box {
             $this->avail = $item->getFields();
         }
         $this->box_id = $box_id;
-        $param_id = 'box_'.$box_id;
+        $param_id = $this->getParamId();
         $data = $context->get($param_id);
         if (is_string($data) && !empty($data)) {
             $data = json_decode($data, true);
         }
-        if (!$data) {
+        if (!$data || !isset($data['is_stored'])) {
             $groups = $context->get('groups');
-            $data = self::prepareGroups($groups);
+            $default_data = self::prepareGroups($groups);
+            $data = $data ? \Floxim\Floxim\System\Util::fullMerge($data, $default_data) : $default_data;
         }
         $this->data = $data;
         if ($loop) {
@@ -74,15 +79,24 @@ class Box {
         }
     }
     
+    protected function getParamId()
+    {
+        return 'box_'.$this->box_id;
+    }
+    
     public function run($template)
     {
         $this->template = $template;
+        $template->context->startScope($this->getParamId());
+        $template->context->push($this->data);
         $this->template->pushTemplateParamHandler($this);
     }
     
     public function stop()
     {
         $this->template->popTemplateParamHandler();
+        $this->template->context->stopScope();
+        $this->template->context->pop();
         if (is_null($this->containing_loop)) {
             $this->export();
         }
@@ -93,6 +107,16 @@ class Box {
         $res = array(
             'groups' => array()
         );
+        if (!$groups || !is_array($groups)) {
+            $groups = array(
+                array(
+                    array('keyword' => 'name', 'field_link' => 1)
+                ),
+                array(
+                    array('keyword' => 'description')
+                )
+            );
+        }
         foreach ($groups as $group) {
             if (!is_array($group)) {
                 $group = array($group);
@@ -120,34 +144,9 @@ class Box {
     
     public function registerParam($name, $data, $context)
     {
-        $loops = $context->getAll('loop');
-        $field_key = null;
-        $group_key = null;
-        foreach ($loops as $loop) {
-            $alias = $loop['current_alias'];
-            if ($field_key === null && $alias === 'field_view') {
-                $field_key = $loop['key'];
-            } elseif ($group_key === null && $alias === 'group') {
-                $group_key = $loop['key'];
-            }
-            if ($field_key!== null && $group_key !== null) {
-                break;
-            }
-        }
-        if ($group_key === null) {
-            return;
-        }
-        
-        $target = &$this->data['groups'][$group_key];
-        
-        if ($field_key !== null) {
-            $target = &$target['fields'][$field_key];
-        }
-        if (!isset($target['params'])) {
-            $target['params'] = array();
-        }
-        unset($data['is_forced']);
-        $target['params'][$name] = $data;
+        $path = $context->getScopePath().'.'.$name;
+        $path = preg_replace("~^[^\.]*?\.~", '', $path);
+        $this->params[$path] = $data;
     }
 
     public function export() {
@@ -180,7 +179,8 @@ class Box {
                 'type' => 'fx-box-builder',
                 'code' => true,
                 'label' => 'Box',
-                'value' => $this->data,
+                'value' => array_merge($this->data, array('is_stored' => true)),
+                'params' => $this->params,
                 'avail' => $avail
             )
         );

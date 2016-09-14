@@ -1,0 +1,60 @@
+/*
+name: Default
+vars: 
+    fields_margin:
+        label: Расстояние между полями
+        type: number
+        step: 0.5
+    margin:
+        label: Внешний отступ
+        type: measures
+        prop: margin
+    padding:
+        label: Внутренний отступ
+        type: measures
+        prop: padding
+    justify_content:
+        label: Горизонтальное выравнивание
+        type: select
+        values:
+            flex-start: Слева
+            flex-end: Справа
+            center: По центру
+            space-between: Растянуть
+    align_items:
+        label: Вертикальное выравнивание
+        type: select
+        values:
+            flex-start: Сверху
+            center: По центру
+            flex-end: Снизу
+    background:
+        label: BG
+        type: css-background
+container:
+    lightness: background
+*/
+
+.group_style_default(
+    @fields_margin:1.5em;
+    @margin:1em 0;
+    @padding:0em;
+    @justify_content:flex-start;
+    @align_items:flex-start;
+    @background:none;
+) 
+{
+    margin:@margin;
+    padding:@padding;
+    
+    display:flex;
+    
+    .background(@background);
+    
+    justify-content: @justify_content;
+    align-items: @align_items;
+    
+    #__field:not(:last-child) {
+        margin-right:@fields_margin;
+    }
+}

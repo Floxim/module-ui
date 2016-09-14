@@ -26,10 +26,11 @@
             {apply list_image_side /}
         </div>
         <div fx:e="data">
-            {apply list_data /}
+            {*{apply list_data /}*}
+            {apply floxim.ui.box:box with $box_id = 'listbox' /}
         </div>
     </div>
-            
+        
     {apply floxim.main.content:pagination with $pagination /}
 </div>
 
