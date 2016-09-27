@@ -51,18 +51,3 @@
 <a fx:template="link_value" fx:aif="$value" fx:omit="!$url" href="{$url}">
     {$value /}
 </a>
-        
-<!--
-<div fx:template="test" fx:of="floxim.corporate.person:list">
-    {set $box_groups format="yaml"}
-        - 
-            - name
-            - birthday
-        -
-            - description
-    {/set}
-    <div fx:each="$items as $item">
-        {apply box with $groups = $box_groups /}
-    </div>
-</div>
--->

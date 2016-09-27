@@ -8,6 +8,7 @@ $t.add(
         return  '<div class="'+cl+'">'+
                     '<input type="hidden" data-json-val="true" class="'+cl+'__value" name="'+ _c.name+'" />'+
                     '<div class="'+cl+'__canvas"></div>'+
+                    '<div class="'+cl+'__adder">+</div>'+
                     '<div class="'+cl+'__avail"></div>'+
                 '</div>';
     },
@@ -19,16 +20,6 @@ $t.add(
         new box_builder($node, params);
     }
 );
-
-$.valHooks.input = {
-  get: function( elem ) {
-      if (elem.getAttribute('data-json-val') !== 'true') {
-          return undefined;
-      }
-      var res = JSON.parse(elem.value);
-      return res;
-  }
-};
 
 function box_builder($node, params) {
     
@@ -43,6 +34,8 @@ function box_builder($node, params) {
         var $group = $('<div class="'+cl+'__group"></div>');
         if (index !== undefined) {
             $group.attr('data-index', index);
+        } else {
+            $group.addClass(cl+'__group_empty')
         }
         if (group.fields) {
             for (var i = 0; i < group.fields.length; i++) {
@@ -61,10 +54,10 @@ function box_builder($node, params) {
     };
     
     this.drawField = function(field, $target, index) {
+        var field_meta = this.fields_map[field.keyword];
         var $field = $(
             '<div class="'+cl+'__field">'+
-                '<span class="'+cl+'__field-label">'+field.keyword+'</span>'+
-                '<span class="'+cl+'__field-settings">...</span>'+
+                '<span class="'+cl+'__field-label">'+field_meta.name+'</span>'+
                 '<span class="'+cl+'__field-kill"></span>'+
             '</div>'
         );
@@ -73,6 +66,42 @@ function box_builder($node, params) {
         }
         $field.data('vals', field);
         $target.append($field);
+    };
+    
+    var active_empty_class = cl+'__group_empty-active';
+    
+    this.startDrag = function(e, ui) {
+        var $empty_groups = that.$canvas.find('.'+cl+'__group_empty'),
+            $c_group = ui.item.closest('.'+cl+'__group'),
+            $empty_group = $([]);
+        
+        //that.$canvas.one('mouseover', function() {
+        hideAvail();
+        //});
+        
+        if ($c_group.length > 0) {
+            var $group_fields = $c_group.find('.'+cl+'__field:not(.ui-sortable-placeholder)');
+            if ($group_fields.length === 1) {
+                $empty_group = $c_group;
+            }
+        }
+        $empty_groups.each(function() {
+            var $eg = $(this);
+            if ($eg.next().is($empty_group) || $eg.prev().is($empty_group)) {
+                return;
+            }
+            $eg.addClass(active_empty_class);
+        });
+    };
+    
+    this.stopDrag = function() {
+        var empty_class = cl+'__group_empty';
+        that.$canvas.find('.'+cl+'__group').each(function() {
+            var $g = $(this);
+            $g.removeClass(active_empty_class);
+            $g.toggleClass(empty_class, $g.find('.'+cl+'__field').length === 0);
+        });
+        that.updateValue();
     };
     
     this.draw = function(value) {
@@ -97,9 +126,10 @@ function box_builder($node, params) {
                 items:'>.'+cl+'__field',
                 tolerance:'pointer',
                 connectWith:'.'+cl+'__canvas .'+cl+'__group',
-                stop:function() {
-                    that.updateValue();
-                }
+                start: that.startDrag,
+                stop: that.stopDrag,
+                scroll:false,
+                appendTo: document.body
             }
         );
         $.each(this.params.params, function(path, data) {
@@ -223,10 +253,44 @@ function box_builder($node, params) {
         });
     };
     
+    
+    var adder_active_class = cl+'__adder_active';
+    function showAvail() {
+        that.$adder.addClass(adder_active_class);
+        //that.$avail.css('display', 'block');
+        that.$avail.addClass(cl+'__avail_active');
+    }
+    
+    function hideAvail() {
+        that.$adder.removeClass(adder_active_class);
+        that.$avail.removeClass(cl+'__avail_active');
+    }
+    
     this.init = function () {
         this.$input = $node.find('.'+cl+'__value');
         this.$canvas = $node.find('.'+cl+'__canvas');
         this.$avail = $node.find('.'+cl+'__avail');
+        
+        this.$adder = $node.find('.'+cl+'__adder');
+        
+        this.$adder.click(function() {
+            if (that.$adder.hasClass(adder_active_class)) {
+                hideAvail();
+            } else {
+                showAvail();
+            }
+        });
+        
+        this.fields_map = {};
+        
+        for (var i = 0; i < this.params.avail.length; i++) {
+            var cf = this.params.avail[i];
+            
+            this.fields_map[cf.keyword] = cf;
+            
+            this.drawField(cf, this.$avail);
+        }
+        
         this.draw(params.value);
         this.$input.val(JSON.stringify(this.params.value));
         
@@ -242,15 +306,13 @@ function box_builder($node, params) {
                 return false;
             });
         
-        for (var i = 0; i < this.params.avail.length; i++) {
-            this.drawField(this.params.avail[i], this.$avail);
-        }
-        
         this.$avail.sortable({
             connectWith:'.'+cl+'__canvas .'+cl+'__group',
-            stop:function() {
-                that.updateValue();
-            }
+            start: that.startDrag,
+            stop: that.stopDrag,
+            appendTo: '.fx_admin_form__body',
+            helper: 'clone',
+            scroll:false
         });
         setTimeout(function() {
             $node.closest('.field').find('label').on('click', function() {

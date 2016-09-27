@@ -1,0 +1,42 @@
+/*
+name: Колонка
+vars:
+    background:
+        type: css-background
+        label: Фон
+    padding:
+        label: Внутренний отступ
+        type: measures
+        prop: padding
+    align:
+        type: css-align
+    valign:
+        type: livesearch
+        label: По вертикали
+        values:
+            top: Сверху
+            middle: По центру
+            bottom: Снизу
+container:
+    lightness: background
+    align: align
+*/
+.col_style_default(
+    @background:none;
+    @padding:0em;
+    @align: none;
+    @valign: top;
+) {
+    .background(@background);
+    padding:@padding;
+    .align-items(@align);
+    & when (@valign = top) {
+        justify-content: flex-start;
+    }
+    & when (@valign = middle) {
+        justify-content: center;
+    }
+    & when (@valign = bottom) {
+        justify-content: flex-end;
+    }
+}

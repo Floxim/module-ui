@@ -1,32 +1,41 @@
 /*
 name: Текст над картинкой
+vars:
+    background:
+        type: css-background
+        label: Фон
+        default:
+            - dark
+            - linear 180deg, main 0 1 0 main 0 0.7 30%
+container:
+    lightness: background
 */
-.slide_style_default() {
-    
-    background: linear-gradient(to bottom, #000, #666);
-
+.slide_style_default(
+    @background: @background;
+) {
     #__data {
-        padding:@layout_padding_vertical 0;
         display:flex;
         flex-direction:column;
         justify-content:center;
-        align-items:center;
+        align-items:stretch;
         top:0;
         width:100%;
-        //height:100%;
         flex-grow:1;
-        text-align:center;
         position:relative;
+        .background(@background);
     }
+    
+    #__slidebox {
+        flex-grow:1;
+    }
+    
     #__image {
         
-        opacity:1;
         position:absolute;
         top:0;
         left:0;
         height:100%;
         width:100%;
-        opacity:0.4;
         
         overflow:hidden;
         background-repeat: no-repeat;

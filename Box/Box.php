@@ -44,17 +44,21 @@ class Box {
     }
     
     
+    public static function addAdminAssets()
+    {
+        $path = fx::path('@module/Floxim/Ui/Box');
+        fx::page()->addJsFile($path.'/box-builder.js');
+        fx::page()->addCssBundle(
+            array(
+                $path.'/box-builder.less'
+            )
+        );
+    }
+    
     public function __construct($context, $box_id, $loop = null)
     {
         if (fx::isAdmin()) {
-
-            $path = fx::path('@module/Floxim/Ui/Box');
-            fx::page()->addJsFile($path.'/box-builder.js');
-            fx::page()->addCssBundle(
-                array(
-                    $path.'/box-builder.less'
-                )
-            );
+            self::addAdminAssets();
             $item = $context->get('item');
             $this->avail = $item->getFields();
         }
@@ -161,23 +165,32 @@ class Box {
             'link_type',
             'external_url',
             'linked_page_id',
-            'meta'
+            'meta',
+            'priority'
         );
+        
+        $skip_types = array(
+            'image',
+            'link',
+            'multilink'
+        );
+        
         foreach ($this->avail as $f) {
             $kw = $f['keyword'];
-            if (in_array($kw, $skip)) {
+            if (in_array($kw, $skip) || in_array($f['type'], $skip_types)) {
                 continue;
             }
             $avail []= array(
                 'keyword' => $kw,
+                'name' => $f['name'],
                 'template' => 'value'
             );
         }
         $this->template->registerParam(
-            'box_'.$this->box_id,
+            //'box_'.$this->box_id,
+            $this->getParamId(),
             array(
                 'type' => 'fx-box-builder',
-                'code' => true,
                 'label' => 'Box',
                 'value' => array_merge($this->data, array('is_stored' => true)),
                 'params' => $this->params,

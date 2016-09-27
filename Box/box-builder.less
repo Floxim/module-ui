@@ -1,6 +1,6 @@
 .floxim-ui-box-builder {
-    display:flex;
-    width:400px;
+    display:inline-flex;
+    position:relative;
     &__value {
         /*
         width: 600px !important;
@@ -14,6 +14,16 @@
         border:1px dotted #CCC;
         display:flex;
         margin-top:-1px;
+        transition:padding 0.1s ease;
+        overflow:hidden;
+        &_empty {
+            padding:0;
+            border-bottom:none;
+        }
+        &_empty-active {
+            padding:5px;
+            border-bottom:1px dotted #CCC;
+        }
     }
     &__field {
         background:#FFF;
@@ -25,6 +35,20 @@
         border-radius: 2px;
         margin-right: 5px;
         cursor:pointer;
+        &.ui-sortable-placeholder {
+            //height:28px;
+            max-width: 30px !important;
+            border:1px dotted #666;
+            visibility: visible !important;
+            //background:#CCC;
+            //margin-top: -2px;
+            //margin-bottom: -2px;
+        }
+        &.ui-sortable-helper {
+            opacity:0.8;
+            z-index:1000002;
+        }
+        
     }
     
     &__field-kill {
@@ -42,15 +66,55 @@
     }
     
     &__avail {
-        margin-left:15px;
+        position:fixed;
+        max-width:200px;
+        border:1px solid #EEE;
+        z-index:10000;
+        display:block;
+        max-height: 0;
+        overflow:hidden;
+        opacity:0;
+        margin-left:2px;
+        transition:all 0.3s ease;
+        &_active {
+            opacity:1;
+            max-height:300px;
+        }
     }
     
     &__avail &__field {
-        display:inline-block;
-        margin-bottom:5px;
+        display:block;
+        margin:0;
+        box-shadow:none;
+        border:none;
+        border-bottom:1px solid #EEE;
+        border-radius:0;
+        &:last-child {
+            border-bottom: none;
+        }
     }
     
     &__avail &__field-kill, &__avail &__field-settings  {
         display:none;
+    }
+    
+    &__adder {
+        position: absolute;
+        right: -8px;
+        width: 15px;
+        top: -8px;
+        height: 15px;
+        border: 1px solid #CCC;
+        text-align: center;
+        line-height: 15px;
+        border-radius: 15px;
+        background: #FFF;
+        cursor:pointer;
+        z-index:10001;
+        transform:rotate(0deg);
+        transition: transform 0.3s ease;
+        &_active {
+            transform:rotate(44deg);
+        }
     }
 }
