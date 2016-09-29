@@ -1,7 +1,7 @@
 <div 
     fx:template="list" 
     fx:name="Список с картинками" 
-    fx:of="floxim.main.page:list#2" 
+    fx:of="floxim.main.page:list#2, floxim.main.factoid:list" 
     {set $list_type = str_replace(".", "-", $infoblock.controller) /}
     fx:b="list {$list_mods}" 
     fx:styled="Стиль списка"
