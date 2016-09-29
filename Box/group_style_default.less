@@ -29,8 +29,10 @@ vars:
             flex-start: Сверху
             center: По центру
             flex-end: Снизу
+    grow:
+        label: Растянуть по вертикали
+        type: checkbox
     background:
-        label: BG
         type: css-background
 container:
     lightness: background
@@ -43,6 +45,7 @@ container:
     @justify_content:none;
     @align_items:flex-start;
     @background:none;
+    @grow:0;
 ) 
 {
     margin:@margin;
@@ -51,6 +54,8 @@ container:
     display:flex;
     
     .background(@background);
+    
+    flex-grow:@grow;
     
     & when not(@justify_content = none) {
         justify-content: @justify_content;

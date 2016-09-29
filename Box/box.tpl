@@ -5,7 +5,7 @@
     fx:b="box" 
     fx:template="box" 
     fx:styled-inline>
-    
+    {css}box.less{/css}
     <div 
         fx:each="$groups as $group" 
         fx:scope

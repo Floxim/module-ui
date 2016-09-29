@@ -11,25 +11,45 @@ vars:
         label: Внутренний отступ
     background:
         type: css-background
-        label: Фон
     align: 
         type: css-align
+    valign:
+        type: livesearch
+        label: Выравнивание строк по вертикали
+        values:
+            top: Сверху
+            middle: По центру
+            bottom: Снизу
+            space-between: Растянуть
 container:
     lightness: background
     align: align
 */
-
-
-
 
 .box_style_default(
     @margin:0rem;
     @padding:0rem;
     @background: none;
     @align:none;
+    @valign: top;
 ) {
-    //border:5px solid #FFA;
     padding:@padding;
     margin:@margin;
     .background(@background);
+    
+    display:flex;
+    flex-direction: column;
+    
+    & when (@valign = top) {
+        justify-content: flex-start;
+    }
+    & when (@valign = middle) {
+        justify-content: center;
+    }
+    & when (@valign = bottom) {
+        justify-content: flex-end;
+    }
+    & when (@valign = space-between) {
+        justify-content: space-between;
+    }
 }

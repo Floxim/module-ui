@@ -75,9 +75,7 @@ function box_builder($node, params) {
             $c_group = ui.item.closest('.'+cl+'__group'),
             $empty_group = $([]);
         
-        //that.$canvas.one('mouseover', function() {
         hideAvail();
-        //});
         
         if ($c_group.length > 0) {
             var $group_fields = $c_group.find('.'+cl+'__field:not(.ui-sortable-placeholder)');

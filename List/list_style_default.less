@@ -6,6 +6,15 @@ vars:
         type: number
         min: 10
         max: 90
+    pic_ratio:
+        type: ratio
+        auto: true
+        min: 0.4
+        max: 4
+    pic_grow:
+        type: checkbox
+        label: Растянуть до высоты текста
+        parent: pic_ratio != none
     pic_position:
         label: Позиция картинки
         type: select
@@ -22,12 +31,16 @@ vars:
         label: Отступ между элементами
         type: number
         max: 20
+export:
+    pic_width: 'ceil(1300 * @pic_width / 10000) * 100'
 */
 .list_style_default(
     @pic_width:30%;
     @pic_margin:2em;
+    @pic_grow:0;
     @item_margin: 2em;
     @pic_position:left;
+    @pic_ratio: 1.5;
 )
 {
     #__item:not(:last-child) {
@@ -35,7 +48,7 @@ vars:
     }
     #__data {
         flex-grow:1;
-        flex-basis: 100% - @pic_width;
+        flex-basis: ~"calc(" 100% - @pic_width ~" - " @pic_margin ~")";
     }
     #__listbox {
         min-height:100%;
@@ -51,6 +64,46 @@ vars:
             order:2;
             margin-left:@pic_margin;
         }
+    }
+    
+    & when not(@pic_ratio = none) {
+        #__image-wrapper {
+            padding-bottom: 100% / @pic_ratio;
+        }
+        #__image-img {
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        }
+        
+        & when (@pic_grow = 1) {
+            #__image-wrapper {
+                min-height:100%;
+                display:flex;
+            }
+            #__image-img {
+                object-fit:cover;
+            }
+        }
+    }
+    
+    & when (@pic_ratio = none) {
+        #__image-wrapper {
+            padding:0;
+            min-height:auto;
+        }
+        #__image-img {
+            position:static;
+        }
+    }
+    
+    
+    
+    & when (@pic_grow = 0) {
+        
     }
     
     & when (@pic_position = left-right) {
