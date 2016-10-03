@@ -7,7 +7,7 @@
     fx:of="floxim.main.page:list, floxim.main.factoid:list, floxim.media.photo:list">
     
     {default $image_ratio = 1.4 /}
-    {default $image_width = 1200 / $cols /}
+    {default $image_width = 1200 / 4 /}
     {default $image_height = $image_width / $image_ratio /}
     {set $image_size = $image_width . '*' . $image_height /}
     
