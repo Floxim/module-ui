@@ -30,7 +30,7 @@
     fx:template="tile" 
     fx:e="body">
     
-    <div fx:e="image">
+    <div fx:e="image" fx:hide-empty>
         {set $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
         <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
     </div>
