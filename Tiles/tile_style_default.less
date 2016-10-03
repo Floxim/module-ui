@@ -18,6 +18,13 @@ vars:
         default:
             - dark
             - color main 0 0.7
+    pic_fit:
+        type: livesearch
+        label: Размер картинки
+        values: 
+            cover: Растянуть
+            contain: Уместить
+        parent: box_position !~ (no_image|overlap)
 container:
     lightness: '@box_position === "overlap" ? @pic_bg : "none"'
 */
@@ -26,6 +33,7 @@ container:
     @box_position:under;
     @ratio: 1.5;
     @pic_bg: @pic_bg;
+    @pic_fit: cover;
 ) {
     #__body {
         a:b;
@@ -103,7 +111,7 @@ container:
         #__img {
             width:100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: @pic_fit;
             position:absolute;
             top:0;
             left:0;
