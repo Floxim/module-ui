@@ -32,10 +32,15 @@ vars:
         }
         margin-bottom:@margin_ver;
     }
-    margin-bottom:@margin_ver * -1;
+    
+    #__wrapper {
+        margin-bottom:@margin_ver * -1;
+    }
     
     & when (unit(@margin_hor) > 0) {
-        margin-right: @margin_hor * -1;
+        #__wrapper {
+            margin-right: @margin_hor * -1;
+        }
         #__tile {
             width:~"calc(" (100% / @cols) ~" - " @margin_hor ~")";
             max-width:~"calc(" (100% / @cols) ~" - " @margin_hor ~" + 0.05%)";

@@ -1,7 +1,7 @@
 <div 
     fx:template="list" 
     fx:name="Список с картинками" 
-    fx:of="floxim.main.page:list#2, floxim.main.factoid:list" 
+    fx:of="floxim.main.page:list#2, floxim.main.factoid:list, floxim.media.photo:list" 
     {set $list_type = str_replace(".", "-", $infoblock.controller) /}
     fx:b="list {$list_mods}" 
     fx:styled="Стиль списка"
@@ -15,7 +15,7 @@
     <div fx:each="$items" fx:e="item">
         <div fx:e="image" fx:hide-empty>
             {set $image_field = $item.hasField('image') ? 'image' : '%image'  /}
-            <div fx:e="image-wrapper">
+            <div fx:e="image-wrapper" fx:hide-empty>
                 <img fx:e="image-img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size}" />
             </div>
         </div>

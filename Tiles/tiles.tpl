@@ -12,9 +12,10 @@
     {set $image_size = $image_width . '*' . $image_height /}
     
     {css}flex-tiles.less{/css}
-    
-    {$items_prepend || :tile_block /}
-    {$items || :tile_block /}
+    <div fx:e="wrapper">
+        {$items_prepend || :tile_block /}
+        {$items || :tile_block /}
+    </div>
 </div>
     
 <div fx:template="tile_block" fx:e="tile" fx:b="tile" fx:styled='label:Стиль отдельной плитки'>
