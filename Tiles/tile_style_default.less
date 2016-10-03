@@ -1,33 +1,111 @@
-.tile_style_default() {
-    
+/*
+vars:
+    box_position:
+        type: livesearch
+        label: Положение текста
+        values:
+            overlap: Поверх картинки
+            under: Под картинкой
+            above: Над картинкой
+            no_image: Не показывать картинку
+    ratio:
+        type: ratio
+        parent: box_position != no_image
+        label: Пропорции картинки
+    pic_bg:
+        type: css-background
+        parent: box_position == overlap
+        default:
+            - dark
+            - color main 0 0.7
+container:
+    lightness: '@box_position === "overlap" ? @pic_bg : "none"'
+*/
+
+.tile_style_default(
+    @box_position:under;
+    @ratio: 1.5;
+    @pic_bg: @pic_bg;
+) {
     #__body {
-        text-decoration:none;
-        display:block;
-        //.color(main 5; background-color);
+        a:b;
+        display:flex;
+        flex-direction:column;
+        height:100%;
     }
-    #__row_image {
-        line-height:0;
+    & when (@box_position = no_image) {
+        #__image {
+            display:none;
+        }
     }
-    #__row_image, #__row_name {
-        margin-bottom: (@layout_padding_vertical / 2);
+    & when (@box_position = above) {
+        #__data {
+            order:-1;
+        }
     }
-    #__name {
-        font-size:18px;
-        .tcolor(alt 1);
+    #__data {
+        display:flex;
     }
-    #__row_extra {
-        font-size:14px;
-        .light({
-            color:@color_light;
-        });
-        .dark({
-            color:@color_light_inverted;
-        });
+    #__tilebox {
+        width:100%;
     }
-    
-    #_padding_off .tile__data {
-        padding-left:@layout_padding_horizontal / 2;
-        padding-right:@layout_padding_horizontal / 2;
-        padding-bottom:@layout_padding_vertical;
+    & when (@box_position = overlap) {
+        #__body {
+            position:relative;
+            height:100%;
+            padding-bottom: 100% / @ratio;
+        }
+        #__data {
+            position:absolute;
+            top:0;
+            left:0;
+            bottom:0;
+            right:0;
+            width:100%;
+            height:100%;
+            overflow:hidden;
+        }
+        #__image {
+            height:100%;
+            position:absolute;
+            top:0;
+            left:0;
+            overflow:hidden;
+            &:after {
+                content:'';
+                display:block;
+                position: absolute;
+                top:0;
+                left:0;
+                padding-bottom: 100% / @ratio;
+                width:100%;
+                .background(@pic_bg);
+            }
+        }
+        #__img {
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+    & when not(@box_position = overlap) {
+        #__image {
+            position:relative;
+            &:after {
+                content:'';
+                display:block;
+                padding-bottom: 100% / @ratio;
+            }
+        }
+        #__data {
+            flex-grow:1;
+        }
+        #__img {
+            width:100%;
+            height: 100%;
+            object-fit: cover;
+            position:absolute;
+            top:0;
+            left:0;
+        }
     }
 }

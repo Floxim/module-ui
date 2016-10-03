@@ -1,7 +1,7 @@
 <div 
     fx:template="slider" 
     fx:name="Слайдер"
-    fx:of="floxim.main.page:list" 
+    fx:of="floxim.main.page:list, floxim.main.factoid:list, floxim.media.photo:list" 
     fx:b="slider type_{$infoblock.short_type /}" 
     fx:styled="Стиль слайдера"
     fx:size="wide,high"
@@ -49,14 +49,16 @@
     </div>
 </div>
 
-<div 
+<div
+    {if !$item[$slide_image_field]}
+        {set $slide_image_field = %image /}
+    {/if}
     fx:template="slide" 
     fx:e="slide" 
     fx:b="slide" 
-    fx:styled="Стиль слайда">
-    {if !$item[$slide_image_field]}
-        {set $slide_image_field = '%image' /}
-    {/if}
+    fx:styled="Стиль слайда"
+    data-pic="{if $_is_admin}{$slide_image_field /}{/if}">
+    
     
     {default $image_in_slide_width = 1 /}
     
@@ -72,13 +74,10 @@
         
     </div>
     <div fx:e="data">
-        {*
-        {$item | :slide_data /}
-        *}
         {apply floxim.ui.box:box with $box_id = 'slidebox' /}
     </div>
 </div>
-
+{*
 {template id="slide_data"}
     <fx:a fx:e="title">{$name}</fx:a>
     <div fx:e="description" fx:aif="$description">{$description}</div>
@@ -98,3 +97,4 @@
         <div fx:e="link" fx:aif="$price"><a href="{$url}">{$price /}</a></div>
     {/use}
 {/preset}
+*}

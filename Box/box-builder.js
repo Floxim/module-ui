@@ -54,7 +54,10 @@ function box_builder($node, params) {
     };
     
     this.drawField = function(field, $target, index) {
-        var field_meta = this.fields_map[field.keyword];
+        var field_meta = this.fields_map[field.keyword] || {};
+        if (!field_meta.name) {
+            field_meta.name = field.keyword;
+        }
         var $field = $(
             '<div class="'+cl+'__field">'+
                 '<span class="'+cl+'__field-label">'+field_meta.name+'</span>'+
@@ -115,6 +118,9 @@ function box_builder($node, params) {
         });
         this.$canvas.data('vals', box_vals);
         
+        if (!value.groups || !value.groups instanceof Array) {
+            value.groups = [];
+        }
         for (var i = 0; i < value.groups.length; i++) {
             this.drawGroup(value.groups[i], i);
             this.drawGroup({});
@@ -255,13 +261,24 @@ function box_builder($node, params) {
     var adder_active_class = cl+'__adder_active';
     function showAvail() {
         that.$adder.addClass(adder_active_class);
-        //that.$avail.css('display', 'block');
         that.$avail.addClass(cl+'__avail_active');
+        var avail_box = that.$avail[0].getBoundingClientRect(),
+            canvas_box = that.$canvas[0].getBoundingClientRect(),
+            doc_box = document.body.getBoundingClientRect();
+        that.$avail.css('left', canvas_box.right);
+        if (doc_box.right - canvas_box.right < avail_box.width + 20) {
+            that.$adder.css('right', canvas_box.width - 7);
+            that.$avail.css('left', canvas_box.left - avail_box.width);
+        } else {
+            
+        }
     }
     
     function hideAvail() {
-        that.$adder.removeClass(adder_active_class);
-        that.$avail.removeClass(cl+'__avail_active');
+        that.$adder.removeClass(adder_active_class).css('right', '');
+        that.$avail.removeClass(cl+'__avail_active').one('transitionend', function() {
+            that.$avail.css('left');
+        });
     }
     
     this.init = function () {

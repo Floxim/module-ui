@@ -1,0 +1,45 @@
+/*
+vars:
+    cols:
+        type: livesearch
+        values:
+            2: 2
+            3: 3
+            4: 4
+            5: 5
+        label: Число колонок
+    margin_hor:
+        label: Отступ сбоку
+        type: number
+        step: 0.25
+        min: 0
+    margin_ver:
+        label: Отступ снизу
+        type: number
+        step: 0.25
+        min: 0
+*/
+.tiles_style_default(
+    @cols: 2;
+    @margin_hor: 1em;
+    @margin_ver: 1em;
+) {
+    #__tile {
+        & when (unit(@margin_hor) <= 0) {
+            width: (100% / @cols);
+            max-width: (100% / @cols) + 0.05%;
+            margin-right:0;
+        }
+        margin-bottom:@margin_ver;
+    }
+    margin-bottom:@margin_ver * -1;
+    
+    & when (unit(@margin_hor) > 0) {
+        margin-right: @margin_hor * -1;
+        #__tile {
+            width:~"calc(" (100% / @cols) ~" - " @margin_hor ~")";
+            max-width:~"calc(" (100% / @cols) ~" - " @margin_hor ~" + 0.05%)";
+            margin-right:@margin_hor;
+        }
+    }
+}

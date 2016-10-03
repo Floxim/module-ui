@@ -55,12 +55,50 @@ class Box {
         );
     }
     
+    public function getAvailFields($context)
+    {
+        $item = $context->get('item');
+        $all = $item->getFields();
+        $avail = array();
+        $skip = array(
+            'id',
+            'is_published',
+            'is_branch_published',
+            'infoblock_id',
+            'parent_id',
+            'site_id',
+            'link_type',
+            'external_url',
+            'linked_page_id',
+            'meta',
+            'priority'
+        );
+        
+        $skip_types = array(
+            'image',
+            'link',
+            'multilink'
+        );
+        
+        foreach ($all as $f) {
+            $kw = $f['keyword'];
+            if (in_array($kw, $skip) || in_array($f['type'], $skip_types)) {
+                continue;
+            }
+            $avail []= array(
+                'keyword' => $kw,
+                'name' => $f['name'],
+                'template' => 'value'
+            );
+        }
+        return $avail;
+    }
+    
     public function __construct($context, $box_id, $loop = null)
     {
         if (fx::isAdmin()) {
             self::addAdminAssets();
-            $item = $context->get('item');
-            $this->avail = $item->getFields();
+            $this->avail = $this->getAvailFields($context);
         }
         $this->box_id = $box_id;
         $param_id = $this->getParamId();
@@ -70,7 +108,7 @@ class Box {
         }
         if (!$data || !isset($data['is_stored'])) {
             $groups = $context->get('groups');
-            $default_data = self::prepareGroups($groups);
+            $default_data = $this->prepareGroups($groups);
             $data = $data ? \Floxim\Floxim\System\Util::fullMerge($data, $default_data) : $default_data;
         }
         $this->data = $data;
@@ -106,20 +144,34 @@ class Box {
         }
     }
     
-    protected static function prepareGroups($groups)
+    protected function hasField($keyword) 
+    {
+        foreach ($this->avail as $f) {
+            if ($f['keyword'] === $keyword) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    protected function prepareGroups($groups)
     {
         $res = array(
             'groups' => array()
         );
         if (!$groups || !is_array($groups)) {
-            $groups = array(
-                array(
+            $groups = array();
+            if ($this->hasField('name')) {
+                $groups []= array(
                     array('keyword' => 'name', 'field_link' => 1)
-                ),
-                array(
+                );
+            }
+            
+            if ($this->hasField('description')) {
+                $groups []= array(
                     array('keyword' => 'description')
-                )
-            );
+                );
+            }
         }
         foreach ($groups as $group) {
             if (!is_array($group)) {
@@ -138,6 +190,7 @@ class Box {
             }
             $res['groups'][]= $group;
         }
+        fx::cdebug($res);
         return $res;
     }
     
@@ -154,47 +207,15 @@ class Box {
     }
 
     public function export() {
-        $avail = array();
-        $skip = array(
-            'id',
-            'is_published',
-            'is_branch_published',
-            'infoblock_id',
-            'parent_id',
-            'site_id',
-            'link_type',
-            'external_url',
-            'linked_page_id',
-            'meta',
-            'priority'
-        );
         
-        $skip_types = array(
-            'image',
-            'link',
-            'multilink'
-        );
-        
-        foreach ($this->avail as $f) {
-            $kw = $f['keyword'];
-            if (in_array($kw, $skip) || in_array($f['type'], $skip_types)) {
-                continue;
-            }
-            $avail []= array(
-                'keyword' => $kw,
-                'name' => $f['name'],
-                'template' => 'value'
-            );
-        }
         $this->template->registerParam(
-            //'box_'.$this->box_id,
             $this->getParamId(),
             array(
                 'type' => 'fx-box-builder',
                 'label' => 'Box',
                 'value' => array_merge($this->data, array('is_stored' => true)),
                 'params' => $this->params,
-                'avail' => $avail
+                'avail' => $this->avail
             )
         );
     }

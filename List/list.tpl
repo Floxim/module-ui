@@ -27,7 +27,7 @@
     {apply floxim.main.content:pagination with $pagination /}
 </div>
 
-    {*
+{*
 {template id="list_image_side"}
     {set $image_field = $item.hasField('image') ? 'image' : '%image'  /}
     <img fx:e="image-img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size}" />

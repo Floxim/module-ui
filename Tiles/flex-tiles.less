@@ -1,32 +1,8 @@
-.tiles_loop(@count) when (@count > 0) {
-    .tiles_loop(@count - 1);
-    
-    .@{namespace}tiles_cols_@{count} .@{namespace}tile {
-        width: (100% / @count);
-        max-width: (100% / @count) + 0.05%;
-    }
-    
-    .tiles_padding_on.tiles_cols_@{count} .@{namespace}tile
-    {
-        width:~"calc(" (100% / @count) ~" - " (@layout_padding_horizontal * 1) ~")";
-        max-width:~"calc(" (100% / @count) ~" - " (@layout_padding_horizontal * 1) ~" + 0.05%)";
-    }
-}
-
-.tiles_loop(5);
-
 .@{namespace}tiles {
     display: flex;
     flex-wrap: wrap;
-    width:100%;
+    min-width:100%;
     justify-content: flex-start;
-    &_padding_on {
-        margin:@layout_padding_horizontal / 2 * -1;
-        margin-right:~"calc(" @layout_padding_horizontal / 2 * -1 ~" - 0.5px)";
-    }
-    &_padding_on .tile {
-        margin:@layout_padding_horizontal / 2;
-    }
 }
 
 .@{namespace}tile {
