@@ -263,13 +263,12 @@ function grid_builder($node, params) {
         
         $.each(params, function(field_key, field) {
             field.name = field_key;
-            fields.push(field);
+            fields.push( $.extend(true, {}, field) );
         });
         
         
         $fx.front.prepare_infoblock_visual_fields([fields], function(res) {
             fields = res[0];
-            
             $.each(fields, function(index, field) {
                  if (field.type === 'group' && field.fields) {
                      for (var i = 0; i < field.fields.length; i++) {

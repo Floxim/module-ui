@@ -15,11 +15,11 @@
     
     {default $slide_image_size = 'max-width:1200px; max-height:600px;' /}
     
-    {default $slide_width = 1 /}
+    {set $slide_width = 1 /}
     
-    {default $image_ratio = 1 /}
+    {set $image_ratio = 1 /}
     
-    {default $slide_image_width = 1200 /}    
+    {set $slide_image_width = 1200 /}    
     {default $slide_image_height = 600 /}
     
     {@autoplay label="Слайдшоу" type="checkbox" default="0"}
@@ -59,7 +59,7 @@
     fx:styled="Стиль слайда"
     data-pic="{if $_is_admin}{$slide_image_field /}{/if}">
     
-    
+    {*
     {default $image_in_slide_width = 1 /}
     
     {set $image_ratio = $image_ratio * $image_in_slide_width /}
@@ -68,7 +68,8 @@
     {set $slide_image_height = $slide_image_width / $image_ratio /}
     
     {set $slide_image_size = 'width: ' . $slide_image_width . '; height: ' . $slide_image_height /}
-    
+    *}
+    {default $slide_image_size = '1200*500' /}
     
     <div fx:e="image" style="background-image:url({$item[$slide_image_field] | fx::image : $slide_image_size});">
         
@@ -77,24 +78,3 @@
         {apply floxim.ui.box:box with $box_id = 'slidebox' /}
     </div>
 </div>
-{*
-{template id="slide_data"}
-    <fx:a fx:e="title">{$name}</fx:a>
-    <div fx:e="description" fx:aif="$description">{$description}</div>
-    <div fx:e="link"><a href="{$url}">{$%more label="Текст ссылки"}Узнать больше{/$}</a></div>
-{/template}
-
-{preset id="slider#photo" of="floxim.media.photo:list" replace="1"}
-    {use as="slide_data"}
-        <div fx:e="description" fx:aif="$description">{$description /}</div>
-    {/use}
-{/preset}
-
-{preset id="slider#service" of="floxim.corporate.service:list" replace="1"}
-    {use as="slide_data"}
-        <fx:a fx:e="title">{$name}</fx:a>
-        <div fx:e="description" fx:aif="$description">{$description}</div>
-        <div fx:e="link" fx:aif="$price"><a href="{$url}">{$price /}</a></div>
-    {/use}
-{/preset}
-*}
