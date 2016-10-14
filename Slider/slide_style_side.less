@@ -18,7 +18,7 @@ export:
         width:100% - @image_width;
         min-height:100%;
         .color(@bg_color; background);
-        padding:@layout_padding_vertical @layout_padding_horizontal;
+        padding:1em;
         display:flex;
         flex-direction:column;
         align-items:flex-start;
@@ -39,19 +39,19 @@ export:
         font-size:30px;
         text-decoration: none;
         font-weight:bold;
-        margin-bottom:@layout_padding_vertical;
+        margin-bottom:1em;
     }
     #__description {
         min-height:0;
         overflow:hidden;
         font-size:21px;
-        padding-bottom:@layout_padding_vertical/2;
-        margin-bottom:@layout_padding_vertical/2;
+        padding-bottom:1em;
+        margin-bottom:1em;
         position:relative;
         &:after {
             content:'';
             width:100%;
-            height:@layout_padding_vertical/2;
+            height:1em;
             position:absolute;
             bottom:0;
             left:0;

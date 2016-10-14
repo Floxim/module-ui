@@ -11,7 +11,8 @@
         fx:scope
         fx:e="group"
         fx:b="group"
-        fx:styled-inline>
+        fx:styled-inline
+        fx:hide-empty>
         <div 
             fx:each="$fields as $field_view" 
             fx:scope
