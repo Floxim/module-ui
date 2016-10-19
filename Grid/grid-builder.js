@@ -267,7 +267,7 @@ function grid_builder($node, params) {
         });
         
         
-        $fx.front.prepare_infoblock_visual_fields([fields], function(res) {
+        $fx.front.prepare_infoblock_visual_fields([fields]).then(function(res) {
             fields = res[0];
             $.each(fields, function(index, field) {
                  if (field.type === 'group' && field.fields) {
