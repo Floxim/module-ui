@@ -190,7 +190,6 @@ class Box {
             }
             $res['groups'][]= $group;
         }
-        fx::cdebug($res);
         return $res;
     }
     
@@ -212,7 +211,7 @@ class Box {
             $this->getParamId(),
             array(
                 'type' => 'fx-box-builder',
-                'label' => 'Box',
+                'label' => 'Поля',
                 'value' => array_merge($this->data, array('is_stored' => true)),
                 'params' => $this->params,
                 'avail' => $this->avail

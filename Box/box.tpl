@@ -38,15 +38,18 @@
     {if $field.type === 'string'}
         {@field_link label="Ссылка?" type="checkbox" default="0" /}
     {/if}
-    <div fx:e="value">
-        <a href="{$url}" fx:omit="!$field_link">
-            {if $field.type === 'datetime'}
-                {apply floxim.ui.date:date with $date = $value /}
-            {else}
-                {$value /}
-            {/if}
-        </a>
-    </div>
+    {set $res_value}
+        {if $field.type === 'datetime'}
+            {apply floxim.ui.date:date with $date = $value /}
+        {else}
+            {$value /}
+        {/if}
+    {/set}
+    {if $field_link}
+        <a href="{$url}" fx:e="value">{$res_value /}</a>
+    {else}
+        <div fx:e="value">{$res_value /}</div>
+    {/if}
 </div>
 
 <a fx:template="link_value" fx:aif="$value" fx:omit="!$url" href="{$url}">

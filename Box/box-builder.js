@@ -78,7 +78,7 @@ function box_builder($node, params) {
             $c_group = ui.item.closest('.'+cl+'__group'),
             $empty_group = $([]);
         
-        hideAvail();
+        (closeAvail || function(){})();
         
         if ($c_group.length > 0) {
             var $group_fields = $c_group.find('.'+cl+'__field:not(.ui-sortable-placeholder)');
@@ -258,7 +258,9 @@ function box_builder($node, params) {
     };
     
     
-    var adder_active_class = cl+'__adder_active';
+    var adder_active_class = cl+'__adder_active',
+        closeAvail = null;
+    
     function showAvail() {
         that.$adder.addClass(adder_active_class);
         that.$avail.addClass(cl+'__avail_active');
@@ -272,6 +274,12 @@ function box_builder($node, params) {
         } else {
             
         }
+        closeAvail = $fx.close_stack.push(
+            function() {
+                hideAvail();
+            },
+            that.$avail
+        );
     }
     
     function hideAvail() {
@@ -290,7 +298,7 @@ function box_builder($node, params) {
         
         this.$adder.click(function() {
             if (that.$adder.hasClass(adder_active_class)) {
-                hideAvail();
+                closeAvail();
             } else {
                 showAvail();
             }
@@ -328,6 +336,18 @@ function box_builder($node, params) {
             appendTo: '.fx_admin_form__body',
             helper: 'clone',
             scroll:false
+        });
+        
+        this.$avail.on('click', '.'+cl+'__field', function() {
+            var $target_group = that.$canvas.find('>.'+cl+'__group').last(),
+                $field = $(this),
+                empty_class = cl+'__group_empty';
+            $target_group.append($field);
+            
+            $target_group.removeClass(empty_class);
+            closeAvail();
+            that.updateValue();
+            return false;
         });
         setTimeout(function() {
             $node.closest('.field').find('label').on('click', function() {
