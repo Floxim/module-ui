@@ -86,7 +86,8 @@ container:
                 position: absolute;
                 top:0;
                 left:0;
-                padding-bottom: 100% / @ratio;
+                //padding-bottom: 100% / @ratio;
+                padding-bottom: ~"calc(" 100% / @ratio ~" + 1px)";
                 width:100%;
                 .background(@pic_bg);
             }
@@ -103,7 +104,7 @@ container:
             &:after {
                 content:'';
                 display:block;
-                padding-bottom: 100% / @ratio;
+                padding-bottom: ~"calc(" 100% / @ratio ~" + 1px)";
             }
         }
         #__data {
