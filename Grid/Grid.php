@@ -84,7 +84,7 @@ class Grid {
                 'type' => 'fx-grid-builder',
                 //'type' => 'text',
                 //'code' => true,
-                'label' => 'Grid',
+                'label' => 'Колонки',
                 'value' => array_merge($this->data, array('is_stored' => true)),
                 'params' => $this->params
             )

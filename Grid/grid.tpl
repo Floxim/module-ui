@@ -2,6 +2,7 @@
     fx:b="grid" 
     fx:of="show"
     fx:template="grid"
+    fx:name="Колонки"
     fx:styled-inline>
     
     {css}grid.less{/css}

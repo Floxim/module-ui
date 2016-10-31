@@ -30,21 +30,28 @@
 </div>
         
 <div fx:template="value" fx:aif="$value" fx:b="value" fx:styled="label:Стиль поля">
-    {@show_label label="Подпись?" type="checkbox" default="0" /}
+    {if true}
+        {@show_label label="Подпись?" type="checkbox" default="0" /}
+        {@value_icon label="Иконка?" type="iconpicker" default="0" /}
+    {/if}
+    {if $field.type === 'string'}
+        {@field_link label="Ссылка?" type="checkbox" default="0" /}
+    {/if}
+    
     
     <div fx:if="$show_label" fx:e="label">
         {%value_label}{$field.name /}{/%}
     </div>
-    {if $field.type === 'string'}
-        {@field_link label="Ссылка?" type="checkbox" default="0" /}
-    {/if}
+    
     {set $res_value}
+        <span fx:if="$value_icon" class="{= \Floxim\Floxim\Asset\Icons::getClass( $value_icon) }" fx:e="icon"></span>
         {if $field.type === 'datetime'}
             {apply floxim.ui.date:date with $date = $value /}
         {else}
             {$value /}
         {/if}
     {/set}
+    
     {if $field_link}
         <a href="{$url}" fx:e="value">{$res_value /}</a>
     {else}
