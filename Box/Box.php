@@ -57,11 +57,27 @@ class Box {
     
     public function getAvailFields($context)
     {
-        $item = $context->get('item');
-        $all = $item->getFields();
+        $field_source = $context->get('field_source');
+        switch ($field_source) {
+            case 'block':
+                return $this->getAvailBlockFields($context->get('infoblock'));
+            case 'item': default:
+                return $this->getAvailItemFields($context->get('item'));
+        }
+    }
+    
+    protected function getAvailItemFields($item)
+    {
         $avail = array();
+        if (!$item) {
+            return $avail;
+        }
+        $all = $item->getFields();
+        
         $skip = array(
             'id',
+            'type',
+            'created',
             'is_published',
             'is_branch_published',
             'infoblock_id',
@@ -70,6 +86,9 @@ class Box {
             'link_type',
             'external_url',
             'linked_page_id',
+            'url',
+            'title',
+            'h1',
             'meta',
             'priority'
         );
@@ -94,6 +113,24 @@ class Box {
         return $avail;
     }
     
+    public function getAvailBlockFields()
+    {
+        //fx::log('gabf', $block);
+        $avail = array(
+            array(
+                'keyword' => 'block:content',
+                'name' => 'Содержание',
+                'template' => 'floxim.layout.wrapper:wrapper_content'
+            ),
+            array(
+                'keyword' => 'block:header',
+                'name' => 'Заголовок',
+                'template' => 'floxim.layout.wrapper:wrapper_header'
+            )
+        );
+        return $avail;
+    }
+
     public function __construct($context, $box_id, $loop = null)
     {
         if (fx::isAdmin()) {
@@ -106,12 +143,14 @@ class Box {
         if (is_string($data) && !empty($data)) {
             $data = json_decode($data, true);
         }
+        //fx::log($this, $data);
         if (!$data || !isset($data['is_stored'])) {
             $groups = $context->get('groups');
             $default_data = $this->prepareGroups($groups);
             $data = $data ? \Floxim\Floxim\System\Util::fullMerge($data, $default_data) : $default_data;
         }
         $this->data = $data;
+        //fx::log('set data', $this->data);
         if ($loop) {
             $this->containing_loop = $loop;
             $box = $this;

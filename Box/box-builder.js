@@ -188,7 +188,8 @@ function box_builder($node, params) {
     this.showSettings = function($el) {
         var params = $el.data('params'),
             data = $el.data('vals'),
-            index = $el.data('index');
+            index = $el.data('index'),
+            $original_form = $el.closest('form');
     
         if (!params) {
             console.log('no params');
@@ -216,8 +217,10 @@ function box_builder($node, params) {
             });
             
             function update_data($form) {
-                var $el = $('div[data-index="'+index+'"]'),
-                    $builder  = $el.closest('.'+cl),
+                var c_name = that.params.name,
+                    $inp = $original_form.find('[name="'+c_name+'"]'),
+                    $builder = $inp.closest('.'+cl),
+                    $el = $builder.find('[data-index="'+index+'"]'),
                     builder = $builder.data('box-builder'), 
                     new_data = $form.formToHash(
                         function(f) {

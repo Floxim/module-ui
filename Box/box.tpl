@@ -18,26 +18,25 @@
             fx:scope
             fx:e="field"
             fx:hide-empty>
-            
-            {apply 
-                $field_view.template 
-                with 
-                    $field = $item.getField($field_view.keyword),
-                    $value = $item[$field_view.keyword] /}
+            {apply $field_view.template /}
         </div>
     </div>
     {= $box.stop() /}
 </div>
         
 <div fx:template="value" fx:aif="$value" fx:b="value" fx:styled="label:Стиль поля">
-    {if true}
+    
+    {first}
+        {set $field = $item.getField($field_view.keyword) /}
+        {set $value = $item[$field_view.keyword] /}
+        
         {@show_label label="Подпись?" type="checkbox" default="0" /}
         {@value_icon label="Иконка?" type="iconpicker" default="0" /}
-    {/if}
-    {if $field.type === 'string'}
-        {@field_link label="Ссылка?" type="checkbox" default="0" /}
-    {/if}
-    
+        
+        {if $field.type === 'string'}
+            {@field_link label="Ссылка?" type="checkbox" default="0" /}
+        {/if}
+    {/first}
     
     <div fx:if="$show_label" fx:e="label">
         {%value_label}{$field.name /}{/%}
@@ -58,7 +57,3 @@
         <div fx:e="value">{$res_value /}</div>
     {/if}
 </div>
-
-<a fx:template="link_value" fx:aif="$value" fx:omit="!$url" href="{$url}">
-    {$value /}
-</a>
