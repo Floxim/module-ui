@@ -30,8 +30,13 @@
         {default $image_ratio = 1.4 /}
         {default $image_width = $full_width / $cols /}
         {default $image_height = $image_width / $image_ratio /}
+        {default $pic_crop = true /}
         
-        {set $image_size = ceil($image_width) . '*' . ceil($image_height) /}
+        {if $pic_crop}
+            {set $image_size = ceil($image_width) . '*' . ceil($image_height) /}
+        {else}
+            {set $image_size = 'max-width:' . ceil($image_width) . '; max-height: ' . ceil($image_height) /}
+        {/if}
         
         {set $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
         <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />

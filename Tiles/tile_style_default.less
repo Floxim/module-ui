@@ -29,6 +29,7 @@ container:
     lightness: '@box_position === "overlap" ? @pic_bg : "none"'
 export:
     image_ratio: '@ratio'
+    pic_crop: '@box_position !== "overlap" && @pic_fit == "cover"'
 */
 
 .tile_style_default(
