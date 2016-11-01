@@ -10,13 +10,13 @@
     {default $full_width = 1400 /}
     {default $pic_ratio = 'none' /}
     
-    {set $pic_width = $pic_part * $full_width /}
+    {set $pic_width = ceil( $pic_part * $full_width ) /}
     
     {if $pic_ratio == 'none'}
         {set $image_size = 'max-width:' . $pic_width /}
     {else}
         {set $pic_height = $pic_width / $pic_ratio /}
-        {set $image_size = $pic_width . '*' . $pic_height /}
+        {set $image_size = $pic_width . '*' . ceil($pic_height) /}
     {/if}
     {css}
         list.less

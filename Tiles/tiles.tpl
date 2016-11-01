@@ -31,7 +31,7 @@
         {default $image_width = $full_width / $cols /}
         {default $image_height = $image_width / $image_ratio /}
         
-        {set $image_size = $image_width . '*' . $image_height /}
+        {set $image_size = ceil($image_width) . '*' . ceil($image_height) /}
         
         {set $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
         <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />

@@ -57,9 +57,7 @@
     {set $image_width = $full_width / $cols /}
     {set $image_height = $image_width / $image_ratio /}
     
-    {set $slide_image_size = $image_width . '*' . $image_height /}
-    
-    {default $slide_image_size = '1200*500' /}
+    {set $slide_image_size = ceil($image_width) . '*' . ceil($image_height) /}
     
     <div fx:e="image" style="background-image:url({$item[$slide_image_field] | fx::image : $slide_image_size});">
         
