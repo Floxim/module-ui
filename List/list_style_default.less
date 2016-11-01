@@ -32,7 +32,8 @@ vars:
         type: number
         max: 20
 export:
-    pic_width: 'ceil(1300 * @pic_width / 10000) * 100'
+    pic_part: '@pic_width / 100'
+    pic_ratio: '@pic_ratio'
 */
 .list_style_default(
     @pic_width:30%;

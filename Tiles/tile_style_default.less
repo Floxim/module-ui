@@ -27,6 +27,8 @@ vars:
         parent: box_position !~ (no_image|overlap)
 container:
     lightness: '@box_position === "overlap" ? @pic_bg : "none"'
+export:
+    image_ratio: '@ratio'
 */
 
 .tile_style_default(

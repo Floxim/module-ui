@@ -13,15 +13,6 @@
     
     {default $slide_image_field = 'image' /}
     
-    {default $slide_image_size = 'max-width:1200px; max-height:600px;' /}
-    
-    {set $slide_width = 1 /}
-    
-    {set $image_ratio = 1 /}
-    
-    {set $slide_image_width = 1200 /}    
-    {default $slide_image_height = 600 /}
-    
     {@autoplay label="Слайдшоу" type="checkbox" default="0"}
     {@pause_time label="Пауза" type="number" min="1" max="20" step="1" parent="autoplay" default="3" units="с"}
     {@move_time label="Скорость" type="number" min="0.2" max="5" step="0.2" default="0.5"}
@@ -59,16 +50,15 @@
     fx:styled="Стиль слайда"
     data-pic="{if $_is_admin}{$slide_image_field /}{/if}">
     
-    {*
-    {default $image_in_slide_width = 1 /}
+    {default $full_width = 1400 /}
+    {default $image_ratio = 3 /}
+    {default $cols = 1 /}
     
-    {set $image_ratio = $image_ratio * $image_in_slide_width /}
+    {set $image_width = $full_width / $cols /}
+    {set $image_height = $image_width / $image_ratio /}
     
-    {set $slide_image_width = $slide_image_width * $slide_width * $image_in_slide_width /}
-    {set $slide_image_height = $slide_image_width / $image_ratio /}
+    {set $slide_image_size = $image_width . '*' . $image_height /}
     
-    {set $slide_image_size = 'width: ' . $slide_image_width . '; height: ' . $slide_image_height /}
-    *}
     {default $slide_image_size = '1200*500' /}
     
     <div fx:e="image" style="background-image:url({$item[$slide_image_field] | fx::image : $slide_image_size});">

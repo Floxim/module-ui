@@ -6,8 +6,18 @@
     fx:b="list {$list_mods}" 
     fx:styled="Стиль списка"
     fx:size="wide,high">
-    {*{default $image_size = '340*240' /}*}
-    {default $image_size = 'max-width:450' /}
+    {default $pic_part = 0.3 /}
+    {default $full_width = 1400 /}
+    {default $pic_ratio = 'none' /}
+    
+    {set $pic_width = $pic_part * $full_width /}
+    
+    {if $pic_ratio == 'none'}
+        {set $image_size = 'max-width:' . $pic_width /}
+    {else}
+        {set $pic_height = $pic_width / $pic_ratio /}
+        {set $image_size = $pic_width . '*' . $pic_height /}
+    {/if}
     {css}
         list.less
     {/css}
@@ -26,31 +36,3 @@
         
     {apply floxim.main.content:pagination with $pagination /}
 </div>
-
-{*
-{template id="list_image_side"}
-    {set $image_field = $item.hasField('image') ? 'image' : '%image'  /}
-    <img fx:e="image-img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size}" />
-{/template}
-
-{template id="list_data"}
-    <div fx:e="title"><fx:a fx:e="item-link">{$name}</fx:a></div>
-    <div fx:e="description">
-        {$description}
-    </div>
-    <div fx:e="extra">
-        {apply list_extra /}
-    </div>
-{/template}
-
-
-{preset id="list#factoid" of="floxim.main.factoid:list" replace="1"}
-    {use as="list_data"}
-        <div fx:e="title">{$name /}</div>
-        <div fx:e="description">{$description /}</div>
-        <div fx:if="$url" fx:e="more">
-            <span fx:e="more-link">{$%link_text}Подробнее{/%}</span>
-        </div>
-    {/use}
-{/preset}
-*}
