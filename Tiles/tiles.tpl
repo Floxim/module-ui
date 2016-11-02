@@ -42,7 +42,6 @@
         <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
     </div>
     <div fx:e="data">
-        {*<p>[{$image_size /}]</p>*}
         {apply floxim.ui.box:box with $box_id = 'tilebox' /}
     </div>
 </div>

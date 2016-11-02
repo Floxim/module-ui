@@ -1,6 +1,25 @@
-
+/*
+vars:
+    sep_color:
+        type: palette
+        label: Разделитель
+        opacity: true
+*/
 .grid_style_default(
-    
+    @sep_color:none;
 ) {
-    
+    & when not(@sep_color = none) {
+        & > #__col:not(:last-child) {
+            position:relative;
+            &:after {
+                content:'';
+                position:absolute;
+                top:0;
+                right:0;
+                height:100%;
+                border-left:1px solid;
+                .color(@sep_color, border-left-color);
+            }
+        }
+    }
 }
