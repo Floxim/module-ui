@@ -23,7 +23,9 @@ class Module extends \Floxim\Floxim\Component\Module\Entity {
         $formats = array(
             'j %month:gen% Y',
             '%Month% Y',
-            'd.m.Y'
+            'd.m.Y',
+            'd/m/Y',
+            'H:i'
         );
         $res = array();
         foreach ($formats as $f) {
