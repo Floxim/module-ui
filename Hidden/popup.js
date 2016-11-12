@@ -22,7 +22,19 @@ $(function() {
                 resolve($popup);
                 return;
             }
-            // ajax call here
+            $.ajax({
+                url:'/~ajax/',
+                data: {
+                    _ajax_infoblock_id:infoblock_id,
+                    _ajax_base_url: base_url || document.location.href
+                },
+                type:'post',
+                success: function(res) {
+                    var $res = $(res);
+                    $('body').append($res);
+                    resolve($res);
+                }
+            });
         });
     }
     
