@@ -45,7 +45,7 @@ Floxim.prototype.block = function(selector, callback) {
 
 Floxim.prototype.ajax = function(params) {
     var data = {
-        _ajax_base_url: params.base_url ? document.baseURI+params.base_url : document.location.href
+        _ajax_base_url: params.base_url || document.location.href
     };
     
     if (params.infoblock_id) {
@@ -71,20 +71,83 @@ Floxim.prototype.ajax = function(params) {
         $.extend(data, params.data);
     }
     
-    var xhr = $.ajax({
-        url:'/~ajax/',
-        type:'post',
-        data:data,
-        dataType: params.dataType || 'html',
-        success: function(res, status, xhr) {
-            window.Floxim.handleAjaxAssets(xhr);
-            if (params.success) {
-                return params.success(res, status, xhr);
+    var that = this;
+    
+    return new Promise(
+        function(resolve, reject) {
+            $.ajax({
+                url:'/~ajax/',
+                type:'post',
+                data:data,
+                dataType: params.dataType || 'html',
+                success: function(res, status, xhr) {
+                    try {
+                        var response = that.parseResponse(res);
+                        resolve(response);
+                    } catch (e) {
+                        reject(e);
+                    }
+                },
+                error: function(res) {
+                    reject(res);
+                }
+            });
+        }
+    );
+};
+
+Floxim.prototype.parseResponse = function(data) {
+    var json = null;
+    try {
+        json = $.parseJSON(data);
+    } catch (e) {
+        return data;
+    }
+    
+    if (!json || !json.format || json.format !== 'fx-response') {
+        return data;
+    }
+
+    var js_assets = json.js;
+    if (js_assets) {
+        if (!window.fx_assets_js) {
+            window.fx_assets_js = [];
+        }
+        for (var i = 0; i < js_assets.length; i++) {
+            var asset = js_assets[i];
+            var is_loaded = $.inArray(asset, window.fx_assets_js);
+            if (is_loaded !== -1) {
+                continue;
+            }
+            (function(asset) {
+                $.ajax({
+                    url:asset,
+                    async:false,
+                    dataType: 'script',
+                    success: function() {
+                        window.fx_assets_js.push(asset);
+                    }
+                });
+            })(asset);
+        }
+    }
+
+    var css_assets = json.css || [];
+    
+    for (var i = 0; i < css_assets.length; i++) {
+        var asset = css_assets[i];
+        if (typeof asset === 'string') {
+            if ($('link[href="'+asset+'"]').length === 0) {
+                $('head').append('<link type="text/css" rel="stylesheet" href="'+asset+'" />');
             }
         }
-    });
+    }
     
-    return xhr;
+    var response = json.response;
+    if ( typeof response !== 'string') {
+        response = JSON.stringify(response);
+    }
+    return response;
 };
 
 Floxim.prototype.reload = function($node, callback, data) {

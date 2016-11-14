@@ -22,18 +22,16 @@ $(function() {
                 resolve($popup);
                 return;
             }
-            $.ajax({
-                url:'/~ajax/',
-                data: {
-                    _ajax_infoblock_id:infoblock_id,
-                    _ajax_base_url: base_url || document.location.href
-                },
-                type:'post',
-                success: function(res) {
-                    var $res = $(res);
-                    $('body').append($res);
-                    resolve($res);
+            Floxim.ajax(
+                {
+                    base_url: base_url,
+                    infoblock_id: infoblock_id
                 }
+            ).then(function(res) {
+                var $res = $(res);
+                $('body').append($res);
+                resolve($res);
+                return;
             });
         });
     }

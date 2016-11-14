@@ -2,7 +2,10 @@
     {first}
         {set $area_name = 'popup-' . $infoblock.id /}
     {/first}
-    {js}popup.js{/js}
+    {js}
+        /module/Floxim/Ui/Js/Floxim.js
+        popup.js
+    {/js}
     {css}popup.less{/css}
     <span fx:e="close"></span>
     
