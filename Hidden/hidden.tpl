@@ -1,6 +1,15 @@
-<div fx:template="popup" fx:of="show" fx:b="popup id_{$area_name} hidden">
+{template id="popup_block" of="show"}
+    {set $popup_id = 'popup-' . $infoblock.id /}
+    {apply popup
+        with $area_name = $popup_id,
+             $popup_id = $popup_id,
+             $popup_content = ''
+    /}       
+{/template}
+
+<div fx:template="popup" fx:of="show" fx:b="popup id_{$popup_id} hidden size_{$size}">
     {first}
-        {set $area_name = 'popup-' . $infoblock.id /}
+        {defualt $size = 'auto' /}
     {/first}
     {js}
         /module/Floxim/Ui/Js/Floxim.js
@@ -8,9 +17,10 @@
     {/js}
     {css}popup.less{/css}
     <span fx:e="close"></span>
-    
     <div fx:e="overlay"></div>
-    <div fx:e="content" fx:area="$area_name">
-        
-    </div>
+    {if $popup_content}
+        <div fx:e="content">{$popup_content /}</div>
+    {elseif $area_name}
+        <div fx:e="content" fx:area="$area_name"></div>
+    {/if}
 </div>

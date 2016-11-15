@@ -43,7 +43,7 @@
     </div>
     
     {set $res_value}
-        <span fx:if="$value_icon" class="{= \Floxim\Floxim\Asset\Icons::getClass( $value_icon) }" fx:e="icon"></span>
+        <span fx:if="$value_icon" class="{= fx::icon( $value_icon ) }" fx:e="icon"></span>
         {if $field.type === 'datetime'}
             {apply floxim.ui.date:date with $date = $value /}
         {else}
