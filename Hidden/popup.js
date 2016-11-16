@@ -21,18 +21,18 @@ $(function() {
         return new Promise(function(resolve) {
             var $popup = $('.'+cl+'_id_popup-'+infoblock_id);
             
-            if ($popup.length) {
+            if ($popup.length && (!base_url || $popup.data('popup_base_url') === base_url)) {
                 resolve($popup);
                 return;
             }
             Floxim.ajax(
                 {
                     base_url: base_url,
-                    infoblock_id: infoblock_id
+                    infoblock_id: infoblock_id,
+                    $target: $('body')
                 }
-            ).then(function(res) {
-                var $res = $(res);
-                $('body').append($res);
+            ).then(function($res) {
+                $res.data('popup_base_url', base_url);
                 resolve($res);
                 return;
             });

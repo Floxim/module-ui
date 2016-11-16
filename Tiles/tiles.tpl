@@ -38,7 +38,7 @@
             {set $image_size = 'max-width:' . ceil($image_width) . '; max-height: ' . ceil($image_height) /}
         {/if}
         
-        {set $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
+        {default $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
         <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
     </div>
     <div fx:e="data">

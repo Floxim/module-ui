@@ -76,13 +76,20 @@ Floxim.prototype.ajax = function(params) {
     return new Promise(
         function(resolve, reject) {
             $.ajax({
-                url:'/~ajax/',
+                url: params.url || '/~ajax/',
                 type:'post',
                 data:data,
                 dataType: params.dataType || 'html',
                 success: function(res, status, xhr) {
                     try {
                         var response = that.parseResponse(res);
+                        if (params.$target) {
+                            var $res = $( $.trim(response) );
+                            params.$target.append($res);
+                            $res.trigger('fx_infoblock_loaded');
+                            resolve($res);
+                            return;
+                        }
                         resolve(response);
                     } catch (e) {
                         reject(e);

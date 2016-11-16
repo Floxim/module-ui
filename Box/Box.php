@@ -99,9 +99,14 @@ class Box {
             'multilink'
         );
         
+        $special_fields = $item->getBoxFields();
+        
         foreach ($all as $f) {
             $kw = $f['keyword'];
-            if (in_array($kw, $skip) || in_array($f['type'], $skip_types)) {
+            if (
+                (in_array($kw, $skip) || in_array($f['type'], $skip_types))
+                && !in_array($kw, $special_fields)
+            ) {
                 continue;
             }
             $avail []= array(
@@ -109,6 +114,12 @@ class Box {
                 'name' => $f['name'],
                 'template' => 'value'
             );
+        }
+        
+        foreach ($special_fields as $sf) {
+            if (is_array($sf)) {
+                $avail []= $sf;
+            }
         }
         return $avail;
     }
