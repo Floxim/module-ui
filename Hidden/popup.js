@@ -21,10 +21,17 @@ $(function() {
         return new Promise(function(resolve) {
             var $popup = $('.'+cl+'_id_popup-'+infoblock_id);
             
-            if ($popup.length && (!base_url || $popup.data('popup_base_url') === base_url)) {
+            var c_url = document.location.href.replace(/#.+$/, '');
+            
+            if (
+                $popup.length && (
+                    !base_url || $popup.data('popup_base_url') === base_url || base_url === c_url
+                )
+            ) {
                 resolve($popup);
                 return;
             }
+            
             Floxim.ajax(
                 {
                     base_url: base_url,
