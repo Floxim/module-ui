@@ -1,5 +1,4 @@
 .@{namespace}tiles {
-    //overflow:hidden;
     width:100%;
     #__wrapper {
         display: flex;
@@ -8,6 +7,14 @@
         justify-content: flex-start;
         &.fx_hidden_placeholded {
             margin:0 !important;
+        }
+    }
+    
+    #__wrapper > #__tile {
+        @media (max-width:800px) {
+            width: 100%;
+            margin-bottom:3rem;
+            max-width:none;
         }
     }
 }
