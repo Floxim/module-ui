@@ -106,6 +106,7 @@ function box_builder($node, params) {
     };
     
     this.draw = function(value) {
+        
         this.drawGroup({});
         
         this.$canvas.attr('data-index', 'root');
@@ -190,7 +191,7 @@ function box_builder($node, params) {
             data = $el.data('vals'),
             index = $el.data('index'),
             $original_form = $el.closest('form');
-    
+        
         if (!params) {
             console.log('no params');
             return;
@@ -203,36 +204,45 @@ function box_builder($node, params) {
             fields.push(field);
         });
         
-        
         $fx.front.prepare_infoblock_visual_fields([fields]).then(function(res) {
             fields = res[0];
             
             $.each(fields, function(index, field) {
-                 if (field.type === 'group' && field.fields) {
-                     for (var i = 0; i < field.fields.length; i++) {
-                         var cf = field.fields[i];
-                         cf.name = field.name+'['+cf.name+']';
-                     }
-                 }
+                if (field.names_updated) {
+                    return;
+                }
+                if (field.type === 'group' && field.fields) {
+                    for (var i = 0; i < field.fields.length; i++) {
+                        var cf = field.fields[i];
+                        cf.name = field.name+'['+cf.name+']';
+                    }
+                }
+                field.names_updated = true;
             });
             
-            function update_data($form) {
+            function get_data($form) {
+                return $form.formToHash(
+                    function(f) {
+                        return f.name !== 'fx_form_target' && f.name !== 'pressed_button';
+                    }
+                );
+            }
+            
+            function update_data(new_data) {
                 var c_name = that.params.name,
                     $inp = $original_form.find('[name="'+c_name+'"]'),
                     $builder = $inp.closest('.'+cl),
                     $el = $builder.find('[data-index="'+index+'"]'),
                     builder = $builder.data('box-builder'), 
-                    new_data = $form.formToHash(
-                        function(f) {
-                            return f.name !== 'fx_form_target' && f.name !== 'pressed_button';
-                        }
-                    );
+                    
                 
                 data = $.extend($el.data('vals'), new_data);
                 
                 $el.data('vals', data);
                 builder.updateValue();
             }
+            
+            var initial_data = null;
            
             $fx.front_panel.show_form(
                 {
@@ -246,14 +256,18 @@ function box_builder($node, params) {
                 {
                     view:'horizontal',
                     onready: function($form) {
+                        initial_data = get_data($form);
                         $form.on('change', function() {
-                            update_data($form);
+                            update_data(get_data($form));
                         });
                     },
                     onsubmit: function(e) {
-                        update_data($(e.target));
+                        update_data(get_data($(e.target)));
                         $fx.front_panel.hide();
                         return false;
+                    },
+                    oncancel: function($form) {
+                        update_data(initial_data)
                     }
                 }
             );
