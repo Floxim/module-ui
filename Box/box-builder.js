@@ -8,6 +8,7 @@ $t.add(
         return  '<div class="'+cl+'">'+
                     '<input type="hidden" data-json-val="true" class="'+cl+'__value" name="'+ _c.name+'" />'+
                     '<div class="'+cl+'__canvas"></div>'+
+                    '<div class="'+cl+'__box-config"></div>'+
                     '<div class="'+cl+'__adder">+</div>'+
                     '<div class="'+cl+'__avail"></div>'+
                 '</div>';
@@ -35,8 +36,9 @@ function box_builder($node, params) {
         if (index !== undefined) {
             $group.attr('data-index', index);
         } else {
-            $group.addClass(cl+'__group_empty')
+            $group.addClass(cl+'__group_empty');
         }
+        
         if (group.fields) {
             for (var i = 0; i < group.fields.length; i++) {
                 this.drawField(group.fields[i], $group, index + '-' + i);
@@ -68,6 +70,7 @@ function box_builder($node, params) {
             $field.attr('data-index', index);
         }
         $field.data('vals', field);
+        $field.data('meta', field_meta);
         $target.append($field);
     };
     
@@ -190,6 +193,7 @@ function box_builder($node, params) {
         var params = $el.data('params'),
             data = $el.data('vals'),
             index = $el.data('index'),
+            meta = $el.data('meta') || {},
             $original_form = $el.closest('form');
         
         if (!params) {
@@ -243,13 +247,17 @@ function box_builder($node, params) {
             }
             
             var initial_data = null;
-           
+            
+            
             $fx.front_panel.show_form(
                 {
                     header: 
-                        data && data.keyword ? 
-                            'Настраиваем поле &laquo;'+data.keyword+'&raquo;' :
-                            'Настраиваем строку №'+(index*1 + 1),
+                        'Настраиваем ' + 
+                        (
+                            data && data.keyword ? 
+                                'поле &laquo;'+(meta.name || data.keyword)+'&raquo;' :
+                                (index === 'root' ?  'контейнер' : 'строку №'+(index*1 + 1))
+                        ),
                     fields: fields,
                     form_buttons: ['cancel']
                 },
@@ -346,6 +354,11 @@ function box_builder($node, params) {
                 return false;
             });
         
+        this.$node.on('click', '.'+cl+'__box-config', function(e) {
+                that.showSettings(that.$canvas);
+                return false;
+            });
+        
         this.$avail.sortable({
             connectWith:'.'+cl+'__canvas .'+cl+'__group',
             start: that.startDrag,
@@ -366,11 +379,6 @@ function box_builder($node, params) {
             that.updateValue();
             return false;
         });
-        setTimeout(function() {
-            $node.closest('.field').find('label').on('click', function() {
-                that.showSettings(that.$canvas);
-            });
-        }, 200);
     };
     
     this.init();

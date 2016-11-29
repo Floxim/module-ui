@@ -12,6 +12,7 @@ vars:
         type: ratio
         parent: box_position != no_image
         label: Пропорции картинки
+        auto: true
     pic_bg:
         type: css-background
         parent: box_position == overlap
@@ -24,12 +25,25 @@ vars:
         values: 
             cover: Растянуть
             contain: Уместить
-        parent: box_position !~ (no_image|overlap)
+        parent: box_position !~ (no_image|overlap) && ratio != none
+    behaviour:
+        type: livesearch
+        label: Поведение текста
+        parent: box_position = overlap
+        values:
+            always: Всегда показывать
+            hover: Показать при наведении
+            hover_out: Скрыть при наведении
+    border:
+        type: measures
+        prop: borders
+    shadow:
+        type: css-shadow
 container:
     lightness: '@box_position === "overlap" ? @pic_bg : "none"'
 export:
     image_ratio: '@ratio'
-    pic_crop: '@box_position !== "overlap" && @pic_fit == "cover"'
+    pic_crop: '@box_position !== "overlap" && @pic_fit == "cover" && @pic_ratio != "none"'
 */
 
 .tile_style_default(
@@ -37,9 +51,17 @@ export:
     @ratio: 1.5;
     @pic_bg: @pic_bg;
     @pic_fit: cover;
+    @behaviour: always;
+    @border: none;
+    @shadow: none;
 ) {
+    
+    .box-shadow(@shadow);
+    .border(@border);
+    
+    overflow:hidden;
+    
     #__body {
-        a:b;
         display:flex;
         flex-direction:column;
         height:100%;
@@ -60,7 +82,7 @@ export:
     #__tilebox {
         width:100%;
     }
-    & when (@box_position = overlap) {
+    & when (@box_position = overlap) and not(@ratio = none) {
         #__body {
             position:relative;
             height:100%;
@@ -89,7 +111,6 @@ export:
                 position: absolute;
                 top:0;
                 left:0;
-                //padding-bottom: 100% / @ratio;
                 padding-bottom: ~"calc(" 100% / @ratio ~" + 1px)";
                 width:100%;
                 .background(@pic_bg);
@@ -101,7 +122,32 @@ export:
             width: 100%;
         }
     }
-    & when not(@box_position = overlap) {
+    
+    & when (@box_position = overlap) and (@ratio = none) {
+        position:relative;
+        
+        #__image {
+            position:relative;
+            &:after {
+                content: '';
+                background: rgba(0,0,0,0.3);
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+        }
+        #__data {
+            position: absolute;
+            width:100%;
+            top:0;
+            left:0;
+        }
+    }
+    
+    & when not(@box_position = overlap) and not(@ratio = none) {
         #__image {
             position:relative;
             &:after {
@@ -120,6 +166,26 @@ export:
             position:absolute;
             top:0;
             left:0;
+        }
+    }
+    
+    & when (@box_position  = overlap) and (@behaviour = hover) {
+        #__data {
+            opacity:0;
+            transition:opacity 0.3s ease;
+        }
+        &:hover #__data {
+            opacity:1;
+        }
+    }
+    
+    & when (@box_position  = overlap) and (@behaviour = hover_out) {
+        #__data {
+            opacity:1;
+            transition:opacity 0.3s ease;
+        }
+        &:hover #__data {
+            opacity:0;
         }
     }
 }

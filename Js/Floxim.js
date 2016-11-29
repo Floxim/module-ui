@@ -67,6 +67,10 @@ Floxim.prototype.ajax = function(params) {
         data._ajax_template = params.template;
     }
     
+    if (params.$block) {
+        data._ajax_container_props = this.getContainerProps(params.$block);
+    }
+    
     if (params.data) {
         $.extend(data, params.data);
     }
@@ -250,6 +254,40 @@ Floxim.prototype.handleAjaxAssets = function(xhr) {
         var asset = css_assets[i];
         $head.append('<link type="text/css" rel="stylesheet" href="'+asset+'" />');
     }
+};
+
+Floxim.prototype.getModifiers = function($node, name) {
+    var rex = new RegExp('^'+name+'_(.+?)(_(.+))?$'),
+        classes = $node.attr('class').split(' '),
+        res = {};
+    for (var i = 0; i < classes.length; i++) {
+        var match = classes[i].match(rex);
+        if (match) {
+            res[match[1]] = match[3] === undefined ? true : match[3];
+        }
+    }
+    return res;
+};
+
+Floxim.prototype.getContainerProps = function($n) {
+    var res = {},
+        $pars = $n.parents('.fx-block'),
+        that = this;
+    
+    $.each($pars, function() {
+        var mods = that.getModifiers($(this), 'fx-block');
+        $.each(mods, function( k, v) {
+            var p = k.match(/own-(.+)/);
+            if (!p) {
+                return;
+            }
+            p = p[1];
+            if (typeof res[p] === 'undefined') {
+                res[p] = v;
+            }
+        });
+    } );
+    return res;
 };
 
 Floxim.prototype.loaded = function($node) {

@@ -21,6 +21,11 @@ vars:
             middle: По центру
             bottom: Снизу
             space-between: Растянуть
+    border:
+        type: measures
+        prop: borders
+    shadow:
+        type: css-shadow
 container:
     lightness: background
     align: align
@@ -32,10 +37,17 @@ container:
     @background: none;
     @align:none;
     @valign: top;
+    @border: none;
+    @shadow: none;
 ) {
     padding:@padding;
     margin:@margin;
     .background(@background);
+    
+    .box-shadow(@shadow);
+    .border(@border);
+    
+    overflow:hidden;
     
     display:flex;
     flex-direction: column;

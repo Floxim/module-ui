@@ -23,24 +23,29 @@
 <div
     fx:template="tile" 
     fx:e="body">
+    {default $cols = 3 /}
+    {default $full_width = 1400 /}
+    {default $image_ratio = 1.4 /}
+    {default $pic_crop = true /}
+    
+    {default $image_width = $full_width / $cols /}
+    
+    {if $image_ratio !== 'none'}
+        {default $image_height = $image_width / $image_ratio /}
+    {/if}
+    
+    {default $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
+    
+    {if $pic_crop && $image_width && $image_height}
+        {set $image_size = ceil($image_width) . '*' . ceil($image_height) /}
+    {else}
+        {set $image_size = 'max-width:' . ceil($image_width) . '; max-height: ' . ceil($image_height) /}
+    {/if}
     
     <div fx:e="image" fx:hide-empty>
-        {default $cols = 3 /}
-        {default $full_width = 1400 /}
-        {default $image_ratio = 1.4 /}
-        {default $image_width = $full_width / $cols /}
-        {default $image_height = $image_width / $image_ratio /}
-        {default $pic_crop = true /}
-        
-        {if $pic_crop}
-            {set $image_size = ceil($image_width) . '*' . ceil($image_height) /}
-        {else}
-            {set $image_size = 'max-width:' . ceil($image_width) . '; max-height: ' . ceil($image_height) /}
-        {/if}
-        
-        {default $image_field = $item.hasField('image') ? 'image' : ( $item.hasField('photo') ? 'photo' : '%image' ) /}
         <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
     </div>
+    
     <div fx:e="data">
         {apply floxim.ui.box:box with $box_id = 'tilebox' /}
     </div>

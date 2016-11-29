@@ -1,3 +1,14 @@
+.tiny_config_icon() {
+    width:15px;
+    height:15px;
+    background: url('/vendor/floxim/floxim/Admin/style/images/sprite.png') no-repeat  -2596px -12px;
+    cursor:pointer;
+    transition:opacity 0.1s ease;
+    &:hover {
+        opacity:1;
+    }
+}
+
 .floxim-ui-box-builder {
     display:inline-flex;
     position:relative;
@@ -16,6 +27,20 @@
         margin-top:-1px;
         transition:padding 0.1s ease;
         overflow:hidden;
+        position: relative;
+        padding-right:25px;
+        &:after {
+            content:'';
+            display:block;
+            position:absolute;
+            top:9px;
+            right:8px;
+            opacity:0;
+            .tiny_config_icon();
+        }
+        &:hover:after {
+            opacity:0.8;
+        }
         &_empty {
             padding:0;
             border-bottom:none;
@@ -117,5 +142,13 @@
             z-index:10001;
             transform:rotate(44deg);
         }
+    }
+    
+    &__box-config {
+        position:absolute;
+        right: 12px;
+        top: -8px;
+        opacity:0.8;
+        .tiny_config_icon();
     }
 }
