@@ -26,7 +26,9 @@
         <div fx:e="image" fx:hide-empty>
             {set $image_field = $item.hasField('image') ? 'image' : '%image'  /}
             <div fx:e="image-wrapper" fx:hide-empty>
-                <img fx:e="image-img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size}" />
+                <a href="{$item.url}" fx:omit="!$item.url">
+                    <img fx:e="image-img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size}" />
+                </a>
             </div>
         </div>
         <div fx:e="data">

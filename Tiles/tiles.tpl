@@ -43,7 +43,9 @@
     {/if}
     
     <div fx:e="image" fx:hide-empty>
-        <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
+        <a href="{$item.url}" fx:omit="!$item.url">
+            <img fx:e="img" fx:aif="$item[$image_field]" src="{$item[$image_field] | fx::image : $image_size /}" />
+        </a>
     </div>
     
     <div fx:e="data">
