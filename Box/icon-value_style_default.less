@@ -1,0 +1,45 @@
+/*
+vars:
+    icon_color:
+        type: palette
+        label: Цвет
+        transparent: true
+    icon_size:
+        type: number
+        min: 11
+        max: 90
+        units: px
+        label: Размер
+    padding:
+        type: measures
+        prop: padding
+        step: 0.25
+    background:
+        type: css-background
+    border:
+        type: measures
+        prop: borders
+container:
+    lightness: background
+*/
+.icon-value_style_default
+(
+    @icon_color: main 0;
+    @icon_size: 25px;
+    @padding:0.25rem;
+    @background:none;
+    @border:none;
+) {
+    .tcolor(@icon_color, color);
+    html & {
+        .font(inherit @icon_size);
+    }
+    padding:@padding;
+    .border(@border);
+    .background(@background);
+    &:before {
+        width:1em;
+        height:1em;
+        display:inline-block;
+    }
+}

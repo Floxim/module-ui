@@ -15,7 +15,6 @@ function Slider($node) {
             }
             return res;
         });
-        console.log('now slides', this.$slides);
         return this.$slides;
     };
     

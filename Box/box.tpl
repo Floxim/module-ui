@@ -31,7 +31,10 @@
         {set $value = $item[$field_view.keyword] /}
         
         {@show_label label="Подпись?" type="checkbox" default="0" /}
-        {@value_icon label="Иконка?" type="iconpicker" default="0" /}
+        
+        {if $field.type !== 'icon'}
+            {@value_icon label="Иконка?" type="iconpicker" default="0" /}
+        {/if}
         
         {if $field.type === 'string'}
             {@field_link label="Ссылка?" type="checkbox" default="0" /}
@@ -46,6 +49,8 @@
         <span fx:if="$value_icon" class="{= fx::icon( $value_icon ) }" fx:e="icon"></span>
         {if $field.type === 'datetime'}
             {apply floxim.ui.date:date with $date = $value /}
+        {elseif $field.type === 'icon'}
+            <span class="{$value | fx::icon}"></span>
         {else}
             {$value /}
         {/if}
@@ -56,4 +61,20 @@
     {else}
         <div fx:e="value">{$res_value /}</div>
     {/if}
+</div>
+
+<div 
+    fx:template="icon_value" 
+    fx:aif="$value" 
+    fx:link-if="$field_link"
+    fx:b="icon-value" 
+    class="{$value | fx::icon /}" 
+    fx:styled="label:Стиль иконки">
+    {first}
+        {set $field = $item.getField($field_view.keyword) /}
+        {set $value = $item[$field_view.keyword] /}
+        {if $item.url}
+            {@field_link label="Ссылка?" type="checkbox" default="0" /}
+        {/if}
+    {/first}
 </div>

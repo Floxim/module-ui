@@ -109,10 +109,18 @@ class Box {
             ) {
                 continue;
             }
+            switch ($f['type']) {
+                default:
+                    $template = 'value';
+                    break;
+                case 'icon':
+                    $template = 'icon_value';
+                    break;
+            }
             $avail []= array(
                 'keyword' => $kw,
                 'name' => $f['name'],
-                'template' => 'value'
+                'template' => $template
             );
         }
         
@@ -126,7 +134,6 @@ class Box {
     
     public function getAvailBlockFields()
     {
-        //fx::log('gabf', $block);
         $avail = array(
             array(
                 'keyword' => 'block:content',

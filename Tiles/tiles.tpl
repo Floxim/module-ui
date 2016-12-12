@@ -4,7 +4,7 @@
     fx:name="Плитки"
     fx:size="high"
     fx:styled-inline
-    fx:of="floxim.main.page:list, floxim.main.factoid:list, floxim.media.photo:list">    
+    fx:of="floxim.main.content:list">    
     {css}flex-tiles.less{/css}
     <div fx:e="wrapper">
         {$items_prepend || :tile_block /}
