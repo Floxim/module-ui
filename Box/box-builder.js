@@ -29,49 +29,129 @@ function box_builder($node, params) {
     this.$node = $node;
     this.params = params;
     
+    
     $node.data('box-builder', this);
     
-    this.drawGroup = function(group, index) {
-        var $group = $('<div class="'+cl+'__group"></div>');
-        if (index !== undefined) {
-            $group.attr('data-index', index);
-        } else {
+    this.drawGroup = function(group, $target, path, replace) {
+        
+        
+        var $group = replace ? $target : $('<div class="'+cl+'__group"></div>');
+        
+        if (replace) {
+            $group.html('');
+        }
+        
+        var group_is_empty = group.is_empty === true; //!path && !replace;
+        
+        if (path !== undefined) {
+            $group.attr('data-path', path);
+        } 
+        
+        if (group_is_empty) {
             $group.addClass(cl+'__group_empty');
+        }
+        
+        if (group.type === 'columns') {
+            $group.addClass(cl+'__cols');
+            
+            for (var i = 0; i < group.columns.length; i++) {
+                var c_col = group.columns[i];
+                if (!c_col.groups) {
+                    c_col.groups = [];
+                }
+                this.drawColumn(c_col, $group, path+'.columns.'+i);
+            }
+        } else if (group.type === 'image') {
+            $group.addClass(cl+'__image').removeClass(cl+'__group');
+            var has_groups = !!(group.groups && group.groups.length > 0);
+            this.drawGroup({is_empty: has_groups}, $group);
+            if (has_groups) {
+                for (var i = 0; i < group.groups.length; i++) {
+                    this.drawGroup(group.groups[i], $group, path+'.groups.'+i);
+                    this.drawGroup({is_empty:true}, $group);
+                }
+            }
         }
         
         if (group.fields) {
             for (var i = 0; i < group.fields.length; i++) {
-                this.drawField(group.fields[i], $group, index + '-' + i);
+                var f = group.fields[i];
+                this.drawField(f, $group, path + '.fields.' + i);
             }
         }
-        var group_data = {};
-        $.each(group, function(k, v) {
-            if (k !== 'fields') {
-                group_data[k] = v;
-            }
-        });
-        $group.data('vals', group_data);
-        this.$canvas.append($group);
+        if (path || replace) {
+            var group_data = {};
+            $.each(group, function(k, v) {
+                if (k !== 'fields') {
+                    group_data[k] = v;
+                }
+            });
+            $group.data('vals', group_data);
+        }
+        if (!replace) {
+            $target.append($group);
+        }
+        
+        if (!group_is_empty) {
+            var $settings = $(
+                '<div class="'+cl+'__group-controls">'+
+                    '<div class="'+cl+'__group-remove">&times;</div>'+
+                    '<div class="'+cl+'__group-settings"></div>'+
+                '</div>'
+            );
+            $group.append($settings);
+        }
+        
         return $group;
     };
     
-    this.drawField = function(field, $target, index) {
+    this.drawColumn = function(col, $target, path) {
+        var $col = $('<div class="'+cl+'__col" data-path="'+path+'"></div>');
+        $target.append($col);
+        $col.data('vals', col);
+        var has_groups = !!(col.groups && col.groups.length > 0);
+        this.drawGroup({is_empty:has_groups}, $col);
+        
+        if (has_groups) {
+            for (var i = 0; i < col.groups.length; i++) {
+                this.drawGroup(col.groups[i], $col, path+'.groups.'+i);
+                this.drawGroup({is_empty:true}, $col);
+            }
+        }
+        return $col;
+    };
+    
+    this.drawField = function(field, $target, path) {
         var field_meta = this.fields_map[field.keyword] || {};
+        
         if (!field_meta.name) {
             field_meta.name = field.keyword;
         }
+        
+        
         var $field = $(
             '<div class="'+cl+'__field">'+
                 '<span class="'+cl+'__field-label">'+field_meta.name+'</span>'+
                 '<span class="'+cl+'__field-kill"></span>'+
             '</div>'
         );
-        if (index !== undefined) {
-            $field.attr('data-index', index);
+
+        if (path !== undefined) {
+            $field.attr('data-path', path);
         }
         $field.data('vals', field);
         $field.data('meta', field_meta);
         $target.append($field);
+    };
+    
+    this.redrawColumns = function($el) {
+        var vals = $el.data('vals'),
+            path = $el.data('path');
+        
+        $el.html('');
+        for (var i = 0; i < vals.columns.length; i++) {
+            this.drawColumn(vals.columns[i], $el, path+'.columns.'+i);
+        }
     };
     
     var active_empty_class = cl+'__group_empty-active';
@@ -98,21 +178,44 @@ function box_builder($node, params) {
         });
     };
     
-    this.stopDrag = function() {
+    this.stopDrag = function(e, ui) {
+        
+        var $item = ui.item,
+            vals = $item.data('vals'),
+            $group = $item.closest('.'+cl+'__group');
+        
+        //console.log($item, vals);
+        
+        if (vals.is_group) {
+            var group_is_not_empty = $group.find('> .'+cl+'__field').length > 1;
+            if (group_is_not_empty) {
+                if (vals.type !== 'image') {
+                    return;
+                }
+            } else {
+                that.drawGroup(vals, $group, null, true);
+            }
+        }
+        
         var empty_class = cl+'__group_empty';
         that.$canvas.find('.'+cl+'__group').each(function() {
             var $g = $(this);
             $g.removeClass(active_empty_class);
             $g.toggleClass(empty_class, $g.find('.'+cl+'__field').length === 0);
         });
+        
         that.updateValue();
     };
     
     this.draw = function(value) {
         
-        this.drawGroup({});
+        if (!value.groups || !value.groups instanceof Array) {
+            value.groups = [];
+        }
         
-        this.$canvas.attr('data-index', 'root');
+        this.drawGroup({is_empty:value.groups.length > 0}, this.$canvas);
+        
+        this.$canvas.attr('data-path', '');
         
         var box_vals = {};
         $.each(value, function(i, v) {
@@ -122,12 +225,10 @@ function box_builder($node, params) {
         });
         this.$canvas.data('vals', box_vals);
         
-        if (!value.groups || !value.groups instanceof Array) {
-            value.groups = [];
-        }
+        
         for (var i = 0; i < value.groups.length; i++) {
-            this.drawGroup(value.groups[i], i);
-            this.drawGroup({});
+            this.drawGroup(value.groups[i], this.$canvas, 'groups.'+i);
+            this.drawGroup({is_empty:true}, this.$canvas);
         }
         this.$node.find('.'+cl+'__group').sortable(
             {
@@ -140,29 +241,6 @@ function box_builder($node, params) {
                 appendTo: document.body
             }
         );
-        $.each(this.params.params, function(path, data) {
-            path = path.split('.');
-            var base = path[0],
-                index = path[1];
-            
-            if (base !== 'groups') {
-                index = 'root';
-            } else {
-                if (path.length > 4) {
-                    index += '-'+path[3];
-                }
-            }
-            var param_name = path [ path.length - 1 ];
-            
-            var $el = that.$node.find('div[data-index="'+index+'"]'),
-                el_params = $el.data('params');
-                
-            if (!el_params) {
-                el_params = {};
-            }
-            el_params[param_name] = data;
-            $el.data('params', el_params);
-        });
     };
     
     this.updateValue = function() {
@@ -172,27 +250,79 @@ function box_builder($node, params) {
         };
         res = $.extend(res, this.$canvas.data('vals'));
         
-        this.$node.find('.'+cl+'__group').each(function() {
-            var fields = [],
-                $group = $(this);
-            
-            $group.find('.'+cl+'__field').each(function() {
-                fields.push( $(this).data('vals') );
+        function get_container_groups($node) {
+            var $children = $node.children(),
+                res = [];
+            $children.each(function() {
+                var $c = $(this);
+                var group_data = $c.data('vals') || {};
+                
+                if ($c.is('.'+cl+'__cols')) {
+                    group_data.columns = get_columns($c);
+                    res.push(group_data);
+                } else if ($c.is('.'+cl+'__image')) {
+                    group_data.groups = get_container_groups($c);
+                    res.push(group_data);
+                } else {
+                    var fields = get_group_fields($c);
+                    if (fields.length) {
+                        group_data.fields = fields;
+                        res.push(group_data);
+                    }
+                }
             });
-            if (fields.length > 0) {
-                var group_data = $group.data('vals');
-                res.groups.push( $.extend(group_data, {
-                    fields: fields
-                }) );
-            }
-        });
+            return res;
+        }
+        
+        function get_group_fields($node) {
+            var fields = [];
+            $node.children().each(function() {
+                var child_vals = $(this).data('vals');
+                if (child_vals) {
+                    fields.push(child_vals);
+                }
+            });
+            return fields;
+        }
+        
+        function get_columns($node) {
+            var res = [];
+            $node.children().each(function() {
+                var $col = $(this),
+                    col_vals = $col.data('vals') || {};
+                col_vals.groups = get_container_groups($col);
+                res.push(col_vals);
+            });
+            return res;
+        }
+        
+        res.groups = get_container_groups(this.$canvas);
+        
         this.$input.val(JSON.stringify(res)).trigger('change');
     };
     
+    this.getParams = function(path) {
+        var res = {},
+            level = path === '' ? 0 : path.split('.').length;
+        
+        $.each(this.params.params, function(k, v) {
+            var parts = k.split('.');
+            if (parts.length !== level + 1) {
+                return;
+            }
+            var base = parts.slice(0, level).join('.');
+            if (base !== path)  {
+                return;
+            }
+            res[ parts[ parts.length - 1] ] = v;
+        });
+        return res;
+    };
+    
     this.showSettings = function($el) {
-        var params = $el.data('params'),
-            data = $el.data('vals'),
-            index = $el.data('index'),
+        var data = $el.data('vals'),
+            path = $el.data('path'),
+            params = this.getParams(path),
             meta = $el.data('meta') || {},
             $original_form = $el.closest('form');
         
@@ -211,7 +341,7 @@ function box_builder($node, params) {
         $fx.front.prepare_infoblock_visual_fields([fields]).then(function(res) {
             fields = res[0];
             
-            $.each(fields, function(index, field) {
+            $.each(fields, function(i, field) {
                 if (field.names_updated) {
                     return;
                 }
@@ -236,11 +366,17 @@ function box_builder($node, params) {
                 var c_name = that.params.name,
                     $inp = $original_form.find('[name="'+c_name+'"]'),
                     $builder = $inp.closest('.'+cl),
-                    $el = $builder.find('[data-index="'+index+'"]'),
-                    builder = $builder.data('box-builder'), 
-                    
+                    $el = $builder.find('[data-path="'+path+'"]'),
+                    builder = $builder.data('box-builder'),
+                    data = $el.data('vals');
+            
+                $.each(new_data, function(k, v) {
+                    data[k] = v;
+                });
                 
-                data = $.extend($el.data('vals'), new_data);
+                if ($el.is('.'+cl+'__cols')) {
+                    that.redrawColumns($el);
+                }
                 
                 $el.data('vals', data);
                 builder.updateValue();
@@ -248,16 +384,21 @@ function box_builder($node, params) {
             
             var initial_data = null;
             
+            var header_name = 'строку';
+            
+            if (path === '') {
+                header_name = 'контейнер';
+            } else if (data && data.keyword && meta.name) {
+                header_name = 'поле &laquo;'+(meta.name || data.keyword)+'&raquo;';
+            } else if (data.type === 'columns') {
+                header_name = 'колонки';
+            }
+            
             
             $fx.front_panel.show_form(
                 {
                     header: 
-                        'Настраиваем ' + 
-                        (
-                            data && data.keyword ? 
-                                'поле &laquo;'+(meta.name || data.keyword)+'&raquo;' :
-                                (index === 'root' ?  'контейнер' : 'строку №'+(index*1 + 1))
-                        ),
+                        'Настраиваем ' + header_name,
                     fields: fields,
                     form_buttons: ['cancel']
                 },
@@ -348,16 +489,24 @@ function box_builder($node, params) {
                 that.updateValue();
                 return false;
             })
-            .on('click', '.'+cl+'__field, .'+cl+'__group', function(e) {
+            .on('click', '.'+cl+'__field', function(e) {
                 that.showSettings($(this));
-                e.stopImmediatePropagation();
+                return false;
+            })
+            .on('click', '.'+cl+'__group-settings', function(e) {
+                that.showSettings($(this).closest('.'+cl+'__group, .'+cl+'__image'));
+                return false;
+            })
+            .on('click', '.'+cl+'__group-remove', function(e) {
+                $(this).closest('.'+cl+'__group, .'+cl+'__image').remove();
+                that.updateValue();
                 return false;
             });
         
         this.$node.on('click', '.'+cl+'__box-config', function(e) {
-                that.showSettings(that.$canvas);
-                return false;
-            });
+            that.showSettings(that.$canvas);
+            return false;
+        });
         
         this.$avail.sortable({
             connectWith:'.'+cl+'__canvas .'+cl+'__group',
@@ -371,11 +520,19 @@ function box_builder($node, params) {
         this.$avail.on('click', '.'+cl+'__field', function() {
             var $target_group = that.$canvas.find('>.'+cl+'__group').last(),
                 $field = $(this),
-                empty_class = cl+'__group_empty';
-            $target_group.append($field);
+                empty_class = cl+'__group_empty',
+                field_meta = $field.data('meta');
+                
+            if (field_meta.is_group) {
+                that.drawGroup($field.data('vals'), $target_group, null, true);
+            } else {
+                $target_group.append($field);
+            }
             
             $target_group.removeClass(empty_class);
-            closeAvail();
+            if (typeof closeAvail === 'function') {
+                closeAvail();
+            }
             that.updateValue();
             return false;
         });

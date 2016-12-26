@@ -30,7 +30,12 @@ Floxim.prototype.handle = function(selector, callback) {
         $nodes.each( callback );
     });
     $(function() {
-        $(selector).each ( callback );
+        $(selector).each ( function(index, node) {
+            if (node.hasAttribute('data-fx_block_is_pending')) {
+                return;
+            }
+            callback (index, node);
+        });
     });
     return Floxim;
 };

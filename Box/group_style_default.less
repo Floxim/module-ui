@@ -41,7 +41,7 @@ container:
 
 .group_style_default(
     @fields_margin:1.5em;
-    @margin:1em 0;
+    @margin:1em 0 0 0;
     @padding:0em;
     @justify_content:none;
     @align_items:flex-start;
@@ -56,7 +56,9 @@ container:
     
     .background(@background);
     
-    flex-grow:@grow;
+    & when not(@grow = none) {
+        flex-grow:@grow;
+    }
     
     & when not(@justify_content = none) {
         justify-content: @justify_content;

@@ -12,17 +12,23 @@
     </div>
 </div>
     
-<div fx:template="tile_block" fx:e="tile" fx:b="tile" fx:styled='label:Стиль отдельной плитки'>
+<div fx:template="tile_block" fx:e="tile" fx:b="tile">
     {apply tile /}
 </div>
     
 {template id="tile" test="is_string($item)" priority="2"}
     {$item /}
 {/template}
+
+{template id="tile"}
+    {apply floxim.ui.box:box with $box_id = 'tilebox' /}
+{/template}
     
+{*
 <div
     fx:template="tile" 
     fx:e="body">
+    
     {default $cols = 3 /}
     {default $full_width = 1400 /}
     {default $image_ratio = 1.4 /}
@@ -52,3 +58,5 @@
         {apply floxim.ui.box:box with $box_id = 'tilebox' /}
     </div>
 </div>
+
+*}

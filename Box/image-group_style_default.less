@@ -1,0 +1,193 @@
+/*
+vars:
+    ratio:
+        type: ratio
+        label: Пропорции
+        auto: true
+        tab: image
+    width:
+        type: livesearch
+        label: Ширина
+        allow_empty: false
+        tab: image
+        values:
+            full: На всю ширину
+            custom:
+                custom: true
+                value: 100
+                units: %
+                type: number
+                step: 5
+    grow:
+        label: Растянуть по высоте
+        type: checkbox
+        tab: image
+        parent: width == full
+    align: 
+        type: css-align
+        tab: image
+        parent: width != full
+    image_border:
+        type: measures
+        prop: borders
+        tab: image
+    image_shadow:
+        type: css-shadow
+        tab: image
+    box_margin:
+        type: measures
+        prop: margin
+        label: Внешний отступ
+        tab: box
+    box_padding:
+        type: measures
+        prop: padding
+        label: Внутренний отступ
+        tab: box
+    box_background:
+        type: css-background
+        default:
+            - dark
+            - color, main 0 0.6
+        tab: box
+    box_align: 
+        type: css-align
+        tab: box
+    box_valign:
+        type: livesearch
+        label: Выравнивание строк по вертикали
+        values:
+            top: Сверху
+            middle: По центру
+            bottom: Снизу
+            space-between: Растянуть
+        tab: box
+    box_border:
+        type: measures
+        prop: borders
+        tab: box
+    box_shadow:
+        type: css-shadow
+        tab: box
+tabs:
+    image: Картинка
+    box: Данные
+container:
+    lightness: box_background
+    align: box_align
+export:
+    ratio: '@ratio'
+*/
+.image-group_style_default(
+    @ratio: 1.5;
+    @width:full;
+    @grow: 0;
+    @align: center;
+    @image_border:none;
+    @image_shadow:none;
+    @box_margin:0rem 0rem 0rem 0rem;
+    @box_padding:1rem 1rem 1rem 1rem;
+    @box_background: @background;
+    @box_align: center;
+    @box_valign: middle;
+    @box_border: none;
+    @box_shadow: none;
+) {
+    width:100%;
+    position:relative;
+    
+    & when (@grow = 1) {
+        flex-grow:1;
+        display:flex;
+        & when (@width = full) {
+            #__image {
+                flex-grow:1;
+            }
+        }
+    }
+    
+    & when not(@width = full) {
+        display:flex;
+        flex-direction: column;
+        #__image {
+            width:unit(@width, %);
+            & when (@align = left) {
+                align-self:flex-start;
+            }
+            & when (@align = center) {
+                align-self:center;
+            }
+            & when (@align = right) {
+                align-self:flex-end;
+            }
+        }
+    }
+    
+    #__image {
+        line-height: 0;
+        overflow: hidden;
+        position:relative;
+        .border(@image_border);
+        .box-shadow(@image_shadow);
+        
+        & when not(@ratio = none) {
+            &:after {
+                content:'';
+                display:block;
+                padding-bottom: 100% / @ratio;
+            }
+        }
+    }
+    #__img {
+        & when not(@ratio = none) {
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+        }
+        width:100%;
+        height:100%;
+        object-fit:cover;
+    }
+    
+    #__box-wrapper {
+        position:absolute;
+        line-height:initial;
+        top:0;
+        left:0;
+        
+        height:100%;
+        width:100%;
+        display:flex;
+    }
+    
+    #__box {
+        
+        .background(@box_background);
+        
+        .box-shadow(@box_shadow);
+        
+        .border(@box_border);
+        
+        padding:@box_padding;
+        margin:@box_margin;
+        
+        display:flex;
+        flex-direction: column;
+        width:100%;
+
+        & when (@box_valign = top) {
+            justify-content: flex-start;
+        }
+        & when (@box_valign = middle) {
+            justify-content: center;
+        }
+        & when (@box_valign = bottom) {
+            justify-content: flex-end;
+        }
+        & when (@box_valign = space-between) {
+            justify-content: space-between;
+        }
+    }
+}

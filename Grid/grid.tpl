@@ -25,8 +25,6 @@
             {each $blocks as $ib}
                 {$ib.render() /}
             {/each}
-        {else}
-            {*<div fx:e="placeholder">Тут будут блоки!</div>*}
         {/if}
     </div>
     {= $grid.stop() /}

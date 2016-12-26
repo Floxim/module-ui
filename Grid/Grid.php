@@ -37,7 +37,7 @@ class Grid {
             $data = json_decode($data, 1);
         }
         if (!$data) {
-            $data = $this->getDefaultData();
+            $data = self::getDefaultData();
         }
         $this->data = $data;
         $this->run($template);
@@ -50,23 +50,48 @@ class Grid {
         $template->context->push($this->data);
         $template->pushTemplateParamHandler($this);
     }
+    
+    
+    public static function addBuilder($template, $prop_name = 'cols')
+    {
+        $data = $template->context->get($prop_name);
+        
+        if (!$data) {
+            $data = self::getDefaultData();
+            $data = $data['cols'];
+        }
+        
+        $template->registerParam(
+            $prop_name, 
+            array(
+                'type' => 'fx-grid-builder',
+                'label' => 'Колонки',
+                'prop_name' => null,
+                'value' => $data
+            )
+        );
+    }
+    
+    public static function getDefaultCols()
+    {
+        return array(
+            array(
+                'id' => fx::util()->uid(),
+                'name' => 'A',
+                'width' => 6
+            ),
+            array(
+                'id' => fx::util()->uid(),
+                'name' => 'B',
+                'width' => 6
+            )
+        );
+    }
 
-
-    protected function getDefaultData()
+    protected static function getDefaultData()
     {
         $data = array(
-            'cols' => array(
-                array(
-                    'id' => fx::util()->uid(),
-                    'name' => 'A',
-                    'width' => 6
-                ),
-                array(
-                    'id' => fx::util()->uid(),
-                    'name' => 'B',
-                    'width' => 6
-                )
-            )
+            'cols' => self::getDefaultCols()
         );
         return $data;
     }
@@ -82,13 +107,12 @@ class Grid {
             $this->getParamId(), 
             array(
                 'type' => 'fx-grid-builder',
-                //'type' => 'text',
-                //'code' => true,
                 'label' => 'Колонки',
                 'value' => array_merge($this->data, array('is_stored' => true)),
                 'params' => $this->params
             )
         );
+        $this->template->context->stopScope();
     }
     
     public function registerParam($name, $data, $context)

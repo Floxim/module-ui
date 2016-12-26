@@ -7,7 +7,8 @@ $t.add(
     function(_c, _o) {
         var input_val = (typeof _c.value === 'string') ? _c.value : JSON.stringify(_c.value);
         return  '<div class="'+cl+'">'+
-                    '<input type="hidden" value=\''+input_val+'\' data-json-val="true" class="'+cl+'__value" name="'+ _c.name+'" />'+
+                    '<input type="hidden" value=\''+input_val+'\' data-json-val="true" '+
+                        'class="'+cl+'__value" '+ (_c.name ? 'name="'+ _c.name+'" ' : '')+' />'+
                     '<div class="'+cl+'__canvas"></div>'+
                 '</div>';
     },
@@ -23,6 +24,28 @@ $t.add(
 function grid_builder($node, params) {
     
     this.params = params;
+    
+    if (typeof params.prop_name === 'undefined') {
+        params.prop_name = 'cols';
+    }
+    
+    if (!params.value) {
+        params.value = {};
+        params.value[params.prop_name] = [
+            {
+                name:'A',
+                width:6
+            },
+            {
+                name:'B',
+                width:6
+            }
+        ];
+    }
+    if (!params.params) {
+        params.params = {};
+    }
+    
     
     this.$node = $node;
     
@@ -74,7 +97,7 @@ function grid_builder($node, params) {
         var $col = $(
             '<div '+
                 'class="'+cl+'__col '+cl+'__col_width_'+col.width+'" '+
-                'data-name="'+col.name+'" data-index="'+index+'">'+
+                'data-name="'+col.name+'" data-index="'+this.getFullIndex(index)+'">'+
                 '<span class="'+cl+'__col-title">'+col.name+'</span>'+
                 '<span class="'+cl+'__col-width">'+col.width+'</span>'+
                 '<span class="'+cl+'__col-killer">&times;</span>'+
@@ -96,10 +119,21 @@ function grid_builder($node, params) {
         }
     };
     
+    this.getColsFromValue = function() {
+        var pn = this.params.prop_name;
+        if (!pn) {
+            return this.params.value;
+        }
+        return this.params.value[pn];
+    };
+    
     this.draw = function() {
         $fx.disableSelection(this.$canvas);
-        for (var i = 0; i < this.params.value.cols.length; i++) {
-            var col = this.params.value.cols[i],
+        
+        var cols = this.getColsFromValue();
+        
+        for (var i = 0; i < cols.length; i++) {
+            var col = cols[i],
                 $col = this.drawCol(col, i);
             this.$canvas.append($col);
         }
@@ -111,6 +145,7 @@ function grid_builder($node, params) {
                 return false;
             }
             that.addCol();
+            return false;
         });
         
         this.$canvas.append($adder);
@@ -132,14 +167,21 @@ function grid_builder($node, params) {
             return false;
         }).on('click', '.'+cl+'__col', function() {
             that.showSettings($(this));
+            return false;
         });
         
+        var prefix_length = this.params.params_base_path ? this.params.params_base_path.length : 0;
+        
         $.each(this.params.params, function(path, data) {
+            if (prefix_length) {
+                path = path.substring(prefix_length);
+            }
             path = path.split('.');
             var index = path[1],
                 prop = path[path.length - 1];
                 
-            var $el = that.$canvas.find('div[data-index="'+index+'"]'),
+                
+            var $el = that.$canvas.find('div[data-index="'+that.getFullIndex(index)+'"]'),
                 el_params = $el.data('params') || {};
                 
             el_params[prop] = data;
@@ -214,7 +256,10 @@ function grid_builder($node, params) {
             c_index = $col.data('index')*1;
 
         var $neighbours = $cols
-                .filter('*[data-index="'+(c_index-1)+'"], *[data-index="'+(c_index+1)+'"]')
+                .filter(
+                    '*[data-index="'+this.getFullIndex(c_index-1)+'"], '+
+                    '*[data-index="'+this.getFullIndex(c_index+1)+'"]'
+                );
 
         if ($neighbours.length > 1) {
             var width_a = getColWidth($neighbours.eq(0)),
@@ -250,10 +295,11 @@ function grid_builder($node, params) {
         if (!$fx.front) {
             return false;
         }
+        
         var params = $el.data('params'),
             data = $el.data('vals'),
-            index = $el.data('index');
-    
+            index = $el.attr('data-index');
+        
         if (!params) {
             console.log('no params');
             return;
@@ -279,6 +325,7 @@ function grid_builder($node, params) {
             });
             
             function update_data($form) {
+                
                 var $el = $('div[data-index="'+index+'"]'),
                     $builder  = $el.closest('.'+cl),
                     builder = $builder.data('grid-builder'), 
@@ -317,14 +364,20 @@ function grid_builder($node, params) {
         });
     };
     
+    this.getFullIndex = function(index) {
+        var base_index = (typeof this.params.base_index !== 'undefined') ? this.params.base_index + '-' : '';
+        return base_index + '' + index;
+    };
+    
     this.updateState = function() {
         var add_class = cl+'__canvas_no-add',
             kill_class = cl+'__canvas_no-kill';
         
-        var $cols = this.getCols();
+        var $cols = this.getCols(),
+            that = this;
         
         $.each($cols, function(index) {
-            $(this).attr('data-index', index).data('index', index);
+            $(this).attr('data-index', that.getFullIndex(index)).data('index', index);
         });
         
         this.$canvas.removeClass(add_class+' '+kill_class);
@@ -340,13 +393,47 @@ function grid_builder($node, params) {
         this.updateState();
         var $cols = this.getCols();
         
-        var res = {
-            is_stored:true,
-            cols: []
-        };
+        var cols = [],
+            total = 0;
+    
         $cols.each(function() {
-            res.cols.push ($(this).data('vals'));
+            var c_val = $(this).data('vals');
+            cols.push (c_val);
+            total += c_val.width*1;
         });
+        
+        if (total !== 12) {
+            var diff = 12 - total,
+                new_total = 0;
+            $cols.each(function(n) {
+                var $col = $(this),
+                    c_width = getColWidth($col),
+                    rel_width =  c_width / total,
+                    c_diff = diff * rel_width,
+                    new_width = Math.max(c_width + Math.round( c_diff), 1);
+                
+                new_total += new_width;
+                
+                if (n === cols.length - 1) {
+                    new_width += 12 - new_total;
+                }
+                setColWidth($col, new_width);
+            });
+            $cols.on('transitionend webkitTransitionEnd oTransitionEnd', function() {
+                that.update();
+            });
+            return;
+        }
+        
+        if (this.params.prop_name) {
+            var res = {
+                is_stored:true
+            };
+            res[this.params.prop_name] = cols;
+        } else {
+            res = cols;
+        }
+        
         this.$input.val(JSON.stringify(res)).trigger('change');
         this.addDraggers();
     };
@@ -354,8 +441,11 @@ function grid_builder($node, params) {
     var $body = $('body');
     
     this.addDraggers = function() {
-        var $cols = this.getCols();
+        var $cols = this.getCols(),
+            that = this;
+        
         this.$canvas.find('.'+cl+'__col-drag').remove();
+            
         $cols.each(function(index) {
             if (index === $cols.length - 1) {
                 return;
@@ -363,7 +453,7 @@ function grid_builder($node, params) {
             var col = this,
                 canvas = that.$canvas[0],
                 $col = $(this),
-                $next_col = $cols.filter('*[data-index="'+(index+1)+'"]'),
+                $next_col = $cols.filter('*[data-index="'+that.getFullIndex(index+1)+'"]'),
                 $drag,
                 c_width = getColWidth($col);
                 
