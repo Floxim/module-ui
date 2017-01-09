@@ -30,7 +30,7 @@ export:
     @margin_hor: 1em;
     @margin_ver: 1em;
 ) {
-    #__tile {
+    & > #__wrapper > #__tile {
         & when (unit(@margin_hor) <= 0) {
             width: (100% / @cols);
             max-width: (100% / @cols) + 0.05%;
@@ -39,15 +39,15 @@ export:
         margin-bottom:@margin_ver;
     }
     
-    #__wrapper {
+    & > #__wrapper {
         margin-bottom:@margin_ver * -1;
     }
     
     & when (unit(@margin_hor) > 0) {
-        #__wrapper {
+        & > #__wrapper {
             margin-right: @margin_hor * -1;
         }
-        #__tile {
+        & > #__wrapper > #__tile {
             width:~"calc(" (100% / @cols) ~" - " @margin_hor ~")";
             max-width:~"calc(" (100% / @cols) ~" - " @margin_hor ~" + 0.05%)";
             margin-right:@margin_hor;

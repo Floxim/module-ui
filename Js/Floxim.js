@@ -34,7 +34,7 @@ Floxim.prototype.handle = function(selector, callback) {
             if (node.hasAttribute('data-fx_block_is_pending')) {
                 return;
             }
-            callback (index, node);
+            callback.apply (node, [index, node]);
         });
     });
     return Floxim;

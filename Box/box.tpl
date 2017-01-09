@@ -15,19 +15,18 @@
 {template id="groups"}
     {each select="$groups as $group" scope="true"}
         {if $group.type === 'columns'}
-            {apply columns_group /}
+            {apply columns_group el group /}
             {= $_is_admin ? $box.handleColumns() : '' /}
         {elseif $group.type === 'image'}
-            {apply image_group /}
+            {apply image_group  el group /}
         {else}
-            {apply group /}
+            {apply group  el group /}
         {/if}
     {/each}
 {/template}
 
 <div 
     fx:template="columns_group"
-    fx:e="group"
     fx:b="floxim.ui.grid:grid">
     <div 
         fx:each="$columns as $column"
@@ -41,7 +40,6 @@
 
 <div
     fx:template="image_group"
-    fx:e="group"
     fx:b="image-group"
     fx:styled-inline>
     <div fx:e="image">
@@ -68,13 +66,11 @@
     fx:b="group"
     fx:styled-inline
     fx:hide-empty>
-    <div 
-        fx:each="$fields as $field_view" 
-        fx:scope
-        fx:e="field"
-        fx:hide-empty>
-        {apply $field_view.template /}
-    </div>
+    {each select="$fields as $field_view" scope="true"}
+        {= $_is_admin ?  $box.startField( $field_view )  : '' /}
+        {set $el = 'field ' . $field_view.keyword /}
+        {apply $field_view.template el $el /}
+    {/each}
 </div>
         
 <div fx:template="value" fx:aif="$value" fx:b="value" fx:styled="label:Стиль поля">
@@ -101,13 +97,23 @@
         <span fx:if="$value_icon" class="{= fx::icon( $value_icon ) }" fx:e="icon"></span>
         {if $field.type === 'datetime'}
             {apply floxim.ui.date:date with $date = $value /}
-        {elseif $field.type === 'multilink'}
-            {apply floxim.ui.tiles:tiles with $items = $value /}
         {else}
             {$value /}
         {/if}
     </div>
 </div>
+    
+{*
+<div fx:template="list_value" fx:e="list-value">
+    {set $value = $item[$field_view.keyword] /}
+    {apply floxim.ui.tiles:tiles with $items = $value /}
+</div>
+*}
+
+{template id="list_value"}
+    {set $value = $item[$field_view.keyword] /}
+    {apply floxim.ui.tiles:tiles el field with $items = $value /}
+{/template}
 
 <div 
     fx:template="icon_value" 
@@ -127,6 +133,7 @@
 
 <div 
     fx:template="image_value" 
+    fx:b="image-value"
     fx:aif="$value" 
     fx:link-if="$field_link"
     fx:styled="label:Стиль картинки">
@@ -137,5 +144,15 @@
             {@field_link label="Ссылка?" type="checkbox" default="0" /}
         {/if}
     {/first}
-    Картинко!
+    <img src="{$value | 'max-width:1600'}" alt="" />
+</div>
+
+<div fx:template="text_value">
+    Text text
+    {@test label="Это хороший текст?" type="checkbox" /}
+    {if $test}крутей текст!{/if}
+</div>
+
+<div fx:template="header_value">
+    Headr
 </div>

@@ -1,10 +1,6 @@
 /*
 name: box
 vars:
-    margin:
-        type: measures
-        prop: margin
-        label: Внешний отступ
     padding:
         type: measures
         prop: padding
@@ -32,7 +28,6 @@ container:
 */
 
 .box_style_default(
-    @margin:0rem;
     @padding:0rem;
     @background: none;
     @align:none;
@@ -41,7 +36,7 @@ container:
     @shadow: none;
 ) {
     padding:@padding;
-    margin:@margin;
+    
     .background(@background);
     
     .box-shadow(@shadow);

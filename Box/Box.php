@@ -58,12 +58,16 @@ class Box {
     public function getAvailFields($context)
     {
         $field_source = $context->get('field_source');
+        $res = null;
         switch ($field_source) {
             case 'block':
-                return $this->getAvailBlockFields($context->get('infoblock'));
+                $res = $this->getAvailBlockFields($context->get('infoblock'));
+                break;
             case 'item': default:
-                return $this->getAvailItemFields($context->get('item'));
+                $res = $this->getAvailItemFields($context->get('item'));
+                break;
         }
+        return $res;
     }
     
     protected function getAvailItemFields($item)
@@ -132,6 +136,14 @@ class Box {
             switch ($f['type']) {
                 default:
                     $field['template'] = 'value';
+                    $field['templates'] = [
+                        ['id' => 'text_value', 'name' => 'Текст'],
+                        ['id' => 'value', 'name' => 'Значение'],
+                        ['id' => 'header_value', 'name' => 'Заголовок']
+                    ];
+                    break;
+                case 'multilink':
+                    $field['template'] = 'list_value';
                     break;
                 case 'icon':
                     $field['template'] = 'icon_value';
@@ -175,6 +187,24 @@ class Box {
         return $avail;
     }
     
+    protected $templates = [];
+
+    public function startField($field)
+    {
+        if (!isset($this->templates[$field['keyword']])) {
+            return;
+        }
+        $this->template->registerParam(
+            'template', 
+            [
+                'label' => 'Шаблон',
+                'type' => 'livesearch',
+                'values' => $this->templates[$field['keyword']],
+                'value' => $field['template']
+            ]
+        );
+    }
+    
     public function getAvailBlockFields()
     {
         $avail = array(
@@ -198,22 +228,28 @@ class Box {
     {
         $this->template = $template;
         $context = $template->context;
+        
         if (fx::isAdmin()) {
             self::addAdminAssets();
             $this->avail = $this->getAvailFields($context);
+            foreach ($this->avail as $f) {
+                if (isset($f['templates']) && isset($f['keyword']) ) {
+                    $this->templates[$f['keyword']] = $f['templates'];
+                }
+            }
         }
         $this->box_id = $box_id;
         $param_id = $this->getParamId();
+        $this->scope_depth = $context->getScopeDepth();
+        
         $data = $context->get($param_id);
+        
         if (is_string($data) && !empty($data)) {
             $data = json_decode($data, true);
         }
         
-        $this->scope_depth = $context->getScopeDepth();
-        
         if (!$data || !isset($data['is_stored'])) {
-            $groups = $context->get('groups');
-            $default_data = $this->prepareGroups($groups);
+            $default_data = $this->prepareGroups($data);
             $data = $data ? \Floxim\Floxim\System\Util::fullMerge($data, $default_data) : $default_data;
         }
         $this->data = $data;
@@ -235,8 +271,11 @@ class Box {
     public function run($template)
     {
         $this->template = $template;
-        $template->context->startScope($this->getParamId());
-        $template->context->push($this->data);
+        $param_id = $this->getParamId();
+        $template->context->startScope($param_id);
+        $template->context->push(
+            array_merge($this->data, [$param_id => null])
+        );
         $this->template->pushTemplateParamHandler($this);
     }
     
@@ -291,7 +330,6 @@ class Box {
             )
         );
         
-        //\Floxim\Ui\Grid\Grid::addBuilder($this->template, 'columns');
         $this->handled_cols[$path] = true;
     }
     
@@ -365,21 +403,23 @@ class Box {
     public function registerParam($name, $data, $context)
     {
         $path = $context->getScopePath($this->scope_depth + 1);
-        $path .= $path ? '.' : '';
+        if ($path) {
+            $path .= '.';
+        }
         $path .= $name;
         $this->params[$path] = $data;
     }
 
     public function export() {
+        $value = array_merge($this->data, array('is_stored' => "1"));
         $this->template->registerParam(
             $this->getParamId(),
             array(
                 'type' => 'fx-box-builder',
                 'label' => 'Поля',
-                'value' => array_merge($this->data, array('is_stored' => true)),
+                'value' => $value,
                 'params' => $this->params,
                 'avail' => $this->avail
-                //, 'base_scope_path' => $this->template->context->getScopePath()
             )
         );
     }

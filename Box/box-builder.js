@@ -27,8 +27,14 @@ function box_builder($node, params) {
     var that = this;
     
     this.$node = $node;
-    this.params = params;
     
+    if (!params.base_path) {
+        params.base_path = [
+            $fx_fields.name_to_path(params.name).slice(1)
+        ];
+    }
+    
+    this.params = params;
     
     $node.data('box-builder', this);
     
@@ -184,8 +190,6 @@ function box_builder($node, params) {
             vals = $item.data('vals'),
             $group = $item.closest('.'+cl+'__group');
         
-        //console.log($item, vals);
-        
         if (vals.is_group) {
             var group_is_not_empty = $group.find('> .'+cl+'__field').length > 1;
             if (group_is_not_empty) {
@@ -245,7 +249,7 @@ function box_builder($node, params) {
     
     this.updateValue = function() {
         var res = {
-            is_stored:true,
+            is_stored:"1",
             groups: []
         };
         res = $.extend(res, this.$canvas.data('vals'));
@@ -298,7 +302,12 @@ function box_builder($node, params) {
         
         res.groups = get_container_groups(this.$canvas);
         
-        this.$input.val(JSON.stringify(res)).trigger('change');
+        var new_val = JSON.stringify(res),
+            old_val = this.$input[0].value;
+        
+        if (old_val !== new_val) {
+            this.$input.val(new_val).trigger('change');
+        }
     };
     
     this.getParams = function(path) {
@@ -319,40 +328,107 @@ function box_builder($node, params) {
         return res;
     };
     
+    this.extractParams = function($ib, item_path) {
+        var path = this.params.base_path.slice(),
+            base = path.shift(),
+            data_prop = base[0] === 'template_visual' ? 'fx_template_params' : 'fx_wrapper_params',
+            ib_data = $ib.data(data_prop),
+            data = null;
+    
+        for (var i = 0 ; i < ib_data.length; i++) {
+            var c_param = ib_data[i];
+            if (c_param[0] === base[1] && typeof c_param[1].params !== 'undefined') {
+                data = c_param[1].params;
+                break;
+            }
+        }
+        
+        if (!data) {
+            console.log(path, base);
+            throw new Error('no data');
+        }
+        
+        while (path.length > 0) {
+            var c_item = path.shift();
+            data = data[c_item].params;
+        }
+        
+        var res = {},
+            path_length = item_path.length;
+    
+        $.each(data, function(k, v) {
+            if (k.slice(0, path_length + 1) !== item_path+'.') {
+                return;
+            }
+            var c_path = k.slice(path_length + 1);
+            if (c_path.split('.').length > 1) {
+                return;
+            }
+            res[ c_path ] = v;
+        });
+        
+        return res;
+    };
+    
+    this.paramsToFields = function(params, path) {
+        var fields = [];
+        
+        $.each(params, function(field_key, field) {
+            field.name = field_key;
+            if (field.type === 'fx-box-builder') {
+                field.base_path = that.params.base_path.slice();
+                field.base_path.push(
+                    path + '.' + field.name
+                );
+            }
+            fields.push(field);
+        });
+        return new Promise(function(resolve) {
+            $fx.front.prepare_infoblock_visual_fields([fields]).then(function(res) {
+                fields = res[0];
+                $.each(fields, function(i, field) {
+                    if (field.names_updated) {
+                        return;
+                    }
+                    if (field.type === 'group' && field.fields) {
+                        for (var i = 0; i < field.fields.length; i++) {
+                            var cf = field.fields[i];
+                            cf.name = field.name+'['+cf.name+']';
+                        }
+                    }
+                    field.names_updated = true;
+                });
+                resolve(fields);
+            });
+        });
+    };
+    
     this.showSettings = function($el) {
         var data = $el.data('vals'),
             path = $el.data('path'),
             params = this.getParams(path),
             meta = $el.data('meta') || {},
-            $original_form = $el.closest('form');
+            $original_form = $el.closest('form'),
+            $settings_form = null;
+    
+        
+        function reload_handler(e) {
+            var new_params = that.extractParams($(e.target), path);
+            that.paramsToFields(new_params, path).then(function(fields) {
+                $fx.form.update({fields: fields}, $settings_form);
+            });
+        };
+        
         
         if (!params) {
             console.log('no params');
             return;
         }
         
-        var fields = [];
         
-        $.each(params, function(field_key, field) {
-            field.name = field_key;
-            fields.push(field);
-        });
         
-        $fx.front.prepare_infoblock_visual_fields([fields]).then(function(res) {
-            fields = res[0];
+        this.paramsToFields(params, path).then(function(fields) {
             
-            $.each(fields, function(i, field) {
-                if (field.names_updated) {
-                    return;
-                }
-                if (field.type === 'group' && field.fields) {
-                    for (var i = 0; i < field.fields.length; i++) {
-                        var cf = field.fields[i];
-                        cf.name = field.name+'['+cf.name+']';
-                    }
-                }
-                field.names_updated = true;
-            });
             
             function get_data($form) {
                 return $form.formToHash(
@@ -405,18 +481,25 @@ function box_builder($node, params) {
                 {
                     view:'horizontal',
                     onready: function($form) {
+                        $settings_form = $form;
                         initial_data = get_data($form);
                         $form.on('change', function() {
                             update_data(get_data($form));
                         });
+                        $('html').on('fx_infoblock_loaded', reload_handler);
                     },
                     onsubmit: function(e) {
                         update_data(get_data($(e.target)));
                         $fx.front_panel.hide();
+                        $('html').off('fx_infoblock_loaded', reload_handler);
                         return false;
                     },
                     oncancel: function($form) {
-                        update_data(initial_data)
+                        var c_data = get_data($form);
+                        if (JSON.stringify(c_data) !== JSON.stringify(initial_data)) {
+                            update_data(initial_data);
+                        }
+                        $('html').off('fx_infoblock_loaded', reload_handler);
                     }
                 }
             );

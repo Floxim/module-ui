@@ -3,5 +3,5 @@
     fx:b="record"
     fx:with="$item">
     
-    {apply floxim.ui.tiles:tile_block with $cols = 1 /}
+    {apply floxim.ui.tiles:tile with $cols = 1 /}
 </div>
