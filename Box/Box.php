@@ -55,9 +55,20 @@ class Box {
         );
     }
     
-    public function getAvailFields($context)
+    protected $field_source = null;
+    
+    protected function getFieldSource()
     {
-        $field_source = $context->get('field_source');
+        if (is_null($this->field_source)) {
+            $this->field_source = $this->template->context->get('field_source');
+        }
+        return $this->field_source;
+    }
+    
+    public function getAvailFields()
+    {
+        $context = $this->template->context;
+        $field_source = $this->getFieldSource();
         $res = null;
         switch ($field_source) {
             case 'block':
@@ -67,9 +78,38 @@ class Box {
                 $res = $this->getAvailItemFields($context->get('item'));
                 break;
         }
+        $res = array_merge($res, $this->getCommonAvailFields());
         return $res;
     }
     
+    protected function getCommonAvailFields()
+    {
+        $right_col_id = fx::util()->uid();
+        $res []= array(
+            'type' => 'columns',
+            'name' => 'Колонки',
+            'is_group' => true,
+            'template' => 'columns',
+            'columns' => [
+                [
+                    'width' => 4,
+                    'groups' => [],
+                    'id' => fx::util()->uid()
+                ],
+                [
+                    'width' => 8,
+                    'groups' => [],
+                    'id' => $right_col_id,
+                    $right_col_id .'_style' => [
+                        'padding' => '0rem 0rem 0rem 2rem'
+                    ]
+                ]
+            ]
+        );
+        return $res;
+    }
+
+
     protected function getAvailItemFields($item)
     {
         $avail = array();
@@ -162,28 +202,6 @@ class Box {
                 $avail []= $sf;
             }
         }
-        $right_col_id = fx::util()->uid();
-        $avail []= array(
-            'type' => 'columns',
-            'name' => 'Колонки',
-            'is_group' => true,
-            'template' => 'columns',
-            'columns' => [
-                [
-                    'width' => 4,
-                    'groups' => [],
-                    'id' => fx::util()->uid()
-                ],
-                [
-                    'width' => 8,
-                    'groups' => [],
-                    'id' => $right_col_id,
-                    $right_col_id .'_style' => [
-                        'padding' => '0rem 0rem 0rem 2rem'
-                    ]
-                ]
-            ]
-        );
         return $avail;
     }
     
@@ -231,7 +249,7 @@ class Box {
         
         if (fx::isAdmin()) {
             self::addAdminAssets();
-            $this->avail = $this->getAvailFields($context);
+            $this->avail = $this->getAvailFields();
             foreach ($this->avail as $f) {
                 if (isset($f['templates']) && isset($f['keyword']) ) {
                     $this->templates[$f['keyword']] = $f['templates'];
@@ -343,35 +361,56 @@ class Box {
         return false;
     }
     
+    protected function getDefaultGroups()
+    {
+        
+        $c_item = $this->template->context->get('item');
+        $groups = [];
+        switch ($this->getFieldSource()) {
+            case 'item':
+            default:
+                if ($c_item && method_exists($c_item, 'getDefaultBoxFields')) {
+                    $groups = $c_item->getDefaultBoxFields();
+                    foreach ($groups as &$g) {
+                        if (isset($g['type']) && $g['type'] === 'image' && !isset($g['template'])) {
+                            $g['template'] = 'image_value';
+                            $g['is_group'] = true;
+                        }
+                    }
+                } else {
+                    $groups = array();
+                    if ($this->hasField('name')) {
+                        $groups []= array(
+                            array('keyword' => 'name', 'field_link' => 1)
+                        );
+                    }
+
+                    if ($this->hasField('description')) {
+                        $groups []= array(
+                            array('keyword' => 'description')
+                        );
+                    }
+                }
+                break;
+            case 'block':
+                $groups = [
+                    [
+                        ['keyword' => 'block:content', 'template' => 'floxim.layout.wrapper:wrapper_content']
+                    ]
+                ];
+                //$groups = [];
+                break;
+        }
+        return $groups;
+    }
+    
     protected function prepareGroups($groups)
     {
         $res = array(
             'groups' =>  array()
         );
         if (!$groups || !is_array($groups)) {
-            $c_item = $this->template->context->get('item');
-            if ($c_item && method_exists($c_item, 'getDefaultBoxFields')) {
-                $groups = $c_item->getDefaultBoxFields();
-                foreach ($groups as &$g) {
-                    if (isset($g['type']) && $g['type'] === 'image' && !isset($g['template'])) {
-                        $g['template'] = 'image_value';
-                        $g['is_group'] = true;
-                    }
-                }
-            } else {
-                $groups = array();
-                if ($this->hasField('name')) {
-                    $groups []= array(
-                        array('keyword' => 'name', 'field_link' => 1)
-                    );
-                }
-
-                if ($this->hasField('description')) {
-                    $groups []= array(
-                        array('keyword' => 'description')
-                    );
-                }
-            }
+            $groups = $this->getDefaultGroups();
         }
         foreach ($groups as $group) {
             if (!is_array($group)) {
