@@ -65,6 +65,11 @@
     fx:e="group"
     fx:b="group"
     fx:styled-inline
+    fx:style-defaults="
+        {if $position !== 1}
+            margin:1rem 0rem 0rem 0rem
+        {/if}
+    "
     fx:hide-empty>
     {each select="$fields as $field_view" scope="true"}
         {= $_is_admin ?  $box.startField( $field_view )  : '' /}
@@ -102,13 +107,6 @@
         {/if}
     </div>
 </div>
-    
-{*
-<div fx:template="list_value" fx:e="list-value">
-    {set $value = $item[$field_view.keyword] /}
-    {apply floxim.ui.tiles:tiles with $items = $value /}
-</div>
-*}
 
 {template id="list_value"}
     {set $value = $item[$field_view.keyword] /}

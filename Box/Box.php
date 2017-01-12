@@ -446,6 +446,9 @@ class Box {
             $path .= '.';
         }
         $path .= $name;
+        if (isset($data['use_inline_default']) && $data['use_inline_default']) {
+            fx::digSet($this->data, $path, $data['value']);
+        }
         $this->params[$path] = $data;
     }
 
