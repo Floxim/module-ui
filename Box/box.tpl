@@ -88,8 +88,7 @@
         {if $field.type !== 'icon'}
             {@value_icon label="Иконка?" type="iconpicker" default="0" /}
         {/if}
-        
-        {if $field.type === 'string'}
+        {if !$field || $field.type === 'string'}
             {@field_link label="Ссылка?" type="checkbox" default="0" /}
         {/if}
     {/first}
@@ -111,6 +110,13 @@
 {template id="list_value"}
     {set $value = $item[$field_view.keyword] /}
     {apply floxim.ui.tiles:tiles el field with $items = $value /}
+{/template}
+
+{template id="link_value"}
+    {set $value = $item[$field_view.keyword] /}
+    {if $value}
+        {apply box el field with $item = $value /}
+    {/if}
 {/template}
 
 <div 

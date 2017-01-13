@@ -28,7 +28,7 @@ class Box {
         $loop = $ctx->get('loop');
         $box_id = $ctx->get('box_id');
         
-        if (!$loop) {
+        if (!$loop || $loop['has_scope']) {
             $box = new self($template, $box_id);
         } else {
             $obj_var = 'box_obj_'.$box_id;
@@ -110,7 +110,7 @@ class Box {
     }
 
 
-    protected function getAvailItemFields($item)
+    protected function getAvailItemFields($item, $level = 0)
     {
         $avail = array();
         if (!$item) {
@@ -125,7 +125,7 @@ class Box {
             'is_published',
             'is_branch_published',
             'infoblock_id',
-            'parent_id',
+            //'parent_id',
             'site_id',
             'link_type',
             'external_url',
@@ -134,12 +134,14 @@ class Box {
             'title',
             'h1',
             'meta',
-            'priority'
+            'priority',
+            'user_id',
+            'children'
         );
         
         $skip_types = array(
             //'image',
-            'link'//,
+            //'link'//,
             //'multilink'
         );
         
@@ -158,6 +160,7 @@ class Box {
         
         foreach ($all as $f) {
             $kw = $f['keyword'];
+            $field_label = $f['name'];
             if (
                 (in_array($kw, $skip) || in_array($f['type'], $skip_types))
                 && !in_array($kw, $forced_fields)
@@ -168,10 +171,7 @@ class Box {
                 continue;
             }
             
-            $field = array(
-                'keyword' => $kw,
-                'name' => $f['name']
-            );
+            $field = array();
             
             switch ($f['type']) {
                 default:
@@ -181,6 +181,10 @@ class Box {
                         ['id' => 'value', 'name' => 'Значение'],
                         ['id' => 'header_value', 'name' => 'Заголовок']
                     ];
+                    break;
+                case 'link':
+                    $field['template'] = 'link_value';
+                    $kw = $f->getPropertyName();
                     break;
                 case 'multilink':
                     $field['template'] = 'list_value';
@@ -194,8 +198,28 @@ class Box {
                     $field['is_group'] = true;
                     break;
             }
+            
+            $field['keyword'] = $kw;
+            $field['name'] = $field_label;
+            
             $avail []= $field;
+            if ($f['type'] === 'link' && $level === 0) {
+                $rel_stub = $f->getTargetFinder($item)->create();
+                $rel_fields = $this->getAvailItemFields($rel_stub, $level + 1);
+                foreach ($rel_fields as &$rel_field) {
+                    $rel_field['keyword'] = ':'.$kw.'.'.$rel_field['keyword'];
+                    $rel_field['name'] = '<span class="floxim-ui-box-builder__field-prefix">' .
+                                             $field_label . 
+                                         '</span> '.
+                                         $rel_field['name'];
+                    
+                    
+                    $avail []= $rel_field;
+                }
+            }
         }
+        
+        
         
         foreach ($special_fields as $sf) {
             if (is_array($sf)) {
