@@ -9,23 +9,27 @@
     
     {set $grid = \Floxim\Ui\Grid\Grid::start($this) /}
     
-    <div 
-        fx:each="$cols as $col" 
-        fx:scope
-        fx:e="col width_{$col.width}"
-        fx:b="col"
-        fx:area="$col.id"
-        fx:area-name="$col.name"
-        fx:area-render="manual"
-        fx:styled-inline="id:{$col.id};">
-        
-        {set $blocks = $grid.getBlocks() /}
-        
-        {if $blocks}
-            {each $blocks as $ib}
-                {$ib.render() /}
-            {/each}
-        {/if}
-    </div>
+    {each select="$cols as $col" scope="true"}
+        {- $context.pushContainerWidth( $col.width / 12 ) /}
+        {set $size = $context.getContainerWidth() > 500 ? 'wide' : 'narrow' /}
+        <div 
+            fx:e="col width_{$col.width}"
+            fx:b="col"
+            fx:area="$col.id"
+            fx:area-name="$col.name"
+            fx:area-render="manual"
+            fx:area-size="$size"
+            fx:styled-inline="id:{$col.id};">
+
+            {set $blocks = $grid.getBlocks() /}
+
+            {if $blocks}
+                {each $blocks as $ib}
+                    {$ib.render() /}
+                {/each}
+            {/if}
+        </div>
+        {- $context.popContainerWidth() /}
+    {/each}
     {= $grid.stop() /}
 </div>

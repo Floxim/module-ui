@@ -5,27 +5,19 @@
     fx:size="high"
     fx:styled-inline
     fx:style-defaults="
-        cols: {= $items->limit  && $items->limit < 3 ? $items->limit : 3 /}
+        {set $container_max = min( max(1, round( $context->getContainerWidth() / 300 ) ), 4) /}
+        cols: {= $items->limit ? min( $items->limit , $container_max) : $container_max /}
     "
     fx:of="floxim.main.content:list#3">
     {css}flex-tiles.less{/css}
     <div fx:e="wrapper">
-        {*
-        {$items_prepend || :tile_block /}
-        *}
         {each $items as $item}
+            {- $context.pushContainerWidth( 1 / $cols ) /}
             {apply floxim.ui.box:box el tile with $box_id = 'tilebox' /}
+            {- $context.popContainerWidth() /}
         {/each}
-        {*
-        {$items || :tile /}
-        *}
     </div>
 </div>
-{*
-<div fx:template="tile_block" fx:e="tile" fx:b="tile">
-    {apply tile /}
-</div>
-*}
     
 {template id="tile" test="is_string($item)" priority="2"}
     <div fx:e='tile'>{$item /}</div>

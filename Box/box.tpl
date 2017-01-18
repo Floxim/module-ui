@@ -28,14 +28,16 @@
 <div 
     fx:template="columns_group"
     fx:b="floxim.ui.grid:grid">
-    <div 
-        fx:each="$columns as $column"
-        fx:scope
-        fx:e="col width_{$column.width}"
-        fx:b="floxim.ui.grid:col"
-        fx:styled-inline="id:{$column.id};">
-            {apply groups with $groups = $column.groups /}
-    </div>
+    {each select="$columns as $column" scope="true"}
+        {- $context.pushContainerWidth( $column.width / 12 ) /}
+        <div 
+            fx:e="col width_{$column.width}"
+            fx:b="floxim.ui.grid:col"
+            fx:styled-inline="id:{$column.id};">
+                {apply groups with $groups = $column.groups /}
+        </div>
+        {- $context.popContainerWidth() /}
+    {/each}
 </div>
 
 <div
@@ -44,14 +46,20 @@
     fx:styled-inline>
     <div fx:e="image">
         {default $ratio = 1.5 /}
-        {set $img_width = 600 /}
-        {if $ratio !== 'none'}
+        {default $image_fit = 'crop' /}
+        {@image_link type="livesearch" tab="image" label="Ссылка?" values="`[['none', 'Нет'],['link','Ссылка']]`" default="none" /}
+        
+        {set $img_width = $context->getContainerWidth() /}
+        
+        {if $ratio !== 'none' && $image_fit === 'crop'}
             {set $img_height = $img_width / $ratio /}
             {set $img_size = $img_width . '*' . $img_height /}
         {else}
             {set $img_size = 'max-width:' . $img_width /}
         {/if}
-        <img fx:e="img" src="{$item[$group.keyword] | fx::image : $img_size /}" />
+        <a fx:omit="$image_link === 'none'" href="{$item.url}" class="link">
+            <img fx:e="img" src="{$item[$group.keyword] | fx::image : $img_size /}" />
+        </a>
         <div fx:e="box-wrapper" fx:hide-empty>
             <div fx:e="box" fx:b="box" fx:hide-empty>
                 {apply groups with $groups = $group.groups /}
