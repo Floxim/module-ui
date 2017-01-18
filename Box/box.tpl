@@ -28,6 +28,11 @@
 <div 
     fx:template="columns_group"
     fx:b="floxim.ui.grid:grid">
+    
+    {css}../Grid/grid.less{/css}
+    
+    {- \Floxim\Ui\Grid\Grid::addAdminAssets() /}
+    
     {each select="$columns as $column" scope="true"}
         {- $context.pushContainerWidth( $column.width / 12 ) /}
         <div 
