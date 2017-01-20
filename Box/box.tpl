@@ -29,7 +29,9 @@
     fx:template="columns_group"
     fx:b="floxim.ui.grid:grid">
     
-    {css}../Grid/grid.less{/css}
+    {css from="floxim.ui.grid"}
+        grid.less
+    {/css}
     
     {- \Floxim\Ui\Grid\Grid::addAdminAssets() /}
     
