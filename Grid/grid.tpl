@@ -15,8 +15,8 @@
         <div 
             fx:e="col width_{$col.width}"
             fx:b="col"
-            fx:area="$col.id"
-            fx:area-name="$col.name"
+            fx:area="$col.area_id"
+            fx:area-name="$col.area_name"
             fx:area-render="manual"
             fx:area-size="$size"
             fx:styled-inline="id:{$col.id};">

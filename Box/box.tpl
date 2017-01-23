@@ -130,7 +130,9 @@
 {template id="link_value"}
     {set $value = $item[$field_view.keyword] /}
     {if $value}
-        {apply box el field with $item = $value /}
+        {with $value}
+            {apply box el field with $item = $value /}
+        {/with}
     {/if}
 {/template}
 

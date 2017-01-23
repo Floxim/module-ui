@@ -32,6 +32,9 @@ class Grid {
     {
         self::addAdminAssets();
         $ctx = $template->context;
+        
+        $ib = $ctx->getFromTop('infoblock');
+        
         $data = $ctx->get($this->getParamId());
         if ($data && is_string($data)) {
             $data = json_decode($data, 1);
@@ -40,6 +43,10 @@ class Grid {
             $data = self::getDefaultData();
         }
         $this->data = $data;
+        foreach ($this->data['cols'] as &$col) {
+            $col['area_id'] = $ib['id'].'-'.$col['id'];
+            $col['area_name'] = $ib['name'].' / '.$col['name'];
+        }
         $this->run($template);
     }
     
@@ -47,6 +54,7 @@ class Grid {
     {
         $this->template = $template;
         $template->context->startScope($this->getParamId());
+        //fx::log('starging', $this->data, $template->context->getFromTop('infoblock'));
         $template->context->push($this->data);
         $template->pushTemplateParamHandler($this);
     }
@@ -125,7 +133,7 @@ class Grid {
     public function getAreaId() 
     {
         $col = $this->template->context->get('col');
-        return $col['id'];
+        return $col['area_id'];
     }
     
     public function getBlocks()

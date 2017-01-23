@@ -478,6 +478,7 @@ class Box {
 
     public function export() {
         $value = array_merge($this->data, array('is_stored' => "1"));
+        
         $this->template->registerParam(
             $this->getParamId(),
             array(
