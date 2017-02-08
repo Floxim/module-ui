@@ -4,7 +4,6 @@
     fx:of="floxim.main.page:list, floxim.main.factoid:list, floxim.media.photo:list" 
     fx:b="slider type_{$infoblock.short_type /}" 
     fx:styled="Стиль слайдера"
-    fx:size="wide,high"
     {if $autoplay}
         data-autoplay="true"
         data-pause_time="{$pause_time*1000}"

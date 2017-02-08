@@ -398,6 +398,9 @@ function grid_builder($node, params) {
     
         $cols.each(function() {
             var c_val = $(this).data('vals');
+            if (!c_val) {
+                console.log(this);
+            }
             cols.push (c_val);
             total += c_val.width*1;
         });

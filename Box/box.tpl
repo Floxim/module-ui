@@ -85,6 +85,11 @@
             margin:1rem 0rem 0rem 0rem
         {/if}
     "
+    fx:style-params="
+        count_fields: {$fields | count /};
+        width_type: {$context.getContainerWidthType() /};
+        width_value: {$context.getContainerWidthValue() /};
+    "
     fx:hide-empty>
     {each select="$fields as $field_view" scope="true"}
         {= $_is_admin ?  $box.startField( $field_view )  : '' /}

@@ -70,7 +70,8 @@ function box_builder($node, params) {
         } else if (group.type === 'image') {
             $group.addClass(cl+'__image').removeClass(cl+'__group');
             var has_groups = !!(group.groups && group.groups.length > 0);
-            this.drawGroup({is_empty: has_groups}, $group);
+            //this.drawGroup({is_empty: !has_groups}, $group);
+            this.drawGroup({is_empty: true}, $group);
             if (has_groups) {
                 for (var i = 0; i < group.groups.length; i++) {
                     this.drawGroup(group.groups[i], $group, path+'.groups.'+i);
@@ -116,7 +117,8 @@ function box_builder($node, params) {
         $target.append($col);
         $col.data('vals', col);
         var has_groups = !!(col.groups && col.groups.length > 0);
-        this.drawGroup({is_empty:has_groups}, $col);
+        //this.drawGroup({is_empty:has_groups}, $col);
+        this.drawGroup({is_empty:true}, $col);
         
         if (has_groups) {
             for (var i = 0; i < col.groups.length; i++) {
@@ -152,12 +154,14 @@ function box_builder($node, params) {
     
     this.redrawColumns = function($el) {
         var vals = $el.data('vals'),
-            path = $el.data('path');
-        
+            path = $el.data('path'),
+            $controls = $el.find('> .'+cl+'__group-controls');
+    
         $el.html('');
         for (var i = 0; i < vals.columns.length; i++) {
             this.drawColumn(vals.columns[i], $el, path+'.columns.'+i);
         }
+        $el.append($controls);
     };
     
     var active_empty_class = cl+'__group_empty-active';
@@ -234,7 +238,7 @@ function box_builder($node, params) {
             this.drawGroup(value.groups[i], this.$canvas, 'groups.'+i);
             this.drawGroup({is_empty:true}, this.$canvas);
         }
-        this.$node.find('.'+cl+'__group').sortable(
+        this.$node.find('.'+cl+'__group:not(.'+cl+'__cols)').sortable(
             {
                 items:'>.'+cl+'__field',
                 tolerance:'pointer',
@@ -311,6 +315,10 @@ function box_builder($node, params) {
     };
     
     this.getParams = function(path) {
+        if (typeof path ==='undefined') {
+            console.log('undpath');
+            console.trace();
+        }
         var res = {},
             level = path === '' ? 0 : path.split('.').length;
         

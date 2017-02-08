@@ -35,8 +35,28 @@ vars:
         type: checkbox
     background:
         type: css-background
+    border:
+        type: measures
+        prop: borders
+    width:
+        type: livesearch
+        label: Ширина
+        allow_empty: false
+        values:
+            none: 100%
+            full: На весь экран
+            auto: Авто
+            layout: Ширина лейаута
+            custom:
+                custom: true
+                value: 100
+                units: %
+                type: number
+    shadow:
+        type: css-shadow
 container:
     lightness: background
+    width: width
 */
 
 .group_style_default(
@@ -47,6 +67,9 @@ container:
     @align_items:flex-start;
     @background:none;
     @grow:0;
+    @border:none;
+    @width:none;
+    @shadow:none;
 ) 
 {
     margin:@margin;
@@ -55,6 +78,10 @@ container:
     display:flex;
     
     .background(@background);
+    
+    .box-shadow(@shadow);
+    
+    .border(@border);
     
     & when not(@grow = none) {
         flex-grow:@grow;
@@ -94,4 +121,6 @@ container:
     & > #__field:not(:last-child) {
         margin-right:@fields_margin;
     }
+    
+    .width(@width; @margin);
 }
