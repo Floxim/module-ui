@@ -53,9 +53,12 @@ function box_builder($node, params) {
             $group.attr('data-path', path);
         } 
         
-        if (group_is_empty) {
+        if (group.is_single) {
+            $group.addClass(cl+'__group_single');
+        } else if (group_is_empty) {
             $group.addClass(cl+'__group_empty');
         }
+        
         
         if (group.type === 'columns') {
             $group.addClass(cl+'__cols');
@@ -70,8 +73,15 @@ function box_builder($node, params) {
         } else if (group.type === 'image') {
             $group.addClass(cl+'__image').removeClass(cl+'__group');
             var has_groups = !!(group.groups && group.groups.length > 0);
-            //this.drawGroup({is_empty: !has_groups}, $group);
-            this.drawGroup({is_empty: true}, $group);
+            
+            this.drawGroup(
+                {
+                    is_empty: true,
+                    is_single: !has_groups
+                }, 
+                $group
+            );
+            
             if (has_groups) {
                 for (var i = 0; i < group.groups.length; i++) {
                     this.drawGroup(group.groups[i], $group, path+'.groups.'+i);
@@ -117,8 +127,14 @@ function box_builder($node, params) {
         $target.append($col);
         $col.data('vals', col);
         var has_groups = !!(col.groups && col.groups.length > 0);
-        //this.drawGroup({is_empty:has_groups}, $col);
-        this.drawGroup({is_empty:true}, $col);
+        
+        this.drawGroup(
+            {
+                is_empty: true,
+                is_single: !has_groups
+            }, 
+            $col
+        );
         
         if (has_groups) {
             for (var i = 0; i < col.groups.length; i++) {
@@ -186,6 +202,11 @@ function box_builder($node, params) {
             }
             $eg.addClass(active_empty_class);
         });
+        
+        var $field = that.$node.closest('.field');
+        $field.css('height', $field.height());
+        that.$node.css('position','fixed');
+        
     };
     
     this.stopDrag = function(e, ui) {

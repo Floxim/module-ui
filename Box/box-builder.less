@@ -12,6 +12,8 @@
 .floxim-ui-box-builder {
     display:inline-flex;
     position:relative;
+    background:#FFF;
+    
     &__value {
         /*
         width: 600px !important;
@@ -28,17 +30,28 @@
         transition:padding 0.1s ease;
         position: relative;
         padding-right:30px;
+        min-height:34px;
         
         &_empty {
-            padding:0;
+            //padding:0;
+            //padding:5px;
             border-bottom:none;
             border-color:transparent;
+            position:relative;
+            z-index:2;
+            margin-top:-5px;
+            margin-bottom:-6px;
+            min-height: 10px;
+            //background:#FFA;
+            //opacity:0.6;
         }
+        /*
         &_empty-active {
             padding:5px;
             border-color:#CCC;
             border-bottom:1px dotted #CCC;
         }
+        */
     }
     
     &__group-controls {
@@ -90,16 +103,30 @@
         }
     }
     
-    &__image > &__group {
+    &__image &__group {
         border-color:#FFF;
     }
     
-    &__image > &__group_empty {
+    &__group_single, &__image &__group_empty, &__image &__group_single, &__col > &__group_single {
         border-color:transparent;
     }
     
-    &__image > &__group_empty-active {
+    &__image &__col {
         border-color:#FFF;
+    }
+    
+    &__col &__group {
+        border-top-color: transparent;
+        border-right-color: transparent;
+        border-left-color: transparent;
+    }
+    
+    &__col &__group:not(:nth-child(2)) {
+        border-bottom-color: transparent;
+    }
+    
+    &__col &__group:nth-last-child(2) {
+        border-bottom-color: transparent;
     }
     
     &__field {
@@ -118,11 +145,22 @@
             visibility: visible !important;
         }
         &.ui-sortable-helper {
-            opacity:0.8;
+            opacity:0.3;
+            width:auto !important;
             z-index:1000002;
         }
         
     }
+    
+    &__group_empty {
+        padding:0;
+    }
+    
+    &__group_empty > &__field.ui-sortable-placeholder {
+        max-height:5px;
+        min-width:100% !important;
+    }
+    
     
     &__field-kill {
         color:#D44;
@@ -196,6 +234,7 @@
         right: 12px;
         top: -8px;
         opacity:0.8;
+        z-index:10001;
         .tiny_config_icon();
     }
     
@@ -214,7 +253,15 @@
             margin-left:3px;
         }
     }
-    &__col > &__group_empty-active {
+    
+    &__group_empty&__group_single {
+        margin-top:5px;
+        margin-bottom:5px;
+    }
+    &__col > &__group_single {
         flex-grow:1;
+    }
+    &__image > &__group_single {
+        min-height:34px;
     }
 }
