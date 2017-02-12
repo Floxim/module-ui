@@ -158,6 +158,8 @@ class Box {
             }
         }
         
+        $link_fields = [];
+        
         foreach ($all as $f) {
             $kw = $f['keyword'];
             $field_label = $f['name'];
@@ -202,7 +204,12 @@ class Box {
             $field['keyword'] = $kw;
             $field['name'] = $field_label;
             
-            $avail []= $field;
+            if ($f['type'] === 'link') {
+                $link_fields []= $field;
+            } else {
+                $avail []= $field;
+            }
+            
             if ($f['type'] === 'link' && $level === 0) {
                 $rel_stub = $f->getTargetFinder($item)->create();
                 $rel_fields = $this->getAvailItemFields($rel_stub, $level + 1);
@@ -214,12 +221,14 @@ class Box {
                                          $rel_field['name'];
                     
                     
-                    $avail []= $rel_field;
+                    $link_fields []= $rel_field;
                 }
             }
         }
         
-        
+        foreach ($link_fields as $lf) {
+            $avail []= $lf;
+        }
         
         foreach ($special_fields as $sf) {
             if (is_array($sf)) {

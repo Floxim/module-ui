@@ -61,6 +61,8 @@ function box_builder($node, params) {
         
         
         if (group.type === 'columns') {
+            group.tip_label = 'колонки';
+            
             $group.addClass(cl+'__cols');
             
             for (var i = 0; i < group.columns.length; i++) {
@@ -71,6 +73,7 @@ function box_builder($node, params) {
                 this.drawColumn(c_col, $group, path+'.columns.'+i);
             }
         } else if (group.type === 'image') {
+            group.tip_label = 'изображение';
             $group.addClass(cl+'__image').removeClass(cl+'__group');
             var has_groups = !!(group.groups && group.groups.length > 0);
             
@@ -110,10 +113,11 @@ function box_builder($node, params) {
         }
         
         if (!group_is_empty) {
+            var tip_label = group.tip_label || 'строку';
             var $settings = $(
                 '<div class="'+cl+'__group-controls">'+
-                    '<div class="'+cl+'__group-remove">&times;</div>'+
-                    '<div class="'+cl+'__group-settings"></div>'+
+                    '<div class="'+cl+'__group-remove" title="Удалить '+tip_label+'">&times;</div>'+
+                    '<div class="'+cl+'__group-settings" title="Настроить '+tip_label+'"></div>'+
                 '</div>'
             );
             $group.append($settings);
@@ -155,8 +159,8 @@ function box_builder($node, params) {
         
         var $field = $(
             '<div class="'+cl+'__field">'+
-                '<span class="'+cl+'__field-label">'+field_meta.name+'</span>'+
-                '<span class="'+cl+'__field-kill"></span>'+
+                '<span class="'+cl+'__field-label" title="Настроить элемент">'+field_meta.name+'</span>'+
+                '<span class="'+cl+'__field-kill" title="Удалить элемент"></span>'+
             '</div>'
         );
 
@@ -545,7 +549,10 @@ function box_builder($node, params) {
         var avail_box = that.$avail[0].getBoundingClientRect(),
             canvas_box = that.$canvas[0].getBoundingClientRect(),
             doc_box = document.body.getBoundingClientRect();
-        that.$avail.css('left', canvas_box.right);
+        that.$avail.css({
+            left:canvas_box.right,
+            display:'block'
+        });
         if (doc_box.right - canvas_box.right < avail_box.width + 20) {
             that.$adder.css('right', canvas_box.width - 7);
             that.$avail.css('left', canvas_box.left - avail_box.width);
@@ -563,7 +570,10 @@ function box_builder($node, params) {
     function hideAvail() {
         that.$adder.removeClass(adder_active_class).css('right', '');
         that.$avail.removeClass(cl+'__avail_active').one('transitionend', function() {
-            that.$avail.css('left');
+            that.$avail.css({
+                left:'',
+                display:'none'
+            });
         });
     }
     
@@ -629,7 +639,12 @@ function box_builder($node, params) {
             scroll:false
         });
         
-        this.$avail.on('click', '.'+cl+'__field', function() {
+        this.$avail.on('click', '.'+cl+'__field', function(e) {
+            
+            if (!that.$avail.hasClass(cl+'__avail_active')) {
+                return;
+            }
+            
             var $target_group = that.$canvas.find('>.'+cl+'__group').last(),
                 $field = $(this),
                 empty_class = cl+'__group_empty',
