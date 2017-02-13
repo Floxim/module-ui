@@ -645,10 +645,11 @@ function box_builder($node, params) {
                 return;
             }
             
-            var $target_group = that.$canvas.find('>.'+cl+'__group').last(),
-                $field = $(this),
+            var $field = $(this),
                 empty_class = cl+'__group_empty',
                 field_meta = $field.data('meta');
+                
+            var $target_group = that.$canvas.find('>.'+cl+'__group')[field_meta.position || 'last']();
                 
             if (field_meta.is_group) {
                 that.drawGroup($field.data('vals'), $target_group, null, true);

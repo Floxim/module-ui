@@ -267,7 +267,8 @@ class Box {
             array(
                 'keyword' => 'block:header',
                 'name' => 'Заголовок',
-                'template' => 'floxim.layout.wrapper:wrapper_header'
+                'template' => 'floxim.layout.wrapper:wrapper_header',
+                'position' => 'first'
             )
         );
         return $avail;
