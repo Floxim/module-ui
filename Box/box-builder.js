@@ -150,24 +150,44 @@ function box_builder($node, params) {
     };
     
     this.drawField = function(field, $target, path) {
-        var field_meta = this.fields_map[field.keyword] || {};
+        var field_meta = this.fields_map[field.keyword],
+            field_is_available = !!field_meta;
         
-        if (!field_meta.name) {
-            field_meta.name = field.keyword;
+        if (!field_is_available) {
+            field_meta = {
+                name: field.name || field.keyword
+            };
         }
         
         
         var $field = $(
             '<div class="'+cl+'__field">'+
-                '<span class="'+cl+'__field-label" title="Настроить элемент">'+field_meta.name+'</span>'+
+                '<span class="'+cl+'__field-label" title="Настроить элемент">'+
+                    field_meta.name+
+                '</span>'+
+                (
+                    field_is_available ? '' : 
+                    '<span class="'+cl+'__field-unavail-marker" title="Поле отсутствует у данных такого типа">!</span>'
+                )+
                 '<span class="'+cl+'__field-kill" title="Удалить элемент"></span>'+
             '</div>'
         );
 
+        if (!field_is_available) {
+            $field.addClass(cl+'__field_unavail');
+            $field.find('.'+cl+'__field-label').attr('title', '');
+        }
+        
+
         if (path !== undefined) {
             $field.attr('data-path', path);
         }
-        $field.data('vals', field);
+        
+        var stored_field = $.extend(true, {}, field);
+        
+        delete stored_field.templates;
+        
+        $field.data('vals', stored_field);
         $field.data('meta', field_meta);
         $target.append($field);
     };
@@ -612,7 +632,10 @@ function box_builder($node, params) {
                 return false;
             })
             .on('click', '.'+cl+'__field', function(e) {
-                that.showSettings($(this));
+                var $field = $(this);
+                if (!$field.is('.'+cl+'__field_unavail')) {
+                    that.showSettings($(this));
+                }
                 return false;
             })
             .on('click', '.'+cl+'__group-settings', function(e) {

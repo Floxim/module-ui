@@ -5,19 +5,14 @@ vars:
         type: css-font
         label: Шрифт
     color:
+        label: Цвет
         type: palette
         transparent: true
-    margin:
-        type: measures
-        prop: margin
-        label: Отступ
 */
 .header_style_default (
-    @font: none;
+    @font:text 20px bold;
     @color: main 0;
-    @margin: 1rem 0;
 ) {
-    margin:@margin;
     .text-align();
     #__text {
         .font(@font);

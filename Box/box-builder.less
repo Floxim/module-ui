@@ -157,7 +157,7 @@
         width: 13px;
         display: inline-block;
         text-align: center;
-        
+        cursor:pointer;
         &:hover {
             color:#F00;
         }
@@ -277,5 +277,22 @@
     }
     &__image > &__group_single {
         min-height:34px;
+    }
+    
+    &__field_unavail {
+        opacity:0.7;
+        cursor:default;
+    }
+    
+    &__field-unavail-marker {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin: 0 5px;
+        text-align: center;
+        color: #F00;
+        border: 1px solid #F00;
+        font-size: 11px;
+        border-radius: 20px;
     }
 }

@@ -162,6 +162,7 @@ class Box {
         
         foreach ($all as $f) {
             $kw = $f['keyword'];
+            $com = $f['component'];
             $field_label = $f['name'];
             if (
                 (in_array($kw, $skip) || in_array($f['type'], $skip_types))
@@ -177,7 +178,14 @@ class Box {
             
             switch ($f['type']) {
                 default:
-                    $field['template'] = 'value';
+                    if ($f['keyword'] === 'name') {
+                        $field['template'] = 'header_value';
+                    } elseif ($f->dig('format.html')) {
+                        $field['template'] = 'text_value';
+                    } else {
+                        $field['template'] = 'value';
+                    }
+                    
                     $field['templates'] = [
                         ['id' => 'text_value', 'name' => 'Текст'],
                         ['id' => 'value', 'name' => 'Значение'],
@@ -202,6 +210,7 @@ class Box {
             }
             
             $field['keyword'] = $kw;
+            $field['component'] = $com['keyword'];
             $field['name'] = $field_label;
             
             if ($f['type'] === 'link') {

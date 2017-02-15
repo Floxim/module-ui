@@ -91,6 +91,7 @@
         width_value: {$context.getContainerWidthValue() /};
     "
     fx:hide-empty>
+    
     {each select="$fields as $field_view" scope="true"}
         {= $_is_admin ?  $box.startField( $field_view )  : '' /}
         {set $el = 'field ' . $field_view.keyword /}
@@ -173,12 +174,22 @@
     <img src="{$value | 'max-width:1600'}" alt="" />
 </div>
 
-<div fx:template="text_value">
-    Text text
-    {@test label="Это хороший текст?" type="checkbox" /}
-    {if $test}крутей текст!{/if}
+<div fx:template="text_value" fx:aif="$value">
+    {first}
+        {set $value = $item[$field_view.keyword] /}
+    {/first}
+    {apply floxim.main.text:text with $text = $value /}
 </div>
 
-<div fx:template="header_value">
-    Headr
+<div fx:template="header_value" fx:aif="$value">
+    {first}
+        {set $value = $item[$field_view.keyword] /}
+        
+        {set $field = $item.getField($field_view.keyword) /}
+        
+        {if !$field || $field.type === 'string'}
+            {@field_link label="Ссылка?" type="checkbox" default="0" /}
+        {/if}
+    {/first}
+    {apply floxim.ui.header:header with $header = $value, $header_link = $field_link ? $item.url : false /}
 </div>
