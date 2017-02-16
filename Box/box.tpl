@@ -110,7 +110,7 @@
             {@value_icon label="Иконка?" type="iconpicker" default="0" /}
         {/if}
         {if !$field || $field.type === 'string'}
-            {@field_link label="Ссылка?" type="checkbox" default="0" /}
+            {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
         {/if}
     {/first}
     
@@ -118,7 +118,7 @@
         {%value_label}{$field.name /}{/%}
     </div>
     
-    <div fx:link-if="$field_link" fx:e="value">
+    <div fx:link-if="$field_link" {if $field_link == 'blank'}target="_blank"{/if} fx:e="value">
         <span fx:if="$value_icon" class="{= fx::icon( $value_icon ) }" fx:e="icon"></span>
         {if $field.type === 'datetime'}
             {apply floxim.ui.date:date with $date = $value /}
@@ -146,6 +146,7 @@
     fx:template="icon_value" 
     fx:aif="$value" 
     fx:link-if="$field_link"
+    {if $field_link == 'blank'}target="_blank"{/if}
     fx:b="icon-value" 
     class="{$value | fx::icon /}" 
     fx:styled="label:Стиль иконки">
@@ -153,7 +154,7 @@
         {set $field = $item.getField($field_view.keyword) /}
         {set $value = $item[$field_view.keyword] /}
         {if $item.url}
-            {@field_link label="Ссылка?" type="checkbox" default="0" /}
+            {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
         {/if}
     {/first}
 </div>
@@ -188,8 +189,14 @@
         {set $field = $item.getField($field_view.keyword) /}
         
         {if !$field || $field.type === 'string'}
-            {@field_link label="Ссылка?" type="checkbox" default="0" /}
+            {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
         {/if}
     {/first}
-    {apply floxim.ui.header:header with $header = $value, $header_link = $field_link ? $item.url : false /}
+    {apply 
+        floxim.ui.header:header 
+        with 
+            $header = $value, 
+            $header_link = $field_link ? $item.url : false,
+            $header_link_target = $field_link
+    /}
 </div>

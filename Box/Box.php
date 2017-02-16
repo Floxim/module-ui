@@ -509,4 +509,18 @@ class Box {
             )
         );
     }
+    
+    public static function getLinkParam($context)
+    {
+        return [
+            'label' => "Ссылка?",
+            'type' => "livesearch",
+            'values' => [
+                [0, 'Нет'],
+                ['link', 'Да'],
+                ['blank', 'В новом окне']
+            ],
+            'default' => "0"
+        ];
+    }
 }
