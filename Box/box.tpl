@@ -99,12 +99,16 @@
     {/each}
 </div>
         
-<div fx:template="value" fx:aif="$value" fx:b="value" fx:styled="label:Стиль поля">
+<div fx:template="value" fx:aif="$value" fx:b="value">
     {first}
         {set $field = $item.getField($field_view.keyword) /}
         {set $value = $item[$field_view.keyword] /}
         
-        {@show_label label="Подпись?" type="checkbox" default="0" /}
+        {@show_label 
+            label="Подпись?" 
+            type="livesearch" 
+            values="`array('0' => 'нет', 'left' => 'слева', 'top' => 'сверху')`" 
+            default="0" /}
         
         {if $field.type !== 'icon'}
             {@value_icon label="Иконка?" type="iconpicker" default="0" /}
@@ -119,14 +123,25 @@
     </div>
     
     <div fx:link-if="$field_link" {if $field_link == 'blank'}target="_blank"{/if} fx:e="value">
-        <span fx:if="$value_icon" class="{= fx::icon( $value_icon ) }" fx:e="icon"></span>
-        {if $field.type === 'datetime'}
-            {apply floxim.ui.date:date with $date = $value /}
-        {else}
-            {$value /}
-        {/if}
+        {set $text_value}
+            <span fx:if="$value_icon" class="{= fx::icon( $value_icon ) }" fx:e="icon"></span>
+            {if $field.type === 'datetime'}
+                {apply floxim.ui.date:date with $date = $value /}
+            {else}
+                {$value /}
+            {/if}
+        {/set}
+        {apply floxim.main.text:text with $text = $text_value /}
     </div>
 </div>
+    
+{template id="display_value"}
+    {if $field.type === 'datetime'}
+        {apply floxim.ui.date:date with $date = $value /}
+    {else}
+        {$value /}
+    {/if}
+{/template}
 
 {template id="list_value"}
     {set $value = $item[$field_view.keyword] /}
@@ -178,8 +193,13 @@
 <div fx:template="text_value" fx:aif="$value">
     {first}
         {set $value = $item[$field_view.keyword] /}
+        {set $field = $item.getField($field_view.keyword) /}
     {/first}
-    {apply floxim.main.text:text with $text = $value /}
+    {*{apply floxim.main.text:text with $text = $value /}*}
+    {set $text_value}
+        {apply display_value /}
+    {/set}
+    {apply floxim.main.text:text with $text = $text_value /}
 </div>
 
 <div fx:template="header_value" fx:aif="$value">
@@ -188,14 +208,17 @@
         
         {set $field = $item.getField($field_view.keyword) /}
         
-        {if !$field || $field.type === 'string'}
+        {if !$field || in_array($field.type, ['string','datetime']) }
             {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
         {/if}
     {/first}
+    {set $header_value}
+        {apply display_value /}
+    {/set}
     {apply 
         floxim.ui.header:header 
         with 
-            $header = $value, 
+            $header = $header_value, 
             $header_link = $field_link ? $item.url : false,
             $header_link_target = $field_link
     /}

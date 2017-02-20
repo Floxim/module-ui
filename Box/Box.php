@@ -188,7 +188,7 @@ class Box {
                     
                     $field['templates'] = [
                         ['id' => 'text_value', 'name' => 'Текст'],
-                        ['id' => 'value', 'name' => 'Значение'],
+                        //['id' => 'value', 'name' => 'Значение'],
                         ['id' => 'header_value', 'name' => 'Заголовок']
                     ];
                     break;
@@ -497,12 +497,15 @@ class Box {
 
     public function export() {
         $value = array_merge($this->data, array('is_stored' => "1"));
-        
+        $box_label = $this->template->context->get('box_label');
+        if (!$box_label) {
+            $box_label = 'Поля';
+        }
         $this->template->registerParam(
             $this->getParamId(),
             array(
                 'type' => 'fx-box-builder',
-                'label' => 'Поля',
+                'label' => $box_label,
                 'value' => $value,
                 'params' => $this->params,
                 'avail' => $this->avail
