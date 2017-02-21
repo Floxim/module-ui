@@ -57,6 +57,7 @@ vars:
 container:
     lightness: background
     width: width
+    align: justify_content
 */
 
 .group_style_default(
@@ -123,4 +124,9 @@ container:
     }
     
     .width(@width; @margin);
+    
+    & when not(@width = none) {
+        as:@justify_content;
+        .align-self(@justify_content);
+    }
 }
