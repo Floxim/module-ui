@@ -3,7 +3,7 @@
     fx:name="Слайдер"
     fx:of="floxim.main.page:list, floxim.main.factoid:list, floxim.media.photo:list" 
     fx:b="slider type_{$infoblock.short_type /}" 
-    fx:styled="Стиль слайдера"
+    fx:styled="label:Стиль слайдера"
     {if $autoplay}
         data-autoplay="true"
         data-pause_time="{$pause_time*1000}"
@@ -26,7 +26,10 @@
     
     <div fx:e="slides-wrapper">
         <div fx:e="slides">
-            {$items || :slide /}
+            {each select="$items as $item"}
+                {*{$items || :slide /}*}
+                {apply floxim.ui.box:box el slide /}
+            {/each}
         </div>
     </div>
     <div fx:e="arrows">

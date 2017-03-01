@@ -212,9 +212,7 @@
             {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
         {/if}
     {/first}
-    {set $header_value}
-        {apply display_value /}
-    {/set}
+    {set $header_value}{apply display_value /}{/set}
     {apply 
         floxim.ui.header:header 
         with 

@@ -7,26 +7,160 @@ vars:
         min: 1
         max: 5
         tip: Сколько слайдов показывать одновременно
-    ratio:
-        label: Пропорции
-        type: ratio
-        min: 1
+        tab: slides
     margin:
         label: Отступ
         type: number
         min: 0
         max: 4
         step: 0.25
+        tab: slides
+    points_pos:
+        type: livesearch
+        label: Выравнивание
+        values:
+            center: По центру
+            flex-start: Слева
+            flex-end: Справа
+            none: Не показывать
+        tab: points
+    point_size:
+        type: number
+        label: Размер
+        min: 0.8
+        max: 4
+        step: 0.2
+        tab: points
+    points_offset:
+        type: number
+        label: Смещение
+        min: -20
+        max: 20
+        tab: points
+    point_color:
+        type: palette
+        opacity: true
+        empty: false
+        label: Цвет
+        tab: points
+    point_border:
+        type: measures
+        prop: borders
+        tab: points
+    c_point_size:
+        type: number
+        label: Размер
+        min: 0.8
+        max: 4
+        step: 0.2
+        tab: c_point
+    c_point_color:
+        type: palette
+        opacity: true
+        empty: false
+        label: Цвет
+        tab: c_point
+    c_point_border:
+        type: measures
+        prop: borders
+        tab: c_point
+tabs:
+    slides: Слайды
+    points: Точки
+    c_point: Активная точка
+    arrows: Стрелки
 export:
-    image_ratio: 1 * @ratio / @count_slides
     cols: '@count_slides'
 */
 .slider_style_default(
     @count_slides:1;
-    @ratio:3;
     @margin:1rem;
+    @points_pos: center;
+    @point_size: 0.7rem;
+    @points_offset: 1rem;
+    @point_color: main 5 0.5;
+    @point_border: none;
+    @c_point_size: 1rem;
+    @c_point_color: main 5 0.9;
+    @c_point_border: none;
 ) 
 {
+    width:100%;
+    position: relative;
+    
+    #__slides {
+        display:flex;
+        width:100%;
+        position:relative;
+    }
+    
+    #__slides-wrapper {
+        width:100%;
+        position:relative;
+        overflow:hidden;
+    }
+    
+    #__slide {
+        @slide_width: ( 100% / @count_slides );
+        & when (@count_slides = 1) {
+            min-width:@slide_width;
+        }
+        & when (@count_slides > 1) {
+            min-width: ~"calc( " @slide_width ~" - " @margin * (1 - 1/@count_slides) ~")";
+        }
+        margin-right: @margin;
+    }
+    
+    #__points {
+        & when (@points_pos = none) {
+            display:none;
+        }
+        & when not(@points_pos = none) {
+            position:absolute;
+            width:100%;
+            display:flex;
+            justify-content:@points_pos;
+            align-items:center;
+            left:0;
+            bottom:@points_offset;
+        }
+    }
+    
+    #__point {
+        //background:rgba(200, 200, 200, 0.4);
+        .color(@point_color, background-color);
+        width:@point_size;
+        height:@point_size;
+        margin:7px;
+        .border(@point_border);
+        cursor:pointer;
+        transition:all 0.5s ease;
+        #_active {
+            width:@c_point_size;
+            height:@c_point_size;
+            .color(@c_point_color, background-color);
+            .border(@c_point_border);
+        }
+    }
+    
+    #__arrows {
+        position: absolute;
+        z-index:2;
+    }
+    
+    #__arrow {
+        transition:opacity 0.2s ease;
+        opacity:1;
+        &_disabled {
+            opacity:0.3 !important;
+        }
+    }
+    
+    #_is-sorted #__arrows {
+        display:none;
+    }
+    
+    /*
     position:relative;
     overflow:hidden;
     width:100%;
@@ -105,4 +239,5 @@ export:
             background:rgba(200, 200, 200, 0.8);
         }
     }
+    */
 }
