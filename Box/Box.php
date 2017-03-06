@@ -468,7 +468,7 @@ class Box {
                         $field = array('keyword' => $field);
                     }
                     if (!isset($field['template'])) {
-                        $field['template'] = 'value';
+                        $field['template'] = 'text_value';
                     }
                 }
             }
@@ -515,14 +515,37 @@ class Box {
     
     public static function getLinkParam($context)
     {
+        static $popup_ibs = null;
+        if (is_null($popup_ibs)) {
+            $popup_ibs = fx::data('infoblock')
+                            ->where('site_id', fx::env('site_id'))
+                            ->where('controller', 'floxim.ui.hidden')
+                            ->all();
+        }
+        $values = [
+            [0, 'Нет'],
+            ['link', 'Да'],
+            ['blank', 'В новом окне']
+        ];
+        if (count($popup_ibs) > 0) {
+            $page = $context->getClosestEntity('floxim.main.page');
+            $popup_vals = ['children' => [], 'name' => 'Попап', 'id' => 'popup', 'disabled' => true];
+            foreach ($popup_ibs as $popup_ib) {
+                if ($popup_ib->isAvailableOnPage($page)) {
+                    $popup_vals['children'] []= [
+                        '#popup-'.$popup_ib['id'],
+                        $popup_ib['name']
+                    ];
+                }
+            }
+            if (count($popup_vals['children']) > 0) {
+                $values []= $popup_vals;
+            }
+        }
         return [
             'label' => "Ссылка?",
             'type' => "livesearch",
-            'values' => [
-                [0, 'Нет'],
-                ['link', 'Да'],
-                ['blank', 'В новом окне']
-            ],
+            'values' => $values,
             'default' => "0"
         ];
     }

@@ -114,7 +114,7 @@
             {@value_icon label="Иконка?" type="iconpicker" default="0" /}
         {/if}
         {if !$field || $field.type === 'string'}
-            {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
+        {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
         {/if}
     {/first}
     
@@ -190,16 +190,21 @@
     <img src="{$value | 'max-width:1600'}" alt="" />
 </div>
 
-<div fx:template="text_value" fx:aif="$value">
+<div 
+    href="$url" 
+    fx:link-if="$field_link" 
+    fx:b="floxim.main.text:text" 
+    fx:styled="Стиль текста" 
+    fx:template="text_value" 
+    fx:aif="$value">
     {first}
         {set $value = $item[$field_view.keyword] /}
         {set $field = $item.getField($field_view.keyword) /}
+        {if !$field || in_array($field.type, ['string','datetime']) }
+            {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
+        {/if}
     {/first}
-    {*{apply floxim.main.text:text with $text = $value /}*}
-    {set $text_value}
-        {apply display_value /}
-    {/set}
-    {apply floxim.main.text:text with $text = $text_value /}
+    {apply display_value /}
 </div>
 
 <div fx:template="header_value" fx:aif="$value">

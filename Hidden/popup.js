@@ -19,16 +19,25 @@ $(function() {
     
     function get_popup(infoblock_id, base_url) {
         return new Promise(function(resolve) {
-            var $popup = $('.'+cl+'_id_popup-'+infoblock_id);
+            var $popups = $('.'+cl+'_id_popup-'+infoblock_id);
             
-            var c_url = document.location.href.replace(/#.+$/, '');
+            var c_url = document.location.href.replace(/#.+$/, ''),
+                local_found = false;
             
-            if (
-                $popup.length && (
+            $popups.each(function() {
+                var $popup = $(this);
+                console.log(base_url, $popup.data('popup_base_url'), c_url);
+                if (
                     !base_url || $popup.data('popup_base_url') === base_url || base_url === c_url
-                )
-            ) {
-                resolve($popup);
+                ) {
+                    console.log('resl local');
+                    resolve($popup);
+                    local_found = true;
+                    return false;
+                }
+            });
+            
+            if (local_found) {
                 return;
             }
             
@@ -40,6 +49,9 @@ $(function() {
                 }
             ).then(function($res) {
                 $res.data('popup_base_url', base_url);
+                if (window.$fx && $fx.front.mode === 'edit') {
+                    $fx.front.hilight($res);
+                }
                 resolve($res);
                 return;
             });
@@ -47,11 +59,15 @@ $(function() {
     }
     
     function open_popup(infoblock_id, base_url) {
+        if (window.$fx) {
+            $fx.front.deselect_item();
+        }
         get_popup(
             infoblock_id, 
             base_url
         ).then(
             function($popup) {
+                console.log('show popop', $popup.length);
                 $popup.removeClass(cl+'_hidden');
                 $popup.find(':input:visible, [tabindex]').not('[tabindex="-1"]').first().focus();
                 $popup.trigger('popup_show');
@@ -61,11 +77,18 @@ $(function() {
     
     $('html').on('click', 'a[href]', function(e) {
         var popup_url = this.href.match(/(.+)\#popup-(.+)$/);
+        
         if (!popup_url) {
             return;
         }
         
-        if (window.$fx && $fx.front.mode === 'edit' && !e.metaKey && !e.ctrlKey) {
+        if (
+            window.$fx && 
+            $fx.front.mode === 'edit' && 
+            !e.metaKey && 
+            !e.ctrlKey && 
+            ! $(this).find('.fx_icon-type-follow').length
+        ) {
             return;
         }
         
