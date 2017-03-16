@@ -197,6 +197,7 @@
     fx:styled="Стиль текста" 
     fx:template="text_value" 
     fx:aif="$value">
+    {css from="floxim.main.text"}text.less{/css}
     {first}
         {set $value = $item[$field_view.keyword] /}
         {set $field = $item.getField($field_view.keyword) /}

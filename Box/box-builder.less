@@ -171,12 +171,13 @@
         max-width:200px;
         border:1px solid #EEE;
         z-index:10000;
-        display:block;
+        display:none;
         max-height: 0;
         overflow:auto;
         opacity:0;
         margin-left:2px;
-        transition:all 0.3s ease;
+        transition:all 0.01s ease;
+        display:none;
         &_active {
             opacity:1;
             max-height:100vh;
@@ -213,6 +214,7 @@
         border:none;
         border-bottom:1px solid #EEE;
         border-radius:0;
+        cursor:move;
         &:last-child {
             border-bottom: none;
         }
@@ -236,7 +238,7 @@
         background: #FFF;
         cursor:pointer;
         transform:rotate(0deg);
-        transition: all 0.3s ease;
+        transition: all 0.01s ease;
         &_active {
             z-index:10001;
             transform:rotate(44deg);

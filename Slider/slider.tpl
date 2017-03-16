@@ -16,7 +16,7 @@
     {@pause_time label="Пауза" type="number" min="1" max="20" step="1" parent="autoplay" default="3" units="с"}
     {@move_time label="Скорость" type="number" min="0.2" max="5" step="0.2" default="0.5"}
     
-    {@show_points type="checkbox" default="0" label="Показывать точки" /}
+    {*{@show_points type="checkbox" default="0" label="Показывать точки" /}*}
     
     {js}
         @floxim_js/jquery.bem.js
@@ -27,17 +27,16 @@
     <div fx:e="slides-wrapper">
         <div fx:e="slides">
             {each select="$items as $item"}
-                {*{$items || :slide /}*}
                 {apply floxim.ui.box:box el slide /}
             {/each}
         </div>
     </div>
     <div fx:e="arrows">
-        <a fx:e="arrow back" data-dir="back"><span></span></a>
-        <a fx:e="arrow next" data-dir="next"><span></span></a>
+        <a fx:e="arrow back" data-dir="back" class="{= fx::icon( 'fa arrow-left') /}"></a>
+        <a fx:e="arrow next" data-dir="next" class="{= fx::icon( 'fa arrow-right') /}"></a>
     </div>
     
-    <div fx:e="points" fx:if="$show_points">
+    <div fx:e="points" fx:aif="$points != 'none'">
         <div fx:each="$items" fx:add="false" fx:e="point" title="{$name}"></div>
     </div>
 </div>

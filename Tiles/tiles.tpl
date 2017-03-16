@@ -10,6 +10,7 @@
     "
     fx:of="floxim.main.content:list#3">
     {css}flex-tiles.less{/css}
+    {default $cols = 1 /}
     <div fx:e="wrapper">
         {each $items as $item}
             {- $context.pushContainerWidth( 1 / $cols ) /}

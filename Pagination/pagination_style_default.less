@@ -1,0 +1,105 @@
+/*
+vars:
+    margin:
+        label: Отступ
+        type: number
+        step: 0.25
+        min: 0
+        max: 2
+        tab: main
+    padding:
+        label: Внутренний отступ
+        type: measures
+        prop: padding
+        tab: main
+        step: 0.1
+    font:
+        label: Шрифт
+        type: css-font
+        tab: main
+    color:
+        label: Цвет
+        type: palette
+        transparent: true
+        empty: false
+        tab: main
+    background:
+        label: Фон
+        type: palette
+        tab: main
+    border:
+        type: measures
+        prop: borders
+        tab: main
+    color_hover:
+        label: Цвет
+        type: palette
+        transparent: true
+        empty: false
+        tab: hover
+    background_hover:
+        label: Фон
+        type: palette
+        tab: hover
+    color_active:
+        label: Цвет
+        type: palette
+        transparent: true
+        empty: false
+        tab: active
+    background_active:
+        label: Фон
+        type: palette
+        tab: active
+    border_active:
+        type: measures
+        prop: borders
+        tab: active
+tabs:
+    main: Основное
+    hover: При наведении
+    active: Активная цифра
+*/
+.pagination_style_default(
+    @margin: 0.5rem;
+    @font: text 16px;
+    @padding: 0.5rem 0.25rem 0.5rem 0.25rem;
+    @color: main 0 1;
+    @border: none;
+    @color_hover: alt 0 1;
+    
+    @background: none;
+    @background_hover: none;
+    
+    @color_active: main 0 1;
+    @background_active: none;
+    
+    @border_active: none;
+) 
+{
+    display:inline-block;
+    #__item {
+        display:inline-block;
+        padding:@padding;
+        .font(@font);
+        .color(@background; background);
+        margin-right:@margin;
+        .tcolor-on(@color; @background);
+        .border(@border);
+        &:hover:not(.floxim--ui--pagination--pagination__item_disabled) {
+            .color(@background_hover; background);
+            .tcolor-on(@color_hover; @background_hover);
+        }
+        #_active, #_active:hover {
+            text-decoration:none;
+            cursor:text;
+            .color(@background_active; background);
+            .tcolor-on(@color_active; @background_active);
+            .border(@border_active);
+        }
+        
+        #_disabled {
+            opacity:0.3;
+        }
+    }
+}

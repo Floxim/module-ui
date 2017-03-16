@@ -573,6 +573,7 @@ function box_builder($node, params) {
             left:canvas_box.right,
             display:'block'
         });
+        that.$node.css('z-index', 'initial');
         if (doc_box.right - canvas_box.right < avail_box.width + 20) {
             that.$adder.css('right', canvas_box.width - 7);
             that.$avail.css('left', canvas_box.left - avail_box.width);
@@ -595,6 +596,7 @@ function box_builder($node, params) {
                 display:'none'
             });
         });
+        that.$node.css('z-index', '');
     }
     
     this.init = function () {

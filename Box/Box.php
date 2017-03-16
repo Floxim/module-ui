@@ -265,7 +265,7 @@ class Box {
         );
     }
     
-    public function getAvailBlockFields()
+    public function getAvailBlockFields($infoblock)
     {
         $avail = array(
             array(
@@ -280,6 +280,14 @@ class Box {
                 'position' => 'first'
             )
         );
+        $action = $infoblock['action'];
+        if (preg_match("~^list~", $action)) {
+            $avail []= array(
+                'keyword' => 'block:pagination',
+                'name' => 'Постраничная навигация',
+                'template' => 'floxim.ui.pagination:pagination'
+            );
+        }
         return $avail;
     }
     

@@ -15,6 +15,14 @@ vars:
         max: 4
         step: 0.25
         tab: slides
+    points_mode:
+        label: Точки
+        type: livesearch
+        values:
+            horizontal: Горизонтальные
+            vertical: Вертикальные
+            none: Не показывать
+        tab: points
     points_pos:
         type: livesearch
         label: Выравнивание
@@ -22,20 +30,42 @@ vars:
             center: По центру
             flex-start: Слева
             flex-end: Справа
-            none: Не показывать
         tab: points
-    point_size:
-        type: number
-        label: Размер
-        min: 0.8
-        max: 4
-        step: 0.2
+        _parent: points_mode == horizontal
+    points_vpos:
+        type: livesearch
+        label: По вертикали
+        values:
+            flex-start: Сверху
+            center: По центру
+            flex-end: Снизу
         tab: points
     points_offset:
         type: number
         label: Смещение
         min: -20
         max: 20
+        step: 0.5
+        tab: points
+    points_voffset:
+        type: number
+        label: По вертикали
+        min: -20
+        max: 20
+        step: 0.5
+        tab: points
+    points_margin:
+        label: Промежуток
+        step: 0.25
+        min: 0
+        max: 10
+        tab: points
+    point_size:
+        type: number
+        label: Размер
+        min: 0.2
+        max: 4
+        step: 0.1
         tab: points
     point_color:
         type: palette
@@ -47,12 +77,15 @@ vars:
         type: measures
         prop: borders
         tab: points
+    point_shadow:
+        type: css-shadow
+        tab: points
     c_point_size:
         type: number
         label: Размер
-        min: 0.8
+        min: 0.2
         max: 4
-        step: 0.2
+        step: 0.1
         tab: c_point
     c_point_color:
         type: palette
@@ -64,6 +97,72 @@ vars:
         type: measures
         prop: borders
         tab: c_point
+    arrows_mode:
+        label: Стрелки
+        type: livesearch
+        values:
+            together: Рядом
+            apart: По краям
+            none: Не показывать
+        tab: arrows
+    arrows_vpos:
+        label: Позиция
+        type: livesearch
+        values:
+            top: Сверху
+            center: По центру
+            bottom: Снизу
+        tab: arrows
+    arrows_hpos:
+        label: По горизонтали
+        type: livesearch
+        values:
+            flex-start: Слева
+            center: По центру
+            flex-end: Справа
+        tab: arrows
+        parent: arrows_mode == together
+    arrows_margin:
+        label: Промежуток
+        step: 0.25
+        tab: arrows
+        parent: arrows_mode == together
+    arrows_hoffset:
+        label: Отступ горизонтальный
+        parent: arrows_hpos != center
+        tab: arrows
+        step: 0.25
+    arrows_voffset:
+        label: Отступ вертикальный
+        parent: arrows_vpos != center
+        tab: arrows
+        step: 0.25
+    arrows_size:
+        label: Размер
+        step: 0.25
+        tab: arrows
+        min: 0.5
+        max: 5
+    arrows_color:
+        label: Цвет
+        type: palette
+        empty: false
+        transparent: true
+        tab: arrows
+    arrows_bg:
+        label: Фон
+        type: palette
+        empty: true
+        opacity: true
+        tab: arrows
+    arrows_padding:
+        type: measures
+        prop: padding
+        tab: arrows
+    arrows_border:
+        type: measures
+        prop: borders
+        tab: arrows
 tabs:
     slides: Слайды
     points: Точки
@@ -71,18 +170,35 @@ tabs:
     arrows: Стрелки
 export:
     cols: '@count_slides'
+    points: '@points_mode'
 */
 .slider_style_default(
     @count_slides:1;
-    @margin:1rem;
+    @margin:0rem;
+    @points_mode: horizontal;
+    @points_margin: 1rem;
     @points_pos: center;
+    @points_vpos: flex-end;
     @point_size: 0.7rem;
     @points_offset: 1rem;
+    @points_voffset: 1rem;
     @point_color: main 5 0.5;
     @point_border: none;
+    @point_shadow: none;
     @c_point_size: 1rem;
     @c_point_color: main 5 0.9;
     @c_point_border: none;
+    @arrows_mode: apart;
+    @arrows_vpos: center;
+    @arrows_hpos: flex-start;
+    @arrows_margin: 1rem;
+    @arrows_hoffset: 1rem;
+    @arrows_voffset: 1rem;
+    @arrows_size: 1rem;
+    @arrows_color: main 0 1;
+    @arrows_bg: none;
+    @arrows_padding: 0.25rem 0.25rem 0.25rem 0.25rem;
+    @arrows_border: none;
 ) 
 {
     width:100%;
@@ -112,27 +228,79 @@ export:
     }
     
     #__points {
-        & when (@points_pos = none) {
+        & when (@points_mode = none) {
             display:none;
         }
-        & when not(@points_pos = none) {
+        & when (@points_mode = horizontal) {
             position:absolute;
             width:100%;
+            height:0px;
             display:flex;
-            justify-content:@points_pos;
             align-items:center;
-            left:0;
-            bottom:@points_offset;
+            justify-content:@points_pos;
+            
+            & when (@points_pos = flex-start) {
+                left:@points_offset;
+            }
+            & when (@points_pos = flex-end) {
+                right:@points_offset;
+            }
+            
+            & when (@points_vpos = flex-start) {
+                top:@points_voffset;
+            }
+            & when (@points_vpos = center) {
+                top: 50%;
+            }
+            & when (@points_vpos = flex-end) {
+                bottom:@points_voffset;
+            }
+        }
+        & when (@points_mode = vertical) {
+            position:absolute;
+            height:100%;
+            width:0px;
+            display:flex;
+            flex-direction: column;
+            justify-content:@points_vpos;
+            align-items:center;
+            
+            & when (@points_pos = flex-start) {
+                left:@points_offset;
+            }
+            & when (@points_pos = center) {
+                left: 50%;
+            }
+            & when (@points_pos = flex-end) {
+                right:@points_offset;
+            }
+            
+            & when (@points_vpos = flex-start) {
+                top:@points_voffset;
+            }
+            & when (@points_vpos = center) {
+                top: 0;
+            }
+            & when (@points_vpos = flex-end) {
+                bottom:@points_voffset;
+            }
         }
     }
     
     #__point {
-        //background:rgba(200, 200, 200, 0.4);
         .color(@point_color, background-color);
         width:@point_size;
         height:@point_size;
-        margin:7px;
+        &:not(:last-child) {
+            & when (@points_mode = vertical) {
+                margin-bottom: @points_margin;
+            }
+            & when (@points_mode = horizontal) {
+                margin-right: @points_margin;
+            }
+        } 
         .border(@point_border);
+        .box-shadow(@point_shadow);
         cursor:pointer;
         transition:all 0.5s ease;
         #_active {
@@ -144,100 +312,78 @@ export:
     }
     
     #__arrows {
-        position: absolute;
-        z-index:2;
+        & when (@arrows_mode = none) {
+            display:none;
+        }
+        & when not(@arrows_mode = none) {
+            position: absolute;
+            z-index:2;
+            height:0;
+            width:100%;
+            display:flex;
+        }
+        & when (@arrows_mode = apart) {
+            justify-content: space-between;
+            left:0;
+        }
+        & when (@arrows_mode = together) {
+            justify-content: @arrows_hpos;
+            & when (@arrows_hpos = flex-start) {
+                left: @arrows_hoffset;
+            }
+            & when (@arrows_hpos = flex-end) {
+                right: @arrows_hoffset;
+            }
+        }
+        & when (@arrows_vpos = top) {
+            top: @arrows_voffset;
+        }
+        
+        & when (@arrows_vpos = center) {
+            top:50%;
+            align-items: center;
+        }
+        
+        & when (@arrows_vpos = bottom) {
+            bottom: @arrows_voffset;
+            align-items: flex-end;
+        }
     }
     
     #__arrow {
         transition:opacity 0.2s ease;
         opacity:1;
-        &_disabled {
-            opacity:0.3 !important;
-        }
-    }
-    
-    #_is-sorted #__arrows {
-        display:none;
-    }
-    
-    /*
-    position:relative;
-    overflow:hidden;
-    width:100%;
-    .fx-block_parent-width_auto& {
-        min-width:300px;
-    }
-    #__slides-wrapper {
-        width:100%;
-        max-height:100vh;
-        position:relative;
-        padding-bottom: 100% / @ratio;
-    }
-    #__slides {
-        left:0;
-        display:flex;
-        position:absolute;
-        top:0;
-        height:100%;
-        width:100%;
-    }
-    #__slide {
-        @slide_width: ( 100% / @count_slides );
-        
-        & when (@count_slides = 1) {
-            min-width:@slide_width;
-        }
-        
-        & when (@count_slides > 1) {
-            min-width: ~"calc( " @slide_width ~" - " @margin * (1 - 1/@count_slides) ~")";
-        }
-            
-        margin-right: @margin;
-        position: relative;
-        display:flex;
-        align-items:stretch;
-        flex-direction:row-reverse;
-    }
-    #__arrows {
-        position: absolute;
-        z-index:2;
-    }
-    
-    #__arrow {
-        transition:opacity 0.2s ease;
-        opacity:1;
-        &_disabled {
-            opacity:0.3 !important;
-        }
-    }
-    
-    #_is-sorted #__arrows {
-        display:none;
-    }
-    
-    #__points {
-        position:absolute;
-        width:100%;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        left:0;
-        bottom:20px;
-    }
-    
-    #__point {
-        background:rgba(200, 200, 200, 0.4);
-        width:13px;
-        height:13px;
-        margin:7px;
-        border-radius:13px;
         cursor:pointer;
-        transition:all 0.5s ease;
-        #_active {
-            width:17px;
-            height:17px;
-            background:rgba(200, 200, 200, 0.8);
+        
+        .color(@arrows_bg; background);
+        
+        .tcolor-on(@arrows_color; @arrows_bg);
+        
+        padding:@arrows_padding;
+        .border(@arrows_border);
+        
+        font-size:@arrows_size;
+        
+        & when (@arrows_mode = together) {
+            #_back {
+                margin-right:@arrows_margin;
+            }
+        }
+        & when (@arrows_mode = apart) {
+            #_back {
+                margin-left:@arrows_hoffset;
+            }
+            #_next {
+                margin-right:@arrows_hoffset;
+            }
+        }
+        &_disabled {
+            opacity:0.3 !important;
         }
     }
-    */
+    
+    #_is-sorted #__arrows {
+        display:none;
+    }
+    
 }
