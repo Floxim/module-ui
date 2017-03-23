@@ -11,7 +11,6 @@ class Module extends \Floxim\Floxim\Component\Module\Entity {
                 'floxim.ui.slider',
                 'floxim.ui.tiles',
                 'floxim.ui.menu',
-                'floxim.ui.list',
                 'floxim.ui.box',
                 'floxim.ui.record',
             )

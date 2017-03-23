@@ -9,11 +9,15 @@ vars:
         tip: Сколько слайдов показывать одновременно
         tab: slides
     margin:
-        label: Отступ
+        label: Отступ между слайдами
         type: number
         min: 0
         max: 4
         step: 0.25
+        tab: slides
+    padding:
+        type: measures
+        prop: padding
         tab: slides
     points_mode:
         label: Точки
@@ -25,7 +29,7 @@ vars:
         tab: points
     points_pos:
         type: livesearch
-        label: Выравнивание
+        label: Позиция ↔
         values:
             center: По центру
             flex-start: Слева
@@ -34,7 +38,7 @@ vars:
         _parent: points_mode == horizontal
     points_vpos:
         type: livesearch
-        label: По вертикали
+        label: Позиция ↕
         values:
             flex-start: Сверху
             center: По центру
@@ -42,18 +46,20 @@ vars:
         tab: points
     points_offset:
         type: number
-        label: Смещение
+        label: Отступ ↔
         min: -20
         max: 20
         step: 0.5
         tab: points
+        parent: points_pos != center
     points_voffset:
         type: number
-        label: По вертикали
+        label: Отступ ↕
         min: -20
         max: 20
         step: 0.5
         tab: points
+        parent: points_vpos != center
     points_margin:
         label: Промежуток
         step: 0.25
@@ -77,6 +83,7 @@ vars:
         type: measures
         prop: borders
         tab: points
+        default: 0 1px solid main 2 1, 0 1px solid main 2 1, 0 1px solid main 2 1, 0 1px solid main 2 1
     point_shadow:
         type: css-shadow
         tab: points
@@ -97,6 +104,7 @@ vars:
         type: measures
         prop: borders
         tab: c_point
+        default: 0 1px solid main 2 1, 0 1px solid main 2 1, 0 1px solid main 2 1, 0 1px solid main 2 1
     arrows_mode:
         label: Стрелки
         type: livesearch
@@ -105,16 +113,8 @@ vars:
             apart: По краям
             none: Не показывать
         tab: arrows
-    arrows_vpos:
-        label: Позиция
-        type: livesearch
-        values:
-            top: Сверху
-            center: По центру
-            bottom: Снизу
-        tab: arrows
     arrows_hpos:
-        label: По горизонтали
+        label: Позиция ↔
         type: livesearch
         values:
             flex-start: Слева
@@ -122,18 +122,26 @@ vars:
             flex-end: Справа
         tab: arrows
         parent: arrows_mode == together
+    arrows_vpos:
+        label: Позиция ↕
+        type: livesearch
+        values:
+            top: Сверху
+            center: По центру
+            bottom: Снизу
+        tab: arrows
     arrows_margin:
         label: Промежуток
         step: 0.25
         tab: arrows
         parent: arrows_mode == together
     arrows_hoffset:
-        label: Отступ горизонтальный
+        label: Отступ ↔
         parent: arrows_hpos != center
         tab: arrows
         step: 0.25
     arrows_voffset:
-        label: Отступ вертикальный
+        label: Отступ ↕
         parent: arrows_vpos != center
         tab: arrows
         step: 0.25
@@ -163,18 +171,29 @@ vars:
         type: measures
         prop: borders
         tab: arrows
+    arrows_left_icon:
+        type: iconpicker
+        label: '&larr;'
+        tab: arrows
+    arrows_right_icon:
+        type: iconpicker
+        label: '&rarr;'
+        tab: arrows
 tabs:
     slides: Слайды
+    arrows: Стрелки
     points: Точки
     c_point: Активная точка
-    arrows: Стрелки
 export:
     cols: '@count_slides'
     points: '@points_mode'
+    icon_left: '@arrows_left_icon'
+    icon_right: '@arrows_right_icon'
 */
 .slider_style_default(
     @count_slides:1;
     @margin:0rem;
+    @padding:0rem 0rem 2rem 0rem;
     @points_mode: horizontal;
     @points_margin: 1rem;
     @points_pos: center;
@@ -183,31 +202,35 @@ export:
     @points_offset: 1rem;
     @points_voffset: 1rem;
     @point_color: main 5 0.5;
-    @point_border: none;
+    @point_border: @default;
     @point_shadow: none;
     @c_point_size: 1rem;
     @c_point_color: main 5 0.9;
-    @c_point_border: none;
+    @c_point_border: @default;
     @arrows_mode: apart;
     @arrows_vpos: center;
     @arrows_hpos: flex-start;
     @arrows_margin: 1rem;
     @arrows_hoffset: 1rem;
     @arrows_voffset: 1rem;
-    @arrows_size: 1rem;
+    @arrows_size: 2.2rem;
     @arrows_color: main 0 1;
-    @arrows_bg: none;
+    @arrows_bg: main 0 0.6;
     @arrows_padding: 0.25rem 0.25rem 0.25rem 0.25rem;
     @arrows_border: none;
+    @arrows_left_icon: fa arrow-left;
+    @arrows_right_icon: fa arrow-left;
 ) 
 {
     width:100%;
     position: relative;
+    padding: @padding;
     
     #__slides {
         display:flex;
         width:100%;
         position:relative;
+        
     }
     
     #__slides-wrapper {
@@ -244,6 +267,9 @@ export:
             }
             & when (@points_pos = flex-end) {
                 right:@points_offset;
+            }
+            & when (@points_pos = center) {
+                left: 0;
             }
             
             & when (@points_vpos = flex-start) {
@@ -334,9 +360,13 @@ export:
             & when (@arrows_hpos = flex-end) {
                 right: @arrows_hoffset;
             }
+            & when (@arrows_hpos = center) {
+                left:0;
+            }
         }
         & when (@arrows_vpos = top) {
             top: @arrows_voffset;
+            align-items: flex-start;
         }
         
         & when (@arrows_vpos = center) {

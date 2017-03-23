@@ -32,6 +32,8 @@ function Slider($node) {
         this.pause_time = $node.data('pause_time') || 3000;
         this.duration = $node.data('move_time') || 1300;
         
+        this.update_current_target();
+        
         if (this.autoplay) {
             this.auto_move();
         }

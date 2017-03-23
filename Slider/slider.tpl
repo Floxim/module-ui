@@ -32,8 +32,10 @@
         </div>
     </div>
     <div fx:e="arrows">
-        <a fx:e="arrow back" data-dir="back" class="{= fx::icon( 'fa arrow-left') /}"></a>
-        <a fx:e="arrow next" data-dir="next" class="{= fx::icon( 'fa arrow-right') /}"></a>
+        {default $icon_left = 'fa arrow-left' /}
+        {default $icon_right = 'fa arrow-right' /}
+        <a fx:e="arrow back" data-dir="back" class="{= fx::icon( $icon_left ) /}"></a>
+        <a fx:e="arrow next" data-dir="next" class="{= fx::icon( $icon_right ) /}"></a>
     </div>
     
     <div fx:e="points" fx:aif="$points != 'none'">
