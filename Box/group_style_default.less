@@ -125,8 +125,7 @@ container:
     
     .width(@width; @margin);
     
-    & when not(@width = none) {
-        as:@justify_content;
+    & when not(@width = none) and not(@width = layout) {
         .align-self(@justify_content);
     }
 }

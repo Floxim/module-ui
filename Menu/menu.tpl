@@ -36,6 +36,6 @@
     menu_layout: vertical
 {/preset}
 
-{preset menu#horizontal name="Горизонтальное меню" size="low,wide"}
+{preset menu#horizontal name="Горизонтальное меню"}
     menu_layout: horizontal
 {/preset}

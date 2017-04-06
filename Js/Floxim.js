@@ -68,6 +68,21 @@ Floxim.prototype.ajax = function(params) {
         data._ajax_controller_params = params.params;
     }
     
+    var that = this;
+    
+    if (params.redraw) {
+        var redraw = {};
+        $.each(params.redraw, function () {
+            var $ib = $(this).closest('.fx_infoblock'),
+                meta = $ib.data('fx_infoblock');
+            if (!meta) {
+                return;
+            }
+            redraw[meta.id] = {container: that.getContainerProps($ib)};
+        });
+        data._ajax_redraw = redraw;
+    }
+    
     if (params.template) {
         data._ajax_template = params.template;
     }
@@ -112,10 +127,18 @@ Floxim.prototype.ajax = function(params) {
     );
 };
 
+Floxim.prototype.updateInfoblock = function($old_infoblock, new_html) {
+    var $new_infoblock = $( $.trim(new_html) );
+    $old_infoblock.before($new_infoblock);
+    $old_infoblock.remove();
+    $new_infoblock.trigger('fx_infoblock_loaded');
+};
+
 Floxim.prototype.parseResponse = function(data) {
-    var json = null;
+    var json = null,
+        that = this;
     try {
-        json = $.parseJSON(data);
+        json = (typeof data === 'string') ? $.parseJSON(data) : $.extend(true, {}, data);
     } catch (e) {
         return data;
     }
@@ -123,7 +146,8 @@ Floxim.prototype.parseResponse = function(data) {
     if (!json || !json.format || json.format !== 'fx-response') {
         return data;
     }
-
+    
+    
     var js_assets = json.js;
     if (js_assets) {
         if (!window.fx_assets_js) {
@@ -157,6 +181,18 @@ Floxim.prototype.parseResponse = function(data) {
                 $('head').append('<link type="text/css" rel="stylesheet" href="'+asset+'" />');
             }
         }
+    }
+    
+    if (json.redraw) {
+        setTimeout(
+            function() {
+                $.each(json.redraw, function(ib_id, html) {
+                    var $old = $('.fx_infoblock_'+ib_id);
+                    that.updateInfoblock($old, html);
+                });
+            }, 
+            100
+        );
     }
     
     var response = json.response;
