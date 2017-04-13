@@ -227,3 +227,18 @@
             $header_link_target = $field_link
     /}
 </div>
+
+<div 
+    fx:template="button_value" 
+    fx:link-if="$field_link"
+    fx:aif="$value" 
+    fx:b="floxim.form.form:button"
+    fx:styled="label:Стиль кнопки"
+    href="$url" >
+    {first}
+        {set $value = $item[$field_view.keyword] /}
+        {set $field = $item.getField($field_view.keyword) /}
+        {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" default="link" /}
+    {/first}
+    {$value /}
+</div>

@@ -19,7 +19,7 @@
         {/each}
     </div>
 </div>
-    
+
 {template id="tile" test="is_string($item)" priority="2"}
     <div fx:e='tile'>{$item /}</div>
 {/template}

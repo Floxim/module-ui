@@ -180,16 +180,15 @@ class Box {
                 default:
                     if ($f['keyword'] === 'name') {
                         $field['template'] = 'header_value';
-                    } elseif ($f->dig('format.html')) {
+                    } else { //if ($f->dig('format.html')) {
                         $field['template'] = 'text_value';
-                    } else {
-                        $field['template'] = 'value';
                     }
                     
                     $field['templates'] = [
                         ['id' => 'text_value', 'name' => 'Текст'],
                         //['id' => 'value', 'name' => 'Значение'],
-                        ['id' => 'header_value', 'name' => 'Заголовок']
+                        ['id' => 'header_value', 'name' => 'Заголовок'],
+                        ['id' => 'button_value', 'name' => 'Кнопка']
                     ];
                     break;
                 case 'link':
