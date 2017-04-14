@@ -240,5 +240,5 @@
         {set $field = $item.getField($field_view.keyword) /}
         {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" default="link" /}
     {/first}
-    {$value /}
+    <span>{$value /}</span>
 </div>
