@@ -1,5 +1,5 @@
 <div 
-    fx:template="record" fx:name="Поля" fx:of="floxim.main.page:record"
+    fx:template="record" fx:name="Поля" fx:of="*:record"
     fx:b="record"
     fx:with="$item">
     {css}record.less{/css}
