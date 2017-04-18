@@ -138,6 +138,10 @@
 {template id="display_value"}
     {if $field.type === 'datetime'}
         {apply floxim.ui.date:date with $date = $value /}
+    {elseif $field.type === 'select'}
+        {set $entity_offset = $field.keyword . '_entity' /}
+        {set $select_entity = $item[ $entity_offset ] /}
+        {$select_entity.name /}
     {else}
         {$value /}
     {/if}
