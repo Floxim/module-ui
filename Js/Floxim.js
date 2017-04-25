@@ -71,8 +71,14 @@ Floxim.prototype.ajax = function(params) {
     var that = this;
     
     if (params.redraw) {
-        var redraw = {};
-        $.each(params.redraw, function () {
+        var redraw = {},
+            $redraw_nodes = params.redraw;
+    
+        if (typeof $redraw_nodes === 'string') {
+            $redraw_nodes = $($redraw_nodes);
+        }
+        
+        $.each($redraw_nodes, function () {
             var $ib = $(this).closest('.fx_infoblock'),
                 meta = $ib.data('fx_infoblock');
             if (!meta) {
@@ -207,8 +213,9 @@ Floxim.prototype.reload = function($node, callback, data) {
     return this.ajax({
         infoblock_id:$node.data('fx_infoblock').id,
         data: data,
-        dataType:'html',
-        success: function(html) {
+        dataType:'html'
+    }).then(
+        function(html) {
             var $new_ib = $(html);
             $node.before($new_ib);
             $node.remove();
@@ -217,7 +224,7 @@ Floxim.prototype.reload = function($node, callback, data) {
                 callback($new_ib);
             }
         }
-    });
+    );
 };
 
 Floxim.prototype.load = function (params) {
@@ -387,6 +394,11 @@ Floxim.prototype.equalize = function($nodes, prop, value) {
     return Eq;
     
 };
+
+$('html').on('click', '[data-action="reload"]', function() {
+    var $ib = $(this).closest('.fx_infoblock');
+    window.Floxim.reload($ib);
+});
 
 window.Floxim = new Floxim();
 

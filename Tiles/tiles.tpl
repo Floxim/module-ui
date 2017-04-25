@@ -8,7 +8,7 @@
         {set $container_max = min( max(1, round( $context->getContainerWidth() / 300 ) ), 4) /}
         cols: {= $items->limit ? min( $items->limit , $container_max) : $container_max /}
     "
-    fx:of="floxim.main.content:list#3">
+    fx:of="*:list">
     {css}flex-tiles.less{/css}
     {default $cols = 1 /}
     <div fx:e="wrapper">
