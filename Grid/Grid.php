@@ -17,14 +17,20 @@ class Grid {
     
     public static function addAdminAssets()
     {
+        static $done = false;
+        if ($done) {
+            return;
+        }
         if (fx::isAdmin()) {
             $path = fx::path('@module/Floxim/Ui/Grid');
-            fx::page()->addJsFile($path.'/grid-builder.js');
-            fx::page()->addCssBundle(
-                array(
+            fx::page()->addJs([$path.'/grid-builder.js'],['to' => 'admin']);
+            fx::page()->addCss(
+                [
                     $path.'/grid-builder.less'
-                )
+                ],
+                ['to' => 'admin']
             );
+            $done = true;
         }
     }
     

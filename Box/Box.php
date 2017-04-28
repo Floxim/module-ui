@@ -46,13 +46,19 @@ class Box {
     
     public static function addAdminAssets()
     {
+        static $done = false;
+        if ($done) {
+            return;
+        }
         $path = fx::path('@module/Floxim/Ui/Box');
-        fx::page()->addJsFile($path.'/box-builder.js');
-        fx::page()->addCssBundle(
-            array(
+        fx::page()->addJs([$path.'/box-builder.js'], ['to' => 'admin']);
+        fx::page()->addCss(
+            [
                 $path.'/box-builder.less'
-            )
+            ],
+            ['to' => 'admin']
         );
+        $done = true;
     }
     
     protected $field_source = null;

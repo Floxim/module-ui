@@ -1,4 +1,4 @@
-(function() {
+(function($) {
 
 var cl = 'floxim-ui-box-builder';
 
@@ -498,7 +498,7 @@ function box_builder($node, params) {
                     $el = $builder.find('[data-path="'+path+'"]'),
                     builder = $builder.data('box-builder'),
                     data = $el.data('vals');
-            
+                
                 $.each(new_data, function(k, v) {
                     data[k] = v;
                 });
@@ -694,4 +694,4 @@ function box_builder($node, params) {
     this.init();
 }
 
-})();
+})($fxj);

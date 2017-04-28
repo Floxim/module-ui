@@ -1,4 +1,4 @@
-(function() {
+(function($) {
 
 var cl = 'floxim-ui-grid-builder';
 
@@ -528,4 +528,4 @@ function grid_builder($node, params) {
     that.init();
 }
 
-})();
+})($fxj);

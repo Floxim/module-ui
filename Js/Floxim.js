@@ -18,6 +18,10 @@ Floxim.prototype.on = function($node, event_name, selector, callback) {
     });
 };
 
+Floxim.prototype.ready = function(callback) {
+    document.readyState === "interactive" || document.readyState === "complete" ? callback() : document.addEventListener("DOMContentLoaded", callback);
+};
+
 Floxim.prototype.handle = function(selector, callback) {
     $('html').on('fx_infoblock_loaded', function(e) {
         var $nodes = $([]),
