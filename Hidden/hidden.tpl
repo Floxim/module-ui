@@ -1,4 +1,4 @@
-{template id="popup_block" of="show"}
+{template id="popup_block" of="show" name="Попап"}
     {set $popup_id = 'popup-' . $infoblock.id /}
     {apply popup
         with $area_name = $popup_id,
@@ -7,15 +7,14 @@
     /}       
 {/template}
 
-<div fx:template="popup" fx:of="show" fx:b="popup id_{$popup_id} hidden size_{$size}">
+<div fx:template="popup" fx:b="popup id_{$popup_id} hidden" fx:styled="label:Стиль попапа">
     {first}
         {defualt $size = 'auto' /}
     {/first}
     {js}
-        /module/Floxim/Ui/Js/Floxim.js
+        Floxim.js from floxim.ui.js
         popup.js
     {/js}
-    {css}popup.less{/css}
     <span fx:e="close"></span>
     <div fx:e="overlay"></div>
     {if $popup_content}

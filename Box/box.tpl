@@ -234,15 +234,18 @@
 
 <div 
     fx:template="button_value" 
+    {*
     fx:link-if="$field_link"
+    href="$url"
+    *}
+    fx:link
     fx:aif="$value" 
     fx:b="floxim.form.form:button"
-    fx:styled="label:Стиль кнопки"
-    href="$url" >
+    fx:styled="label:Стиль кнопки">
     {first}
         {set $value = $item[$field_view.keyword] /}
         {set $field = $item.getField($field_view.keyword) /}
-        {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" default="link" /}
+        {*{@field_link source="\Floxim\Ui\Box\Box::getLinkParam" default="link" /}*}
     {/first}
     <span>{$value /}</span>
 </div>

@@ -17,6 +17,19 @@ vars:
             top: Сверху
             middle: По центру
             bottom: Снизу
+    border:
+        type: measures
+        prop: borders
+    shadow:
+        type: css-shadow
+    align_self:
+        type: livesearch
+        label: Позиция
+        values: 
+            stretch: Растянуть
+            flex-start: Сверху
+            center: По центру
+            flex-end: Снизу
 container:
     lightness: background
     align: align
@@ -26,10 +39,19 @@ container:
     @padding:0em;
     @align: none;
     @valign: top;
+    @border: none;
+    @shadow: none;
+    @align_self: stretch;
 ) {
     .background(@background);
     padding:@padding;
     .align-items(@align);
+    
+    align-self:@align_self;
+    
+    .box-shadow(@shadow);
+    .border(@border);
+    
     & when (@valign = top) {
         justify-content: flex-start;
     }

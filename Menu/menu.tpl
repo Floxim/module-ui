@@ -21,7 +21,7 @@
 
         <a {if $url} href="{$url}" {/if} fx:e="link {if $is_active}active{/if}">
             <span fx:e="link-name">
-                <span fx:if="$icon" class="{= fx::icon($icon) }"></span>
+                {*<span fx:if="$icon" class="{= fx::icon($icon) }"></span>*}
                 {$name}
             </span>
         </a>

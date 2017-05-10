@@ -541,7 +541,15 @@ class Box {
             ['blank', 'В новом окне']
         ];
         if (count($popup_ibs) > 0) {
-            $page = $context->getClosestEntity('floxim.main.page');
+            $page = $context->getClosestEntity(
+                function($entity) {
+                    return isset($entity['url']);
+                }
+            );
+            if ($page && !$page->isInstanceOf('floxim.main.page')) {
+                $page_url = $page['url'];
+                $page = fx::data('floxim.main.page')->getByUrl($page_url);
+            }
             $popup_vals = ['children' => [], 'name' => 'Попап', 'id' => 'popup', 'disabled' => true];
             foreach ($popup_ibs as $popup_ib) {
                 if ($popup_ib->isAvailableOnPage($page)) {

@@ -1,0 +1,69 @@
+/*
+vars:
+    overlay_background:
+        type: css-background
+        label: Подложка
+        default:
+            - dark
+            - color, main 0 0.6
+    popup_background:
+        type:  css-background
+        default:
+            - light
+            - color, main 5 1
+    padding:
+        type: measures
+        prop: padding
+    border:
+        type: measures
+        prop: borders
+    shadow:
+        type: css-shadow
+container:
+    lightness: popup_background
+*/
+.popup_style_default (
+    @overlay_background:@overlay_background;
+    @popup_background:@popup_background;
+    @padding: 2rem 2rem 2rem 2rem;
+    @border: none;
+    @shadow: none;
+)
+{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:2000;
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    
+    #_hidden {
+        display:none;
+    }
+    
+    #__content { 
+        max-height: 95vh;
+        overflow:auto;
+        position:relative;
+        z-index:2;
+        min-width:40vw;
+        .background(@popup_background);
+        padding: @padding;
+        .box-shadow(@shadow);
+        .border(@border);
+    }
+    
+    #__overlay {
+        position:absolute;
+        width:100%;
+        height:100%;
+        top:0;
+        left:0;
+        //background:rgba(30,30,30,0.4);
+        .background(@overlay_background);
+        cursor:pointer;
+    }
+}

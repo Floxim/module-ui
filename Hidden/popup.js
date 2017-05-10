@@ -26,11 +26,11 @@ $(function() {
             
             $popups.each(function() {
                 var $popup = $(this);
-                console.log(base_url, $popup.data('popup_base_url'), c_url);
                 if (
                     !base_url || $popup.data('popup_base_url') === base_url || base_url === c_url
                 ) {
-                    console.log('resl local');
+                    // check if form in popup was sent
+                    return; 
                     resolve($popup);
                     local_found = true;
                     return false;
@@ -67,7 +67,6 @@ $(function() {
             base_url
         ).then(
             function($popup) {
-                console.log('show popop', $popup.length);
                 $popup.removeClass(cl+'_hidden');
                 $popup.find(':input:visible, [tabindex]').not('[tabindex="-1"]').first().focus();
                 $popup.trigger('popup_show');
