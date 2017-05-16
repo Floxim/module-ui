@@ -24,6 +24,7 @@ Floxim.prototype.ready = function(callback) {
 
 Floxim.prototype.handle = function(selector, callback) {
     $('html').on('fx_infoblock_loaded', function(e) {
+        console.log('onev', e);
         var $nodes = $([]),
             $ib = $(e.target);
             
@@ -189,6 +190,13 @@ Floxim.prototype.parseResponse = function(data) {
         if (typeof asset === 'string') {
             if ($('link[href="'+asset+'"]').length === 0) {
                 $('head').append('<link type="text/css" rel="stylesheet" href="'+asset+'" />');
+            }
+        } else if (asset.styles instanceof Array ) {
+            for (var j = 0; j < asset.styles.length; j++) {
+                var c_asset = asset.styles[j];
+                if ($('link[href="'+c_asset+'"]').length === 0) {
+                    $('head').append('<link type="text/css" rel="stylesheet" href="'+c_asset+'" />');
+                }
             }
         }
     }
@@ -406,4 +414,4 @@ $('html').on('click', '[data-action="reload"]', function() {
 
 window.Floxim = new Floxim();
 
-}) ( window.$fxj || window.jQuery );
+}) ( window.jQuery );

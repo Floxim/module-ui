@@ -50,7 +50,7 @@ $(function() {
             ).then(function($res) {
                 $res.data('popup_base_url', base_url);
                 if (window.$fx && $fx.front.mode === 'edit') {
-                    $fx.front.hilight($res);
+                    $fx.front.hilight($fxj($res[0]));
                 }
                 resolve($res);
                 return;

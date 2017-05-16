@@ -195,8 +195,7 @@
 </div>
 
 <div 
-    href="$url" 
-    fx:link-if="$field_link" 
+    fx:link
     fx:b="floxim.main.text:text" 
     fx:styled="Стиль текста" 
     fx:template="text_value" 
@@ -205,9 +204,6 @@
     {first}
         {set $value = $item[$field_view.keyword] /}
         {set $field = $item.getField($field_view.keyword) /}
-        {if !$field || in_array($field.type, ['string','datetime']) }
-            {@field_link source="\Floxim\Ui\Box\Box::getLinkParam" /}
-        {/if}
     {/first}
     {apply display_value /}
 </div>
