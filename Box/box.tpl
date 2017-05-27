@@ -135,7 +135,7 @@
     </div>
 </div>
     
-{template id="display_value"}
+{template id="display_value" nows="true"}
     {if $field.type === 'datetime'}
         {apply floxim.ui.date:date with $date = $value /}
     {elseif $field.type === 'select'}
@@ -230,10 +230,6 @@
 
 <div 
     fx:template="button_value" 
-    {*
-    fx:link-if="$field_link"
-    href="$url"
-    *}
     fx:link
     fx:aif="$value" 
     fx:b="floxim.form.form:button"
@@ -241,7 +237,52 @@
     {first}
         {set $value = $item[$field_view.keyword] /}
         {set $field = $item.getField($field_view.keyword) /}
-        {*{@field_link source="\Floxim\Ui\Box\Box::getLinkParam" default="link" /}*}
     {/first}
     <span>{$value /}</span>
+</div>
+
+<div 
+    fx:template="free_text"
+    fx:b="floxim.main.text:text" 
+    fx:styled="Стиль текста">
+    {css from="floxim.main.text"}text.less{/css}
+    {*{@value_mode type="livesearch" label="Значение" values="`[['same', 'Везде одинаковое'],['different','Разное']]`" /}*}
+    {default $default_value = 'Придумайте текст' /}
+    {@default_value type="string" label="Текст" /}
+    
+    
+    {%default_value /}
+</div>
+
+<div 
+    fx:template="free_button" 
+    fx:link
+    fx:b="floxim.form.form:button"
+    fx:styled="label:Стиль кнопки">
+    <span>
+        {default $default_value = 'Кнопка' /}
+        {@default_value type="string" label="Надпись" /}
+        {%default_value /}
+    </span>
+</div>
+    
+<div fx:template="fromatted_value"
+     fx:b="floxim.main.text:text"
+     fx:styled="label:Стиль; id:all"
+     fx:aif="$value"
+     fx:nows>
+    {first}
+        {set $value = $item[$field_view.keyword] /}
+        {set $field = $item.getField($field_view.keyword) /}
+        {default $value_prefix = $field.name /}
+        {@value_prefix label="До значения" /}
+        {@value_postfix label="После значения" /}
+    {/first}
+    <span>{%value_prefix /}</span>
+    <span 
+        fx:b="floxim.main.text:text"
+        fx:styled="label:Стиль значения; id: val">
+        {apply display_value /}
+    </span>
+    <span>{%value_postfix label="..." /}</span>
 </div>

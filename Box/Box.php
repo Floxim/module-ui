@@ -112,6 +112,14 @@ class Box {
                 ]
             ]
         );
+        $res []= [
+            'name' => 'Произвольный текст',
+            'template' => 'free_text'
+        ];
+        $res []= [
+            'name' => 'Кнопка',
+            'template' => 'free_button'
+        ];
         return $res;
     }
 
@@ -194,7 +202,8 @@ class Box {
                         ['id' => 'text_value', 'name' => 'Текст'],
                         //['id' => 'value', 'name' => 'Значение'],
                         ['id' => 'header_value', 'name' => 'Заголовок'],
-                        ['id' => 'button_value', 'name' => 'Кнопка']
+                        ['id' => 'button_value', 'name' => 'Кнопка'],
+                        ['id' => 'fromatted_value', 'name' => 'По формату']
                     ];
                     break;
                 case 'link':
