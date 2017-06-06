@@ -48,11 +48,13 @@ $(function() {
                     $target: $('body')
                 }
             ).then(function($res) {
-                $res.data('popup_base_url', base_url);
+                var $popup = $res.is('.'+cl) ? $res : $res.find('.'+cl);
+                
+                $popup.data('popup_base_url', base_url);
                 if (window.$fx && $fx.front.mode === 'edit') {
-                    $fx.front.hilight($fxj($res[0]));
+                    $fx.front.hilight($fxj($popup[0]));
                 }
-                resolve($res);
+                resolve($popup);
                 return;
             });
         });

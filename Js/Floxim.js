@@ -24,7 +24,6 @@ Floxim.prototype.ready = function(callback) {
 
 Floxim.prototype.handle = function(selector, callback) {
     $('html').on('fx_infoblock_loaded', function(e) {
-        console.log('onev', e);
         var $nodes = $([]),
             $ib = $(e.target);
             
