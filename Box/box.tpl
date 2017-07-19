@@ -278,7 +278,7 @@
         {@value_prefix label="До значения" /}
         {@value_postfix label="После значения" /}
     {/first}
-    <span>{%value_prefix /}</span>
+    <span>{%value_prefix label="..." /}</span>
     <span 
         fx:b="floxim.main.text:text"
         fx:styled="label:Стиль значения; id: val">
