@@ -1,5 +1,5 @@
-Floxim.block('.floxim--ui--menu--menu', function(menu) {
-    var $menu = $(menu),
+Floxim.block('floxim--ui--menu--menu', function() {
+    var $menu = this.$node,
         $body = $('body'),
         body_style = $body.attr('style'),
         bl = 'floxim--ui--menu--menu';

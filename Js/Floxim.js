@@ -44,12 +44,45 @@ Floxim.prototype.handle = function(selector, callback) {
     return Floxim;
 };
 
-Floxim.prototype.block = function(selector, callback) {
-    var builder = function() {
-        var $item = $(this);
-        $item.data('floxim_block', new callback(this));
+function bemBlock($node, name, proto) {
+    this.name = name;
+    this.$node = $node;
+    
+    this.init = function() {
+        console.log('default init');
     };
-    this.handle(selector, builder);
+    
+    $.extend( this, proto );
+    
+    var that = this;
+    
+    this.prepareSelector = function(selector) {
+        return selector.replace(/#/g, '.'+that.name);
+    };
+    
+    this.find = function(selector) {
+        return $node.find( this.prepareSelector( selector ) );
+    };
+    
+    this.on = function(event, selector, callback) {
+        this.$node.on(event, that.prepareSelector(selector), callback);
+    };
+};
+
+Floxim.prototype.block = function(name, proto) {
+    if (typeof proto === "function") {
+        proto = {
+            init: proto
+        };
+    }
+    var builder = function() {
+        var $node = $(this),
+            block = new bemBlock($node, name, proto);
+    
+        $node.data('floxim_block', block);
+        block.init();
+    };
+    this.handle('.'+name, builder);
 };
 
 Floxim.prototype.ajax = function(params) {
