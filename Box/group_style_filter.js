@@ -8,13 +8,6 @@ function floxim_ui_box_group_style_filter(fields, params, values) {
                     wv = params.width_value;
                 
                 if (wv*1 !== 1) {
-                    /*
-                    f.type = 'number';
-                    f.step = 5;
-                    f.max = 100;
-                    f.units = '%';
-                    f.default = 100;
-                    */
                    delete f.values.layout;
                    delete f.values.full;
                 } else {

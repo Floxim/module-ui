@@ -1,30 +1,50 @@
 /*
 name: box
+tabs:
+    main: Основное
+    hover: При наведении
 vars:
     padding:
         type: measures
         prop: padding
         label: Внутренний отступ
+        tab: main
     background:
         type: css-background
+        tab: main
     align: 
         type: css-align
+        tab: main
     valign:
         type: livesearch
         label: Выравнивание строк по вертикали
+        tab: main
         values:
             top: Сверху
             middle: По центру
             bottom: Снизу
             space-between: Растянуть
     border:
+        tab: main
         type: measures
         prop: borders
     shadow:
+        tab: main
         type: css-shadow
+    background_hover:
+        type: css-background
+        tab: hover
+    border_hover:
+        type: measures
+        prop: borders
+        tab: hover
+    shadow_hover:
+        type: css-shadow
+        tab: hover
 container:
     lightness: background
     align: align
+    hover-lightness: background_hover
 */
 
 .box_style_default(
@@ -34,6 +54,9 @@ container:
     @valign: top;
     @border: none;
     @shadow: none;
+    @background_hover: none;
+    @border_hover: none;
+    @shadow_hover: none;
 ) {
     padding:@padding;
     
@@ -55,5 +78,21 @@ container:
     }
     & when (@valign = space-between) {
         justify-content: space-between;
+    }
+
+    & when not(@background_hover = none) {
+      &:hover {
+        .background(@background_hover);
+      }
+    }
+    & when not(@shadow_hover = none) {
+      &:hover {
+        .box-shadow(@shadow_hover);
+      }
+    }
+    & when not(@border_hover = none) {
+      &:hover {
+        .border(@border_hover);
+      }
     }
 }

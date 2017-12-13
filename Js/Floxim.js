@@ -139,11 +139,16 @@ Floxim.prototype.ajax = function(params) {
     }
     
     var that = this;
+
+    var url = params.url || '/~ajax/';
+    if (params.query) {
+        url += (url.indexOf('?') !== -1 ? '&' : '?') + params.query.replace(/^\?/, '')
+    }
     
     return new Promise(
         function(resolve, reject) {
             $.ajax({
-                url: params.url || '/~ajax/',
+                url: url,
                 type:'post',
                 data:data,
                 dataType: params.dataType || 'html',
@@ -216,19 +221,24 @@ Floxim.prototype.parseResponse = function(data) {
     }
 
     var css_assets = json.css || [];
-    
+
     for (var i = 0; i < css_assets.length; i++) {
         var asset = css_assets[i];
         if (typeof asset === 'string') {
             if ($('link[href="'+asset+'"]').length === 0) {
                 $('head').append('<link type="text/css" rel="stylesheet" href="'+asset+'" />');
             }
-        } else if (asset.styles instanceof Array ) {
-            for (var j = 0; j < asset.styles.length; j++) {
-                var c_asset = asset.styles[j];
-                if ($('link[href="'+c_asset+'"]').length === 0) {
-                    $('head').append('<link type="text/css" rel="stylesheet" href="'+c_asset+'" />');
+        } else {
+            if (asset.styles instanceof Array ) {
+                for (var j = 0; j < asset.styles.length; j++) {
+                    var c_asset = asset.styles[j];
+                    if ($('link[href="'+c_asset+'"]').length === 0) {
+                        $('head').append('<link type="text/css" rel="stylesheet" href="'+c_asset+'" />');
+                    }
                 }
+            }
+            if (window.$fx) {
+                window.$fx.handleCssAsset(asset)
             }
         }
     }
@@ -252,23 +262,32 @@ Floxim.prototype.parseResponse = function(data) {
     return response;
 };
 
-Floxim.prototype.reload = function($node, callback, data) {
+Floxim.prototype.reload = function($node, params) {
     $node = $node.closest('.fx_infoblock');
-    return this.ajax({
-        infoblock_id:$node.data('fx_infoblock').id,
-        data: data,
-        dataType:'html'
-    }).then(
-        function(html) {
-            var $new_ib = $(html);
-            $node.before($new_ib);
-            $node.remove();
-            $new_ib.trigger('fx_infoblock_loaded');
-            if (callback) {
-                callback($new_ib);
-            }
-        }
+    params = $.extend(
+        true,
+        {},
+        {
+            infoblock_id:$node.data('fx_infoblock').id,
+            dataType:'html'
+        },
+        params
     );
+    var that = this;
+    return new Promise(function(resolve, reject) {
+        that.ajax(params).then(
+            function (html) {
+                var $new_ib = $(html);
+                $node.before($new_ib);
+                $node.trigger('fx_infoblock_unloaded', {
+                    $newIb: $new_ib
+                });
+                $node.remove();
+                $new_ib.trigger('fx_infoblock_loaded');
+                resolve($new_ib)
+            }
+        );
+    });
 };
 
 Floxim.prototype.load = function (params) {
@@ -361,6 +380,27 @@ Floxim.prototype.getModifiers = function($node, name) {
     return res;
 };
 
+function cn($n) {
+    return $n[0].className.split(" ").join("\n");
+}
+
+window.cn = cn;
+
+Floxim.prototype.setModifiers = function($node, block, mods) {
+    var prev = this.getModifiers($node, block);
+    $.each(mods, function(mod, value) {
+        var className = block+'_'+mod + (typeof value === 'boolean' ? '' : '_'+value);
+        if (value === false) {
+            $node.removeClass(className);
+        } else {
+            if (prev[mod]) {
+                $node.removeClass(block+'_'+mod+'_'+prev[mod]);
+            }
+            $node.addClass(className)
+        }
+    });
+}
+
 Floxim.prototype.getContainerProps = function($n) {
     var res = {},
         $pars = $n.parents('.fx-block'),
@@ -380,6 +420,52 @@ Floxim.prototype.getContainerProps = function($n) {
         });
     } );
     return res;
+};
+
+Floxim.prototype.setContainerProps = function($n, props, inherited) {
+    var block = 'fx-block',
+        that = this;
+    if (!$n.is('.'+block)) {
+        $n.children().each(function() {
+            that.setContainerProps($(this), props, true);
+        })
+        return;
+    }
+    var mods = this.getModifiers($n, block),
+        diff = {},
+        pc = cn($n);
+    
+    $.each(props, function(prop, val) {
+        var own = mods['own-'+prop]
+        if (
+            (inherited && own) ||
+            (!inherited && own === val)
+        ) {
+            return;
+        }
+        diff[prop] = val;
+    });
+    if (JSON.stringify(diff) === '{}') {
+        return;
+    }
+    var mods = {};
+    var assign_to_self = ['lightness'];
+    $.each(diff, function(prop, value) {
+        var prefix = assign_to_self.indexOf(prop) !== -1 
+                ? ''
+                : (inherited ? 'parent-' : 'own-');
+        if (typeof value !== 'undefined') {
+            mods[prefix + prop] = value;
+        } else {
+            mods[prefix + prop] = false;
+            mods['has-' + prop] = false;
+        }
+    });
+    this.setModifiers($n, block, mods);
+    var nc = cn($n);
+    $n.children().each(function() {
+        that.setContainerProps($(this), diff, true);
+    })
 };
 
 Floxim.prototype.loaded = function($node) {
@@ -444,6 +530,122 @@ $('html').on('click', '[data-action="reload"]', function() {
     window.Floxim.reload($ib);
 });
 
+
+Floxim.prototype.onPopState = function(callback) {
+    if (!this.popStateListeners) {
+        this.popStateListeners = []
+    }
+    this.popStateListeners.push(callback);
+};
+
+Floxim.prototype.offPopState = function(callback) {
+    if (!this.popStateListeners) {
+        return;
+    }
+    var index = this.popStateListeners.indexOf(callback)
+    if (index !== -1) {
+        this.popStateListeners.splice(index, 1)
+    }
+}
+
+Floxim.prototype.pushState = function(url, state) {
+    if (!this.stateStack) {
+        this.stateStack = [];
+    }
+    this.stateStack.push([url, state]);
+    if (window.history && window.history.pushState) {
+        window.history.pushState(state, '', url);
+    }
+};
+
+Floxim.prototype.replaceState = function(url, state) {
+    if (window.history && window.history.replaceState) {
+        window.history.replaceState(state, '', url);
+    }
+}
+
+Floxim.prototype.handlePopState = function(e) {
+    var prevState = this.stateStack ? this.stateStack.pop() : undefined;
+    for (var i = 0; i < this.popStateListeners.length; i++) {
+        var listener = this.popStateListeners[i];
+        var res = listener(e, prevState);
+        if (res === false) {
+            break;
+        }
+    }
+};
+
 window.Floxim = new Floxim();
+
+$(window).on('popstate', function(e) {
+    window.Floxim.handlePopState(e.originalEvent);
+});
+
+function getMediaMode() {
+    return window.innerWidth > 800 ? 'desktop' : 'mobile';
+}
+
+function csplit(c) {
+    return c.replace(/\s+/g, ' ').replace(/^\s|\s$/g, '').split(' ');
+}
+
+function cdiff(c1, c2) {
+    c1 = csplit(c1);
+    c2 = csplit(c2);
+    var res = [];
+    c1.forEach(function(v) {
+        if (c2.indexOf(v) === -1) {
+            res.push(' - ' + v);
+        }
+    });
+    c2.forEach(function(v) {
+        if (c1.indexOf(v) === -1) {
+            res.push(' + ' + v);
+        }
+    });
+    return res.join("\n");
+}
+
+function onMediaUpdate(newMode) {
+    var $nodes = $('[data-container-mobile]');
+    $nodes.each(function() {
+        var $n = $(this),
+            mob_data = $n.data('container-mobile'),
+            desk_data = $n.data('container-desktop');
+        if (!desk_data) {
+            desk_data = {};
+            var mods = window.Floxim.getModifiers($n, 'fx-block');
+            $.each(mob_data, function(prop) {
+                desk_data[prop] = mods['own-'+prop] || mods['parent-'+prop];
+            });
+            $n.data('container-desktop', desk_data);
+        }
+        var dataToSet = newMode === 'mobile' ? mob_data : desk_data
+        window.Floxim.setContainerProps($n, dataToSet);
+    });
+}
+
+$(function() {
+    window.mediaMode = getMediaMode();
+    $(window).on('resize', function() {
+        var newMode = getMediaMode();
+        if (window.mediaMode !== newMode) {
+            onMediaUpdate(newMode);
+            window.mediaMode = newMode;
+        }
+    });
+    onMediaUpdate(window.mediaMode);
+    var hover_lightnes_sel = '.fx-block_hover-lightness_light, .fx-block_hover-lightness_dark';
+    $(document.body).on('mouseenter', hover_lightnes_sel, function(e) {
+        var $n = $(this);
+        var mods = window.Floxim.getModifiers($n, 'fx-block');
+        var prevLightness = mods['lightness'];
+        var newLightness = mods['hover-lightness'];
+        window.Floxim.setContainerProps($n, {lightness: newLightness});
+        $n.one('mouseleave', function() {
+            window.Floxim.setContainerProps($n, {lightness: prevLightness});
+        });
+    })
+});
 
 }) ( window.jQuery );

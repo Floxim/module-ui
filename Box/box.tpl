@@ -54,8 +54,9 @@
     <div fx:e="image">
         {default $ratio = 1.5 /}
         {default $image_fit = 'crop' /}
+        {*
         {@image_link type="livesearch" tab="image" label="Ссылка?" values="`[['none', 'Нет'],['link','Ссылка']]`" default="none" /}
-        
+        *}
         {set $img_width = $context->getContainerWidth() /}
         
         {if $ratio !== 'none' && $image_fit === 'crop'}
@@ -64,7 +65,8 @@
         {else}
             {set $img_size = 'max-width:' . $img_width /}
         {/if}
-        <a fx:omit="$image_link === 'none'" href="{$item.url}" class="link">
+        {*<a fx:omit="$image_link === 'none'" href="{$item.url}" class="link">*}
+        <a fx:link>
             <img fx:e="img" src="{$item[$group.keyword] | fx::image : $img_size /}" />
         </a>
         <div fx:e="box-wrapper" fx:hide-empty>
@@ -79,6 +81,7 @@
     fx:template="group"
     fx:e="group"
     fx:b="group"
+    fx:link="tab: main;"
     fx:styled-inline
     fx:style-defaults="
         {if $position !== 1}
@@ -223,7 +226,7 @@
         floxim.ui.header:header 
         with 
             $header = $header_value, 
-            $header_link = $field_link ? $item.url : false,
+            $header_link = $field_link ? $item.url . ( substr($field_link, 0, 1) === '#' ? $field_link : '' ) : false,
             $header_link_target = $field_link
     /}
 </div>
@@ -266,7 +269,7 @@
     </span>
 </div>
     
-<div fx:template="fromatted_value"
+<div fx:template="formatted_value"
      fx:b="floxim.main.text:text"
      fx:styled="label:Стиль; id:all"
      fx:aif="$value"

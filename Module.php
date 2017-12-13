@@ -13,6 +13,7 @@ class Module extends \Floxim\Floxim\Component\Module\Entity {
                 'floxim.ui.menu',
                 'floxim.ui.box',
                 'floxim.ui.record',
+                'floxim.ui.nav'
             )
         );
     }

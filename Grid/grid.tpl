@@ -13,14 +13,15 @@
         {- $context.pushContainerWidth( $col.width / 12 ) /}
         {set $size = $context.getContainerWidth() > 500 ? 'wide' : 'narrow' /}
         <div 
+            class=""
             fx:e="col width_{$col.width}"
             fx:b="col"
             fx:area="$col.area_id"
             fx:area-name="$col.area_name"
             fx:area-render="manual"
             fx:area-size="$size"
-            fx:styled-inline="id:{$col.id};">
-
+            fx:styled-inline="id:{$col.id};"
+            {= $grid.getMobModifiers() /} >
             {set $blocks = $grid.getBlocks() /}
 
             {if $blocks}

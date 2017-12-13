@@ -1,0 +1,98 @@
+/*
+tabs:
+    main: Основное
+    active: Активный пункт
+vars:
+    layout:
+        type: livesearch
+        label: Лейаут
+        tab: main
+        values:
+            hor: Горизонтально
+            ver: Вертикально
+    submenu_mode:
+        label: Подразделы
+        type: livesearch
+        tab: main
+        values:
+            dropdown: Выпадушкой
+            list: Списком
+            none: Не показывать
+    level_padding:
+        label: Отступы
+        type: measures
+        prop: padding
+        step: 0.25
+        lock: 1-3--2-4
+        tab: main
+    level_bg:
+        type: css-background
+        tab: main
+    level_border:
+        type: measures
+        prop: borders
+        tab: main
+    level_shadow:
+        type: css-shadow
+        tab: main
+    active_item_bg:
+        type: css-background
+        tab: active
+*/
+.level_style_default(
+    @layout: hor;
+    @submenu_mode: dropdow;
+    @level_padding: 0rem;
+    @level_bg: none;
+    @level_border: none;
+    @level_shadow: none;
+    @active_item_bg: none;
+) {
+    display:flex;
+    & when (@layout = hor) {
+        flex-direction: row;
+    }
+    & when (@layout = ver) {
+        flex-direction: column;
+    }
+
+    padding:@level_padding;
+    .border(@level_border);
+    .box-shadow(@level_shadow);
+    .background(@level_bg);
+
+    & > #__item {
+        position:relative;
+        z-index:1;
+        &:hover {
+            z-index:2;
+        }
+        & > #__link {
+            display:block;
+        }
+    }
+
+    & when (@submenu_mode = none) {
+        & > #__item > #__level {
+            display:none;
+        }
+    }
+    & when (@submenu_mode = dropdown) {
+        & > #__item > #__level {
+            display:none;
+            position:absolute;
+            & when (@layout = hor) {
+                left:0;
+                margin-right:-200px;
+            }
+            & when (@layout = ver) {
+                left:100%;
+                top: 0;
+            }
+        }
+        & > #__item:hover > #__level {
+            display:flex;
+            margin-top:-2px;
+        }
+    }
+}

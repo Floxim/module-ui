@@ -1,0 +1,34 @@
+/*
+vars:
+    layout:
+        type: livesearch
+        label: Лейаут
+        values:
+            hor: Горизонтально
+            ver: Вертикально
+    margin:
+        type: number
+        label: Отступ
+        step: 0.25
+        min: 0
+        max: 10
+*/
+.level_style_default(
+    @layout: hor;
+    @margin: 1rem;
+) {
+    display:flex;
+    width:100%;
+    &:hover {
+      // z-index:2;
+    }
+    & when (@layout = hor) {
+        flex-direction: row;
+        & > #__item:not(:last-child) {
+          margin-right: @margin;
+        }
+    }
+    & when (@layout = ver) {
+        flex-direction: column;
+    }
+}

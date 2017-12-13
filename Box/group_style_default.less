@@ -1,22 +1,28 @@
 /*
-name: Default
+tabs:
+    main: Основное
+    hover: При наведении
 vars: 
     fields_margin:
-        label: Расстояние между полями
+        label: Между полями
         type: number
         step: 0.5
         max: 9
+        tab: main
     margin:
         label: Внешний отступ
         type: measures
         prop: margin
+        tab: main
     padding:
         label: Внутренний отступ
         type: measures
         prop: padding
+        tab: main
     justify_content:
-        label: Горизонтальное выравнивание
+        label: Выравнивание ↔
         type: select
+        tab: main
         values:
             none: Авто
             flex-start: Слева
@@ -24,24 +30,29 @@ vars:
             center: По центру
             space-between: Растянуть
     align_items:
-        label: Вертикальное выравнивание
+        label: Выравнивание ↕
         type: select
+        tab: main
         values:
             flex-start: Сверху
             center: По центру
             flex-end: Снизу
     grow:
-        label: Растянуть по вертикали
+        label: Растянуть ↕
         type: checkbox
+        tab: main
     background:
         type: css-background
+        tab: main
     border:
         type: measures
         prop: borders
+        tab: main
     width:
         type: livesearch
         label: Ширина
         allow_empty: false
+        tab: main
         values:
             none: 100%
             full: На весь экран
@@ -54,8 +65,31 @@ vars:
                 type: number
     shadow:
         type: css-shadow
+        tab: main
+    show:
+        type: livesearch
+        label: Показывать
+        tab: main
+        values:
+            always: Всегда
+            parent_hover: При наведении
+    hover_bg:
+        type: css-background
+        tab: hover
+    set_hover_border:
+        type: checkbox
+        label: Изменить рамки
+        tab: hover
+    hover_border:
+        type: measures
+        prop: borders
+        tab: hover
+    hover_shadow:
+        type: css-shadow
+        tab: hover
 container:
     lightness: background
+    hover-lightness: hover_bg
     width: width
     align: justify_content
 */
@@ -71,18 +105,53 @@ container:
     @border:none;
     @width:none;
     @shadow:none;
+    @show: always;
+    @hover_bg: none;
+    @hover_border: none;
+    @hover_shadow: none;
+    @set_hover_border: 0;
 ) 
 {
     margin:@margin;
     padding:@padding;
     
     display:flex;
+    text-decoration: none;
+    & when (@show = parent_hover) {
+        display: none;
+        position: absolute;
+        top:100%;
+        z-index: 2;
+        margin-right:-200px;
+        *:hover > & {
+            display: flex;
+        }
+    }
     
     .background(@background);
     
     .box-shadow(@shadow);
     
     .border(@border);
+
+    & when not(@hover_bg = none) {
+        &:hover {
+          .background(@hover_bg);
+        }
+    }
+
+    & when (@set_hover_border = 1) {
+      &:hover {
+        brd: @hover_border;
+        .border(@hover_border);
+      }
+    }
+
+    & when not(@hover_shadow = none) {
+      &:hover {
+        .box-shadow(@hover_shadow);
+      }
+    }
     
     & when not(@grow = none) {
         flex-grow:@grow;

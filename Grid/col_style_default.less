@@ -4,15 +4,19 @@ vars:
     background:
         type: css-background
         label: Фон
+        tab: main
     padding:
         label: Внутренний отступ
         type: measures
         prop: padding
+        tab: main
     align:
         type: css-align
+        tab: main
     valign:
         type: livesearch
         label: По вертикали
+        tab: main
         values:
             top: Сверху
             middle: По центру
@@ -20,19 +24,49 @@ vars:
     border:
         type: measures
         prop: borders
+        tab: main
     shadow:
         type: css-shadow
+        tab: main
     align_self:
         type: livesearch
         label: Позиция
+        tab: main
         values: 
             stretch: Растянуть
             flex-start: Сверху
             center: По центру
             flex-end: Снизу
+    mob_pos:
+        type: livesearch
+        label: Положение
+        allow_empty: false
+        tab: mobile
+        values:
+            auto: Авто
+            custom:
+                custom: true
+                value: 1
+                type: number
+    mob_width:
+        type: livesearch
+        label: Ширина
+        allow_empty: false
+        tab: mobile
+        values:
+            auto: 100%
+            preserve: Как на десктопе
+    mob_align:
+        type: css-align
+        tab: mobile
 container:
     lightness: background
     align: align
+export:
+    mob_align: '@mob_align'
+tabs:
+    main: Основное
+    mobile: На мобильном
 */
 .col_style_default(
     @background:none;
@@ -42,6 +76,9 @@ container:
     @border: none;
     @shadow: none;
     @align_self: stretch;
+    @mob_pos: auto;
+    @mob_width: 100%;
+    @mob_align: none;
 ) {
     .background(@background);
     padding:@padding;
@@ -60,5 +97,19 @@ container:
     }
     & when (@valign = bottom) {
         justify-content: flex-end;
+    }
+    
+    @media (max-width: 800px) {
+        .@{namespace}--grid > & {
+            & when not(@mob_pos = auto) {
+                order:@mob_pos;
+            }
+            & when not(@mob_width = preserve) {
+                width:100%;
+            }
+            & when not(@mob_align = none) {
+                .align-items(@mob_align);
+            }
+        }
     }
 }

@@ -17,6 +17,11 @@
     {/js}
     <span fx:e="close"></span>
     <div fx:e="overlay"></div>
+    {@show_nav label="Навигация?" type="checkbox" /}
+    <div fx:if="$show_nav" fx:e="nav">
+        <a fx:e="nav-link dir_back"></a>
+        <a fx:e="nav-link dir_next"></a>
+    </div>
     {if $popup_content}
         <div fx:e="content">{$popup_content /}</div>
     {elseif $area_name}

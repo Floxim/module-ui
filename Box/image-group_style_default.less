@@ -11,8 +11,21 @@ vars:
         values:
             crop: Обрезать
             contain: Уместить
-        parent: ratio != none
+        parentoooo: ratio != none
         tab: image
+    max_height:
+        type: livesearch
+        label: Максимальная высота
+        allow_empty: false
+        tab: image
+        values:
+            none: Нет
+            custom:
+                custom: true
+                value: 100
+                units: vh
+                type: number
+                step: 1
     width:
         type: livesearch
         label: Ширина
@@ -90,6 +103,7 @@ export:
 .image-group_style_default(
     @ratio: 1.5;
     @image_fit: crop;
+    @max_height: none;
     @width:full;
     @grow: 0;
     @align: center;
@@ -163,6 +177,9 @@ export:
         }
         & when (@image_fit = contain) {
             object-fit:contain;
+        }
+        & when not(@max_height = none) {
+            max-height: unit(@max_height, vh);
         }
     }
     

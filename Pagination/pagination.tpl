@@ -6,6 +6,7 @@
     {first}
         {set $pagination = $controller.getPagination() /}
     {/first}
+    {js}pagination.js{/js}
     {with $pagination}
         <fx:a href="$prev" fx:e="item type_prev {if !$prev}disabled{/if}">
             <span fx:e="wrap">&laquo;</span>

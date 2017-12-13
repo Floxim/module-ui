@@ -131,7 +131,7 @@ class Box {
             return $avail;
         }
         $all = $item->getFields();
-        
+
         $skip = array(
             'id',
             'type',
@@ -159,7 +159,11 @@ class Box {
             //'multilink'
         );
         
-        $special_fields = $item->getBoxFields();
+        $special_fields = (array) $item->getBoxFields();
+        $passed_fields = $this->template->context->get('box_extra_fields');
+        if ($passed_fields){
+            $special_fields = array_merge($special_fields, $passed_fields);
+        }
         
         $special_field_keywords = [];
         $forced_fields = [];
@@ -173,7 +177,7 @@ class Box {
         }
         
         $link_fields = [];
-        
+
         foreach ($all as $f) {
             $kw = $f['keyword'];
             $com = $f['component'];
@@ -190,21 +194,21 @@ class Box {
             
             $field = array();
             
+            $value_templates = [
+                ['id' => 'text_value', 'name' => 'Текст'],
+                ['id' => 'header_value', 'name' => 'Заголовок'],
+                ['id' => 'button_value', 'name' => 'Кнопка'],
+                ['id' => 'formatted_value', 'name' => 'По формату']
+            ];
+            
             switch ($f['type']) {
                 default:
                     if ($f['keyword'] === 'name') {
                         $field['template'] = 'header_value';
-                    } else { //if ($f->dig('format.html')) {
+                    } else {
                         $field['template'] = 'text_value';
                     }
-                    
-                    $field['templates'] = [
-                        ['id' => 'text_value', 'name' => 'Текст'],
-                        //['id' => 'value', 'name' => 'Значение'],
-                        ['id' => 'header_value', 'name' => 'Заголовок'],
-                        ['id' => 'button_value', 'name' => 'Кнопка'],
-                        ['id' => 'fromatted_value', 'name' => 'По формату']
-                    ];
+                    $field['templates'] = $value_templates;
                     break;
                 case 'link':
                     $field['template'] = 'link_value';
@@ -255,6 +259,12 @@ class Box {
         
         foreach ($special_fields as $sf) {
             if (is_array($sf)) {
+                if (!isset($sf['template'])) {
+                    $sf['template'] = 'formatted_value';
+                    if (!isset($sf['templates'])) {
+                        $sf['templates'] = $value_templates;
+                    }
+                }
                 $avail []= $sf;
             }
         }
@@ -302,15 +312,21 @@ class Box {
                 'template' => 'floxim.ui.pagination:pagination'
             );
         }
+        $ctr = $infoblock->initController();
+        if (method_exists($ctr, 'getAvailableParts')) {
+            $avail = array_merge($avail, $ctr->getAvailableParts());
+        }
         return $avail;
     }
     
     protected $scope_depth = 0;
+    protected $box_label = '';
 
     public function __construct($template, $box_id, $loop = null)
     {
         $this->template = $template;
         $context = $template->context;
+        $this->box_label = $context->get('box_label');
         
         if (fx::isAdmin()) {
             self::addAdminAssets();
@@ -325,8 +341,8 @@ class Box {
         $param_id = $this->getParamId();
         $this->scope_depth = $context->getScopeDepth();
         
-        $data = $context->get($param_id);
         
+        $data = $context->get($param_id);
         if (is_string($data) && !empty($data)) {
             $data = json_decode($data, true);
         }
@@ -428,7 +444,10 @@ class Box {
     
     protected function getDefaultGroups()
     {
-        
+        $groups_from_context = $this->template->context->get('default_box_groups');
+        if ($groups_from_context) {
+            return $groups_from_context;
+        }
         $c_item = $this->template->context->get('item');
         $groups = [];
         switch ($this->getFieldSource()) {
@@ -514,12 +533,16 @@ class Box {
         if (isset($data['use_inline_default']) && $data['use_inline_default']) {
             fx::digSet($this->data, $path, $data['value']);
         }
-        $this->params[$path] = $data;
+        if (isset($this->params[$path])) {
+            $this->params[$path] = fx::util()->fullMerge($this->params[$path], $data);
+        } else {
+            $this->params[$path] = $data;
+        }
     }
 
     public function export() {
         $value = array_merge($this->data, array('is_stored' => "1"));
-        $box_label = $this->template->context->get('box_label');
+        $box_label = $this->box_label ? $this->box_label : $this->template->context->get('box_label');
         if (!$box_label) {
             $box_label = 'Поля';
         }
@@ -555,7 +578,12 @@ class Box {
                     return isset($entity['url']);
                 }
             );
-            if ($page && !$page->isInstanceOf('floxim.main.page')) {
+            if (
+                $page &&
+                is_object($page) &&
+                method_exists($page, 'isInstanceOf') &&
+                !$page->isInstanceOf('floxim.main.page')
+            ) {
                 $page_url = $page['url'];
                 $page = fx::data('floxim.main.page')->getByUrl($page_url);
             }

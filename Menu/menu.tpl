@@ -11,7 +11,9 @@
         <div fx:e="sandwich"></div>
 </nav>
         
-<ul fx:template="recursive_menu" fx:e="level level_{$lv}">
+<ul 
+    fx:template="recursive_menu" 
+    fx:e="level level_{$lv}">
     <li 
         fx:each="$items"
         fx:e="item 

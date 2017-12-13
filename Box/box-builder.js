@@ -463,8 +463,7 @@ function box_builder($node, params) {
             meta = $el.data('meta') || {},
             $original_form = $el.closest('form'),
             $settings_form = null;
-    
-        
+
         function reload_handler(e) {
             var new_params = that.extractParams($(e.target), path);
             that.paramsToFields(new_params, path).then(function(fields) {

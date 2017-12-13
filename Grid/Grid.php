@@ -86,6 +86,19 @@ class Grid {
         );
     }
     
+    public function getMobModifiers()
+    {
+        $mods = [];
+        $props = ['align'];
+        foreach ($props as $prop) {
+            $val = $this->template->context->get('mob_'.$prop);
+            if ($val !== null && $val !== 'none') {
+                $mods[$prop] = $val;
+            }
+        }
+        return count($mods) === 0 ? '' : "data-container-mobile='".json_encode($mods)."'";
+    }
+    
     public static function getDefaultCols()
     {
         return array(

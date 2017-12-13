@@ -19,8 +19,31 @@ vars:
         prop: borders
     shadow:
         type: css-shadow
+    min_width:
+        label: Мин. ширина
+        type: number
+        step: 1
+        min: 10
+        max: 100
+    min_height:
+        label: Мин. высота
+        type: number
+        step: 1
+        min: 10
+        max: 100
+    back_icon:
+        type: iconpicker
+        label: '&larr;'
+        store_code: true
+    next_icon:
+        type: iconpicker
+        label: '&rarr;'
+        store_code: true
 container:
     lightness: popup_background
+export:
+    icon_left: '@arrows_left_icon'
+    icon_right: '@arrows_right_icon'
 */
 .popup_style_default (
     @overlay_background:@overlay_background;
@@ -28,6 +51,10 @@ container:
     @padding: 2rem 2rem 2rem 2rem;
     @border: none;
     @shadow: none;
+    @min_width: 40vw;
+    @min_height: 10vh;
+    @back_icon: none;
+    @next_icon: none;
 )
 {
     position:fixed;
@@ -39,18 +66,22 @@ container:
     display:flex;
     align-items: center;
     justify-content: center;
+
+    @max_height: 95vh;
+    @panel_height: 60px;
     
     #_hidden {
         display:none;
     }
     
     #__content { 
-        max-height: 95vh;
         overflow:auto;
         position:relative;
         z-index:2;
-        min-width:40vw;
-        max-width:95vw;
+        min-width: @min_width;
+        min-height: @min_height;
+        max-width:92vw;
+        max-height: @max_height;
         .background(@popup_background);
         padding: @padding;
         .box-shadow(@shadow);
@@ -66,5 +97,37 @@ container:
         //background:rgba(30,30,30,0.4);
         .background(@overlay_background);
         cursor:pointer;
+    }
+    body.fx_infoblock & {
+        height: ~"calc(100% - " @panel_height ~")";
+        top: @panel_height;
+        #__content {
+            max-height: ~"calc(" @max_height ~" - " @panel_height ~")";
+        }
+    }
+    & when not(@back_icon = none) and not(@next_icon = none) {
+        @arrow_size: 2rem;
+        #__nav {
+            z-index: 3;
+            position: fixed;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 0px;
+        }
+        #__nav-link {
+            cursor: pointer;
+            position: absolute;
+            font-size: @arrow_size;
+            top: ~"calc(" @arrow_size ~"/ 2 * - 1)";
+            #_dir_back {
+              .fx_icon(@back_icon);
+              left: @arrow_size / 2;
+            }
+            #_dir_next {
+              .fx_icon(@next_icon);
+              right: @arrow_size / 2;
+            }
+        }
     }
 }
