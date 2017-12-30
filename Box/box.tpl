@@ -66,10 +66,10 @@
             {set $img_size = 'max-width:' . $img_width /}
         {/if}
         {*<a fx:omit="$image_link === 'none'" href="{$item.url}" class="link">*}
-        <a fx:link>
+        <a fx:link fx:e="link">
             <img fx:e="img" src="{$item[$group.keyword] | fx::image : $img_size /}" />
         </a>
-        <div fx:e="box-wrapper" fx:hide-empty>
+        <div fx:e="box-wrapper" fx:hide-empty fx:link>
             <div fx:e="box" fx:b="box" fx:hide-empty>
                 {apply groups with $groups = $group.groups /}
             </div>
@@ -141,6 +141,8 @@
 {template id="display_value" nows="true"}
     {if $field.type === 'datetime'}
         {apply floxim.ui.date:date with $date = $value /}
+    {elseif in_array($field.type, array('int', 'float', 'number')) }
+        {apply floxim.ui.number:number with $number = $value /}
     {elseif $field.type === 'select'}
         {set $entity_offset = $field.keyword . '_entity' /}
         {set $select_entity = $item[ $entity_offset ] /}

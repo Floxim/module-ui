@@ -548,6 +548,23 @@ Floxim.prototype.offPopState = function(callback) {
     }
 }
 
+Floxim.prototype.onPushState = function(callback) {
+    if (!this.pushStateListeners) {
+        this.pushStateListeners = []
+    }
+    this.pushStateListeners.push(callback);
+};
+
+Floxim.prototype.offPushState = function(callback) {
+    if (!this.pushStateListeners) {
+        return;
+    }
+    var index = this.pushStateListeners.indexOf(callback)
+    if (index !== -1) {
+        this.pushStateListeners.splice(index, 1)
+    }
+}
+
 Floxim.prototype.pushState = function(url, state) {
     if (!this.stateStack) {
         this.stateStack = [];
@@ -555,8 +572,24 @@ Floxim.prototype.pushState = function(url, state) {
     this.stateStack.push([url, state]);
     if (window.history && window.history.pushState) {
         window.history.pushState(state, '', url);
+        setTitle(state.title);
+    }
+    if (this.pushStateListeners) {
+        for (var i = 0 ; i < this.pushStateListeners.length; i++) {
+            this.pushStateListeners[i](url, state)
+        }
     }
 };
+
+function setTitle(title) {
+    if (typeof document.initialTitle === 'undefined') {
+        document.initialTitle = document.title;
+    }
+    if (!title) {
+        title = document.initialTitle
+    }
+    document.title = title;
+}
 
 Floxim.prototype.replaceState = function(url, state) {
     if (window.history && window.history.replaceState) {
@@ -566,6 +599,9 @@ Floxim.prototype.replaceState = function(url, state) {
 
 Floxim.prototype.handlePopState = function(e) {
     var prevState = this.stateStack ? this.stateStack.pop() : undefined;
+    if (e.state) {
+        setTitle(e.state.title);
+    }
     for (var i = 0; i < this.popStateListeners.length; i++) {
         var listener = this.popStateListeners[i];
         var res = listener(e, prevState);
@@ -574,6 +610,17 @@ Floxim.prototype.handlePopState = function(e) {
         }
     }
 };
+
+Floxim.prototype.getPathFromUrl  = function (url) {
+    return url.replace(/^https?:\/\/[^\/]+/, '')
+}
+
+Floxim.prototype.getUrlFromPath = function(path) {
+    if (/^https?:\/\//.test(path)) {
+        return path;
+    }
+    return document.location.protocol + '//' + document.location.host + path;
+}
 
 window.Floxim = new Floxim();
 

@@ -8,6 +8,7 @@
 {/template}
 
 <div fx:template="popup" fx:b="popup id_{$popup_id} hidden" fx:styled="label:Стиль попапа">
+    {css}popup.less{/css}
     {first}
         {defualt $size = 'auto' /}
     {/first}
@@ -15,16 +16,18 @@
         Floxim.js from floxim.ui.js
         popup.js
     {/js}
-    <span fx:e="close"></span>
     <div fx:e="overlay"></div>
+    <div fx:e="content">
+        <span fx:e="close"></span>
+        {if $popup_content}
+            <div fx:e="content-area">{$popup_content /}</div>
+        {elseif $area_name}
+            <div fx:e="content-area" fx:area="$area_name"></div>
+        {/if}
+    </div>
     {@show_nav label="Навигация?" type="checkbox" /}
     <div fx:if="$show_nav" fx:e="nav">
         <a fx:e="nav-link dir_back"></a>
         <a fx:e="nav-link dir_next"></a>
     </div>
-    {if $popup_content}
-        <div fx:e="content">{$popup_content /}</div>
-    {elseif $area_name}
-        <div fx:e="content" fx:area="$area_name"></div>
-    {/if}
 </div>

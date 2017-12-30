@@ -3,10 +3,11 @@ $(function() {
 var cl = 'floxim--ui--pagination--pagination';
 
 function loadInfoblockPage($ib, url) {
+    url = url.replace(/^https?:\/\/[^\/]+/, '')
     var qs = url.match(/\?(.+)/),
         params = {
             query: qs ? qs[1] : '',
-            base_url: document.location.href.replace(/(\?|&)page=\d+/, '')
+            base_url: document.location.protocol + '//' + document.location.host + url.replace(/(\?|&)page=\d+/, '')
         },
         pageNum = params.query.match(/page=(\d+)/);
     return Floxim.reload($ib, params).then(function($newIb) {
@@ -33,18 +34,24 @@ Floxim.block(cl, function() {
     if (!hasLinks) {
         return;
     }
+    var cPath = Floxim.getPathFromUrl($n.find('.'+cl+'__item_active').attr('href'));
     if (!history.state || history.state.action !== 'pagination') {
-        Floxim.replaceState(document.location.href, state);
-        console.log('repl stat')
+        if (Floxim.getPathFromUrl(document.location.href) === cPath) {
+            Floxim.replaceState(document.location.href, state);
+        }
     }
-    $n.on('click', 'a[href]', function(e) {
+    $n.on('click', 'a[href]', function(e, params) {
         var href = this.getAttribute('href'),
             ibData = $ib.data('fx_infoblock');
+        params = params || {}
         loadInfoblockPage($ib, href).then(function() {
-            Floxim.pushState(
-                href,
-                state
-            );
+            if (params.pushState !== false) {
+                console.log('push pag', params)
+                Floxim.pushState(
+                    href,
+                    state
+                );
+            }
         });
         return false;
     });

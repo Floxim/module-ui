@@ -106,6 +106,8 @@ tabs:
             }
             & when not(@mob_width = preserve) {
                 width:100%;
+                padding-left:0;
+                padding-right:0;
             }
             & when not(@mob_align = none) {
                 .align-items(@mob_align);

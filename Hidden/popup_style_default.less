@@ -1,4 +1,8 @@
 /*
+tabs:
+    main: Попап
+    nav: Навигация
+    close: Крестик
 vars:
     overlay_background:
         type: css-background
@@ -6,39 +10,91 @@ vars:
         default:
             - dark
             - color, main 0 0.6
+        tab: main
     popup_background:
         type:  css-background
         default:
             - light
             - color, main 5 1
+        tab: main
     padding:
         type: measures
         prop: padding
+        tab: main
     border:
         type: measures
         prop: borders
+        tab: main
     shadow:
         type: css-shadow
+        tab: main
     min_width:
         label: Мин. ширина
         type: number
         step: 1
         min: 10
         max: 100
+        tab: main
     min_height:
         label: Мин. высота
         type: number
         step: 1
         min: 10
         max: 100
+        tab: main
     back_icon:
         type: iconpicker
         label: '&larr;'
         store_code: true
+        tab: nav
     next_icon:
         type: iconpicker
         label: '&rarr;'
         store_code: true
+        tab: nav
+    nav_size:
+        type: number
+        min: 20
+        max: 90
+        label: Размер
+        tab: nav
+    nav_color:
+        type: palette
+        transparent: true
+        tab: nav
+    nav_bg:
+        type: css-background
+        tab: nav
+        default:
+            - dark
+            - color, main 0 0.6
+    nav_hover_bg:
+        type: css-background
+        label: Фон при наведении
+        tab: nav
+        default:
+            - dark
+            - color, main 0 0.6
+    nav_padding:
+        type: measures
+        prop: padding
+        step: 0.1
+        tab: nav
+    nav_border:
+        type: measures
+        prop: borders
+        tab: nav
+    close_icon:
+        type: iconpicker
+        label: '&times;'
+        store_code: true
+        tab: close
+    close_size:
+        type: number
+        min: 20
+        max: 90
+        label: 'Размер &times;'
+        tab: close
 container:
     lightness: popup_background
 export:
@@ -55,6 +111,14 @@ export:
     @min_height: 10vh;
     @back_icon: none;
     @next_icon: none;
+    @nav_size: 30px;
+    @nav_bg: @nav_bg;
+    @nav_padding: 1rem;
+    @nav_border: none;
+    @nav_hover_bg: @nav_hover_bg;
+    @nav_color: main 0;
+    @close_icon: fa times f00d;
+    @close_size: 30px;
 )
 {
     position:fixed;
@@ -68,6 +132,7 @@ export:
     justify-content: center;
 
     @max_height: 95vh;
+    @max_width: 92vw;
     @panel_height: 60px;
     
     #_hidden {
@@ -75,17 +140,37 @@ export:
     }
     
     #__content { 
-        overflow:auto;
         position:relative;
         z-index:2;
+        display: flex;
+        flex-direction:column;
+        /*
         min-width: @min_width;
         min-height: @min_height;
-        max-width:92vw;
-        max-height: @max_height;
-        .background(@popup_background);
-        padding: @padding;
-        .box-shadow(@shadow);
-        .border(@border);
+        & when (@min_width < @max_width) {
+          max-width: @max_width;
+        }
+        & when (@min_width >= @max_width) {
+          max-width: @min_width;
+        }
+        & when (@min_height < @max_height) {
+          max-height: @max_height;
+        }
+        & when (@min_height >= @max_height) {
+          max-height: @min_height;
+        }
+        */
+        width: 90vw;
+        height: 90vh;
+    }
+
+    #__content-area {
+      .background(@popup_background);
+      padding: @padding;
+      .box-shadow(@shadow);
+      .border(@border);
+      overflow:auto;
+      height:100%;
     }
     
     #__overlay {
@@ -118,16 +203,47 @@ export:
         #__nav-link {
             cursor: pointer;
             position: absolute;
-            font-size: @arrow_size;
+            font-size: 0;
+            &:before {
+              .font_size(@nav_size);
+              width: 1em;
+              height: 1em;
+            }
             top: ~"calc(" @arrow_size ~"/ 2 * - 1)";
             #_dir_back {
               .fx_icon(@back_icon);
-              left: @arrow_size / 2;
+              left:1rem;
+              //.font_size(@nav_size / 2, left);
             }
             #_dir_next {
               .fx_icon(@next_icon);
-              right: @arrow_size / 2;
+              right:1rem;
+              //.font_size(@nav_size / 2, right);
+            }
+            .border(@nav_border);
+            .background(@nav_bg);
+            .tcolor-on-bg(@nav_color, @nav_bg);
+            padding: @nav_padding;
+            &:hover {
+              .background(@nav_hover_bg);
+              .tcolor-on-bg(@nav_color, @nav_hover_bg);
             }
         }
+    }
+
+    #__close {
+        .fx_icon(@close_icon);
+        &:before {
+          .font_size(@close_size);
+          width:1em;
+          height:1em;
+          display:inline-block;
+        }
+        position:absolute;
+        top:0;
+        right:0;
+        transform: translate(-20%, 20%);
+        z-index: 3;
+        cursor: pointer;
     }
 }
