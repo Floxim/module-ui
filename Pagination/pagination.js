@@ -13,11 +13,14 @@ function loadInfoblockPage($ib, url) {
     return Floxim.reload($ib, params).then(function($newIb) {
         var $panel = $('.fx-admin-panel'),
             panelHeight = $panel.length ? $panel.height() : 0;
+        if (typeof window.scrollTo === 'function') {
+            window.scrollTo(0, 0)
+        }
         setTimeout(function() {
             $('html').animate({
                 'scrollTop': ($newIb.offset().top - 30 - panelHeight)
             })
-        }, 1000);
+        }, 200);
         document.title = document.title.replace(/ \-\- Страница \d+$/, '')
         if (pageNum) {
             document.title += ' -- Страница '+pageNum[1]
