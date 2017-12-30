@@ -13,9 +13,11 @@ function loadInfoblockPage($ib, url) {
     return Floxim.reload($ib, params).then(function($newIb) {
         var $panel = $('.fx-admin-panel'),
             panelHeight = $panel.length ? $panel.height() : 0;
-        $('html').animate({
-            'scrollTop': ($newIb.offset().top - 30 - panelHeight)
-        })
+        setTimeout(function() {
+            $('html').animate({
+                'scrollTop': ($newIb.offset().top - 30 - panelHeight)
+            })
+        }, 1000);
         document.title = document.title.replace(/ \-\- Страница \d+$/, '')
         if (pageNum) {
             document.title += ' -- Страница '+pageNum[1]
