@@ -100,6 +100,9 @@ container:
 export:
     icon_left: '@arrows_left_icon'
     icon_right: '@arrows_right_icon'
+    icon_left_inc: '@arrows_left_icon !== "none" && fx::icon( @arrows_left_icon )'
+    icon_right_inc: '@arrows_right_icon !== "none" && fx::icon( @arrows_right_icon )'
+    icon_close_inc: '@close_icon !== "none" && fx::icon( @close_icon )'
 */
 .popup_style_default (
     @overlay_background:@overlay_background;
