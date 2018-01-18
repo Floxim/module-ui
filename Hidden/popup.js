@@ -230,7 +230,9 @@
         }
 
         $('html').on('click', 'a[href]', function (e) {
-            var popup_url = this.href.match(/(.+)\#popup-(.+)$/);
+
+            var popup_url = this.href.match(/(.+)\#popup-(.+)$/),
+                $link = $(this);
 
             if (!popup_url) {
                 return;
@@ -241,7 +243,8 @@
                 $fx.front.mode === 'edit' &&
                 !e.metaKey &&
                 !e.ctrlKey &&
-                !$(this).find('.fx_icon-type-follow').length
+                !$link.find('.fx_icon-type-follow').length &&
+                !$link.hasClass('fx-pass-click')
             ) {
                 return;
             }
@@ -297,4 +300,4 @@
         });
 
     });
-})(window.jQuery);
+})(window.$fxj || window.jQuery)

@@ -8,14 +8,35 @@ vars:
         label: Цвет
         type: palette
         transparent: true
+    background:
+        label: Фон
+        type: css-background
+    inline:
+        label: Инлайновый
+        type: checkbox
+    padding:
+        type: measures
+        prop: padding
+        step: 0.05
+container:
+    lightness: background
 */
 .header_style_default (
     @font:text 20px bold;
     @color: main 0;
+    @background: none;
+    @inline: 0;
+    @padding: 0rem;
 ) {
     .text-align();
     #__text {
         .font(@font);
         .tcolor(@color);
+        .background(@background);
+        & when (@inline = 1) {
+          display: inline;
+          -webkit-box-decoration-break: clone;
+        }
+        padding: @padding;
     }
 }

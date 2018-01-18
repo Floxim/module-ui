@@ -1,15 +1,18 @@
-$(function() {
+(function() {
 
 var cl = 'floxim--ui--pagination--pagination';
 
 function loadInfoblockPage($ib, url) {
-    url = url.replace(/^https?:\/\/[^\/]+/, '')
-    var qs = url.match(/\?(.+)/),
+    url = url.replace(/^https?:\/\/[^\/]+/, '');
+    var qs = url.match(/\?.+/),
+        base_url =  document.location.protocol + '//' +
+                    document.location.host +
+                    url.replace(/\?.+$/, '') + (qs ? qs[0] : ''),
         params = {
-            query: qs ? qs[1] : '',
-            base_url: document.location.protocol + '//' + document.location.host + url.replace(/(\?|&)page=\d+/, '')
+            base_url: base_url
         },
-        pageNum = params.query.match(/page=(\d+)/);
+        pageNum = base_url.match(/(?:\?|&)page=(\d+)/, '');
+
     return Floxim.reload($ib, params).then(function($newIb) {
         var $panel = $('.fx-admin-panel'),
             panelHeight = $panel.length ? $panel.height() : 0;
@@ -51,7 +54,6 @@ Floxim.block(cl, function() {
         params = params || {}
         loadInfoblockPage($ib, href).then(function() {
             if (params.pushState !== false) {
-                console.log('push pag', params)
                 Floxim.pushState(
                     href,
                     state
@@ -71,4 +73,4 @@ Floxim.onPopState(function(e, prev) {
     }
 });
 
-});
+})(window.$fxj || window.jQuery)

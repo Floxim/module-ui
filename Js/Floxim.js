@@ -1,5 +1,5 @@
 (function($) {
-    
+
 var Floxim = function() {
     
 };
@@ -695,4 +695,4 @@ $(function() {
     })
 });
 
-}) ( window.jQuery );
+}) ( window.$fxj || window.jQuery );
