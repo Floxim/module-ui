@@ -6,6 +6,7 @@
     fx:template="box" 
     fx:styled-inline>
     {css}box.less{/css}
+    {js}box.js{/js}
     
     {apply groups /}
     
@@ -48,15 +49,15 @@
 </div>
 
 <div
-    fx:template="image_group"
+    fx:template="image_group_old"
     fx:b="image-group"
-    fx:styled-inline>
+    fx:styled-inline
+    fx:style-params="
+        count_fields: {$fields | count /};
+    ">
     <div fx:e="image">
         {default $ratio = 1.5 /}
         {default $image_fit = 'crop' /}
-        {*
-        {@image_link type="livesearch" tab="image" label="Ссылка?" values="`[['none', 'Нет'],['link','Ссылка']]`" default="none" /}
-        *}
         {set $img_width = $context->getContainerWidth() /}
         
         {if $ratio !== 'none' && $image_fit === 'crop'}
@@ -77,6 +78,39 @@
     </div>
 </div>
 
+<div
+    class="" {* <- hack: add class first to make data from styled-inline available later *}
+    fx:template="image_group"
+    fx:b="image-group size_{= $ratio == 'none' ? 'auto' : 'fixed' /}"
+    fx:styled-inline
+    fx:link="tab: image;"
+    {default $ratio = 1.5 /}
+    {default $image_fit = 'crop' /}
+    {set $img_width = $context->getContainerWidth() /}
+    {if $ratio !== 'none' && $image_fit === 'crop'}
+        {set $img_height = $img_width / $ratio /}
+        {set $img_size = $img_width . '*' . $img_height /}
+    {else}
+        {set $img_size = 'max-width:' . $img_width /}
+    {/if}
+    style="background-image: url('{$item[$group.keyword] | fx::image : $img_size /}');">
+
+    {css}image-group.less{/css}
+
+
+    <div fx:e="image-spacer">
+        <img src="{$item[$group.keyword] editable='false' | fx::image : $img_size /}" />
+    </div>
+    {*
+    <a fx:link="tab: image;" fx:e="image">
+        <img src="{$item[$group.keyword] | fx::image : $img_size /}" />
+    </a>
+    *}
+    <div fx:e="content" fx:link="tab: image;" fx:b="box" fx:hide-empty>
+        {apply groups with $groups = $group.groups /}
+    </div>
+</div>
+
 <div 
     fx:template="group"
     fx:e="group"
@@ -93,8 +127,8 @@
         width_type: {$context.getContainerWidthType() /};
         width_value: {$context.getContainerWidthValue() /};
     "
+    class="{if $show_group === 'parent_hover'}fx-handle-parent-hover{/if}"
     fx:hide-empty>
-    
     {each select="$fields as $field_view" scope="true"}
         {= $_is_admin ?  $box.startField( $field_view )  : '' /}
         {set $el = 'field ' . $field_view.keyword /}

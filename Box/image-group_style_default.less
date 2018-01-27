@@ -5,9 +5,11 @@ vars:
         label: Пропорции
         auto: true
         tab: image
+        force_redraw: true
     image_fit:
         type: livesearch
         label: Обрезать?
+        force_redraw: true
         values:
             crop: Обрезать
             contain: Уместить
@@ -44,7 +46,7 @@ vars:
         type: checkbox
         tab: image
         parent: width == full
-    align: 
+    align:
         type: css-align
         tab: image
         parent: width != full
@@ -71,7 +73,7 @@ vars:
             - dark
             - color, main 0 0.6
         tab: box
-    box_align: 
+    box_align:
         type: css-align
         tab: box
     box_valign:
@@ -101,126 +103,141 @@ export:
     image_fit: '@image_fit'
 */
 .image-group_style_default(
-    @ratio: 1.5;
-    @image_fit: crop;
-    @max_height: none;
-    @width:full;
-    @grow: 0;
-    @align: center;
-    @image_border:none;
-    @image_shadow:none;
-    @box_margin:0rem 0rem 0rem 0rem;
-    @box_padding:1rem 1rem 1rem 1rem;
-    @box_background: @background;
-    @box_align: center;
-    @box_valign: middle;
-    @box_border: none;
-    @box_shadow: none;
+  @ratio: 1.5;
+  @image_fit: crop;
+  @max_height: none;
+  @width:full;
+  @grow: 0;
+  @align: center;
+  @image_border:none;
+  @image_shadow:none;
+  @box_margin:0rem 0rem 0rem 0rem;
+  @box_padding:1rem 1rem 1rem 1rem;
+  @box_background: @background;
+  @box_align: center;
+  @box_valign: middle;
+  @box_border: none;
+  @box_shadow: none;
 ) {
-    width:100%;
-    position:relative;
-    
-    & when (@grow = 1) {
-        flex-grow:1;
-        display:flex;
-        & when (@width = full) {
-            #__image {
-                flex-grow:1;
-            }
-        }
+  & when not(@width = full) {
+    html & {
+      width: unit(@width, %);
     }
-    
-    & when not(@width = full) {
-        display:flex;
-        flex-direction: column;
-        #__image {
-            width:unit(@width, %);
-            & when (@align = left) {
-                align-self:flex-start;
-            }
-            & when (@align = center) {
-                align-self:center;
-            }
-            & when (@align = right) {
-                align-self:flex-end;
-            }
-        }
+    & when (@align = left) {
+      align-self:flex-start;
     }
-    
-    #__image {
-        line-height: 0;
-        overflow: hidden;
-        position:relative;
-        .border(@image_border);
-        .box-shadow(@image_shadow);
-        
-        & when not(@ratio = none) {
-            &:after {
-                content:'';
-                display:block;
-                padding-bottom: 100% / @ratio;
-            }
-        }
+    & when (@align = center) {
+      align-self:center;
     }
-    #__img {
-        & when not(@ratio = none) {
-            position:absolute;
-            top:0;
-            left:0;
-            right:0;
-            bottom:0;
-        }
-        width:100%;
-        height:100%;
-        & when (@image_fit = crop) {
-            object-fit:cover;
-        }
-        & when (@image_fit = contain) {
-            object-fit:contain;
-        }
-        & when not(@max_height = none) {
-            max-height: unit(@max_height, vh);
-        }
+    & when (@align = right) {
+      align-self:flex-end;
     }
-    
-    #__box-wrapper {
-        position:absolute;
-        line-height:initial;
-        top:0;
-        left:0;
-        
-        height:~"calc(100% + 1px)";
-        width:100%;
-        display:flex;
-        text-decoration: none;
-    }
-    
-    #__box {
-        
-        .background(@box_background);
-        
-        .box-shadow(@box_shadow);
-        
-        .border(@box_border);
-        
-        padding:@box_padding;
-        margin:@box_margin;
-        
-        display:flex;
-        flex-direction: column;
-        width:100%;
+  }
 
-        & when (@box_valign = top) {
-            justify-content: flex-start;
-        }
-        & when (@box_valign = middle) {
-            justify-content: center;
-        }
-        & when (@box_valign = bottom) {
-            justify-content: flex-end;
-        }
-        & when (@box_valign = space-between) {
-            justify-content: space-between;
-        }
+  & when (@grow = 1) {
+    flex-grow:1;
+  }
+
+  .border(@image_border);
+  .box-shadow(@image_shadow);
+
+  /*
+  #__image {
+    .border(@image_border);
+    .box-shadow(@image_shadow);
+    img {
+      & when (@image_fit = crop) {
+        object-fit:cover;
+      }
+      & when (@image_fit = contain) {
+        object-fit:contain;
+      }
+      & when not(@max_height = none) {
+        max-height: unit(@max_height, vh);
+      }
     }
+  }
+  */
+  & when (@image_fit = crop) {
+    background-size:cover;
+  }
+  & when (@image_fit = contain) {;
+    background-size: contain;
+  }
+
+
+  & when not(@ratio = none) {
+    &:before {
+      padding-bottom:100% / @ratio;
+    }
+  }
+
+  #__content {
+    &:before {
+      .background(@box_background);
+    }
+    /*
+    .box-shadow(@box_shadow);
+
+    .border(@box_border);
+    */
+    padding:@box_padding;
+    margin:@box_margin;
+  }
+
+  & when not(@ratio = none) {
+    &:before, #__content {
+      & when (@box_valign = top) {
+        vertical-align: top;
+      }
+      & when (@box_valign = middle) {
+        vertical-align: middle;
+      }
+      & when (@box_valign = bottom) {
+        vertical-align: bottom;
+      }
+    }
+    & when (@box_valign = space-between) {
+      #__content {
+        justify-content: space-between;
+      }
+    }
+  }
+  & when (@ratio = none) {
+    #__content {
+      & when (@box_valign = top) {
+        justify-content: flex-start;
+      }
+      & when (@box_valign = middle) {
+        justify-content: center;
+      }
+      & when (@box_valign = bottom) {
+        justify-content: flex-end;
+      }
+      & when (@box_valign = space-between) {
+        justify-content: space-between;
+      }
+    }
+    /*
+    #__content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      & when (@box_valign = top) {
+        justify-content: flex-start;
+      }
+      & when (@box_valign = middle) {
+        justify-content: center;
+      }
+      & when (@box_valign = bottom) {
+        justify-content: flex-end;
+      }
+      & when (@box_valign = space-between) {
+        justify-content: space-between;
+      }
+    }
+    */
+  }
 }

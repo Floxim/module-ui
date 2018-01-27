@@ -682,8 +682,8 @@ $(function() {
         }
     });
     onMediaUpdate(window.mediaMode);
-    var hover_lightnes_sel = '.fx-block_hover-lightness_light, .fx-block_hover-lightness_dark';
-    $(document.body).on('mouseenter', hover_lightnes_sel, function(e) {
+    var hover_lightness_sel = '.fx-block_hover-lightness_light, .fx-block_hover-lightness_dark';
+    $(document.body).on('mouseenter', hover_lightness_sel, function(e) {
         var $n = $(this);
         var mods = window.Floxim.getModifiers($n, 'fx-block');
         var prevLightness = mods['lightness'];

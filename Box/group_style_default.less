@@ -2,6 +2,7 @@
 tabs:
     main: Основное
     hover: При наведении
+    advanced: Прочее
 vars: 
     fields_margin:
         label: Между полями
@@ -41,7 +42,7 @@ vars:
     grow:
         label: Растянуть ↕
         type: checkbox
-        tab: main
+        tab: advanced
     background:
         type: css-background
         tab: main
@@ -53,7 +54,7 @@ vars:
         type: livesearch
         label: Ширина
         allow_empty: false
-        tab: main
+        tab: advanced
         values:
             none: 100%
             full: На весь экран
@@ -64,13 +65,21 @@ vars:
                 value: 100
                 units: %
                 type: number
+    breaks:
+        type: livesearch
+        label: Переносы
+        tab: advanced
+        values:
+            none: Нет
+            flex: По полям
+            inline: В строку
     shadow:
         type: css-shadow
         tab: main
     show:
         type: livesearch
         label: Показывать
-        tab: main
+        tab: hover
         values:
             always: Всегда
             parent_hover: При наведении
@@ -93,6 +102,8 @@ container:
     hover-lightness: hover_bg
     width: width
     align: justify_content
+export:
+    show_group: '@show'
 */
 
 .group_style_default(
@@ -111,6 +122,7 @@ container:
     @hover_border: none;
     @hover_shadow: none;
     @set_hover_border: 0;
+    @breaks: none;
 ) 
 {
     margin:@margin;
@@ -119,13 +131,13 @@ container:
     display:flex;
     text-decoration: none;
     & when (@show = parent_hover) {
-        display: none;
+        // display: none;
         position: absolute;
         top:100%;
         z-index: 2;
         margin-right:-200px;
-        *:hover > & {
-            display: flex;
+        *:not(.fx-is-hover) > & {
+            display: none;
         }
     }
     
@@ -143,7 +155,6 @@ container:
 
     & when (@set_hover_border = 1) {
       &:hover {
-        brd: @hover_border;
         .border(@hover_border);
       }
     }
@@ -197,5 +208,24 @@ container:
     
     & when not(@width = none) and not(@width = layout) {
         .align-self(@justify_content);
+    }
+
+    & when (@breaks = none) {
+      flex-wrap: nowrap;
+    }
+
+    & when (@breaks = flex) {
+      flex-wrap: wrap;
+    }
+    & when (@breaks = inline) {
+      display: inline-block;
+      html & > #__field {
+        &, & * {
+          display: inline;
+        }
+        &.floxim--ui--box--icon-value {
+          display: inline-block;
+        }
+      }
     }
 }

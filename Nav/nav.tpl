@@ -2,6 +2,7 @@
     fx:template="nav" 
     fx:of="floxim.main.page:list"
     fx:b="nav">
+        {css}nav.less{/css}
         {apply recursive_nav with $lv = 1 /}
         <div fx:e="sandwich"></div>
 </nav>
