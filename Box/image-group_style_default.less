@@ -13,11 +13,12 @@ vars:
         values:
             crop: Обрезать
             contain: Уместить
+            original: Оригинальный размер
         parentoooo: ratio != none
         tab: image
     max_height:
         type: livesearch
-        label: Максимальная высота
+        label: Макс. высота
         allow_empty: false
         tab: image
         values:
@@ -35,6 +36,8 @@ vars:
         tab: image
         values:
             full: На всю ширину
+            fullscreen: Ширина экрана
+            layout: Ширина лейаута
             custom:
                 custom: true
                 value: 100
@@ -42,14 +45,22 @@ vars:
                 type: number
                 step: 5
     grow:
-        label: Растянуть по высоте
+        label: Растянуть ↕
         type: checkbox
         tab: image
         parent: width == full
     align:
         type: css-align
         tab: image
-        parent: width != full
+        parent: width != full || image_fit == original
+    valign:
+        type: livesearch
+        label: По вертикали
+        values:
+            top: Сверху
+            middle: По центру
+            bottom: Снизу
+        tab: image
     image_border:
         type: measures
         prop: borders
@@ -102,6 +113,7 @@ export:
     ratio: '@ratio'
     image_fit: '@image_fit'
 */
+
 .image-group_style_default(
   @ratio: 1.5;
   @image_fit: crop;
@@ -109,6 +121,7 @@ export:
   @width:full;
   @grow: 0;
   @align: center;
+  @valign: center;
   @image_border:none;
   @image_shadow:none;
   @box_margin:0rem 0rem 0rem 0rem;
@@ -120,8 +133,16 @@ export:
   @box_shadow: none;
 ) {
   & when not(@width = full) {
-    html & {
-      width: unit(@width, %);
+    & when (isnumber(@width)) {
+      html & {
+        width: unit(@width, %);
+      }
+    }
+    & when (@width = fullscreen) {
+      .width(full);
+      html & {
+        width: auto;
+      }
     }
     & when (@align = left) {
       align-self:flex-start;
@@ -141,28 +162,33 @@ export:
   .border(@image_border);
   .box-shadow(@image_shadow);
 
-  /*
-  #__image {
-    .border(@image_border);
-    .box-shadow(@image_shadow);
-    img {
-      & when (@image_fit = crop) {
-        object-fit:cover;
-      }
-      & when (@image_fit = contain) {
-        object-fit:contain;
-      }
-      & when not(@max_height = none) {
-        max-height: unit(@max_height, vh);
-      }
-    }
-  }
-  */
   & when (@image_fit = crop) {
     background-size:cover;
   }
   & when (@image_fit = contain) {;
     background-size: contain;
+  }
+
+  & when (@image_fit = original) {
+    html & {
+      display: block;
+      ratio: @ratio;
+    }
+    & when not(@ratio = none) {
+      &:before {
+        display: inline-block;
+        content: '';
+      }
+      &:before, #__image {
+        vertical-align: @valign;
+      }
+    }
+    & when not(@align = none) {
+      text-align: @align;
+    }
+    & when (@align = none) {
+      .text-align();
+    }
   }
 
 
@@ -176,17 +202,18 @@ export:
     &:before {
       .background(@box_background);
     }
-    /*
-    .box-shadow(@box_shadow);
-
-    .border(@box_border);
-    */
     padding:@box_padding;
     margin:@box_margin;
   }
 
-  & when not(@ratio = none) {
-    &:before, #__content {
+
+  #__image {
+    .border-radius(@image_border);
+  }
+
+  /*
+  & when not(@ratio = none) and (@image_fit = original) {
+    &:before, #__image {
       & when (@box_valign = top) {
         vertical-align: top;
       }
@@ -203,7 +230,8 @@ export:
       }
     }
   }
-  & when (@ratio = none) {
+  */
+  /* & when (@ratio = none) { */
     #__content {
       & when (@box_valign = top) {
         justify-content: flex-start;
@@ -239,5 +267,5 @@ export:
       }
     }
     */
-  }
+  /* } */
 }

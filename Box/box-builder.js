@@ -150,9 +150,10 @@ function box_builder($node, params) {
     };
     
     this.drawField = function(field, $target, path) {
-        var field_meta = this.fields_map[field.keyword],
+        var kw = field.keyword || '_'+(field.template),
+            field_meta = this.fields_map[kw],
             field_is_available = !!field_meta;
-        
+
         if (!field_is_available) {
             field_meta = {
                 name: field.name || field.keyword

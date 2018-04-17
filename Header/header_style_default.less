@@ -18,6 +18,9 @@ vars:
         type: measures
         prop: padding
         step: 0.05
+    shadow:
+        type: css-shadow
+        shadowType: text
 container:
     lightness: background
 */
@@ -27,12 +30,14 @@ container:
     @background: none;
     @inline: 0;
     @padding: 0rem;
+    @shadow: none;
 ) {
     .text-align();
     #__text {
         .font(@font);
         .tcolor(@color);
         .background(@background);
+        .text-shadow(@shadow);
         & when (@inline = 1) {
           display: inline;
           -webkit-box-decoration-break: clone;

@@ -13,7 +13,7 @@ Floxim.handle('.fx-handle-parent-hover', function(i, n) {
         $n.css('outline', '');
         $par.addClass('fx-is-hover');
     }).on('mouseleave', function() {
-        console.log('mouse leaved');
+        // console.log('mouse leaved');
         $n.css('outline', '1px solid #0F0');
         leaveTimeout = setTimeout(function() {
             $par.removeClass('fx-is-hover');
@@ -22,7 +22,7 @@ Floxim.handle('.fx-handle-parent-hover', function(i, n) {
 })
 
 $('html').on('mouseenter', '.fx_front_overlay', function () {
-    console.log('mouse on frontovr!');
+    // console.log('mouse on frontovr!');
 })
 
 })(window.$fxj || window.jQuery);

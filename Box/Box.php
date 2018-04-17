@@ -51,7 +51,7 @@ class Box {
             return;
         }
         $path = fx::path('@module/Floxim/Ui/Box');
-        fx::page()->addJs([$path.'/box-builder.js'], ['to' => 'admin']);
+        fx::page()->addJs([$path.'/box-builder.js', $path.'/format-field.js'], ['to' => 'admin']);
         fx::page()->addCss(
             [
                 $path.'/box-builder.less'
@@ -114,11 +114,13 @@ class Box {
         );
         $res []= [
             'name' => 'Произвольный текст',
-            'template' => 'free_text'
+            'template' => 'free_text',
+            'keyword' => '_free_text'
         ];
         $res []= [
-            'name' => 'Кнопка',
-            'template' => 'free_button'
+            'name' => 'Кнопкавв',
+            'template' => 'free_button',
+            'keyword' => '_free_button'
         ];
         return $res;
     }
@@ -130,7 +132,7 @@ class Box {
         if (!$item) {
             return $avail;
         }
-        $all = $item->getFields();
+        $all = $item instanceof \Floxim\Floxim\System\Entity ? $item->getFields() : [];
 
         $skip = array(
             'id',
@@ -154,6 +156,7 @@ class Box {
         );
         
         $skip_types = array(
+            'group'
             //'image',
             //'link'//,
             //'multilink'
@@ -198,7 +201,8 @@ class Box {
                 ['id' => 'text_value', 'name' => 'Текст'],
                 ['id' => 'header_value', 'name' => 'Заголовок'],
                 ['id' => 'button_value', 'name' => 'Кнопка'],
-                ['id' => 'formatted_value', 'name' => 'По формату']
+                ['id' => 'formatted_value', 'name' => 'По формату'],
+                ['id' => 'formatted_header_value', 'name' => 'Заголовок по формату']
             ];
             
             switch ($f['type']) {
@@ -224,6 +228,10 @@ class Box {
                     $field['template'] = 'image_value';
                     $field['type'] = 'image';
                     $field['is_group'] = true;
+                    break;
+                case 'file':
+                    $field['template'] = 'file_value';
+                    $field['type'] = 'file';
                     break;
             }
             
@@ -265,6 +273,9 @@ class Box {
                         $sf['templates'] = $value_templates;
                     }
                 }
+                if (!isset($sf['name'])) {
+                    $sf['name'] = isset($sf['label']) ? $sf['label'] : $sf['keyword'];
+                }
                 $avail []= $sf;
             }
         }
@@ -275,7 +286,7 @@ class Box {
 
     public function startField($field)
     {
-        if (!isset($this->templates[$field['keyword']])) {
+        if (!isset($field['keyword']) || !isset($this->templates[$field['keyword']])) {
             return;
         }
         $this->template->registerParam(
@@ -435,7 +446,7 @@ class Box {
     protected function hasField($keyword) 
     {
         foreach ($this->avail as $f) {
-            if ($f['keyword'] === $keyword) {
+            if (isset($f['keyword']) && $f['keyword'] === $keyword) {
                 return true;
             }
         }
@@ -575,7 +586,7 @@ class Box {
         if (count($popup_ibs) > 0) {
             $page = $context->getClosestEntity(
                 function($entity) {
-                    return isset($entity['url']);
+                    return $entity instanceof \Floxim\Floxim\System\Entity && ($entity['url']);
                 }
             );
             if (

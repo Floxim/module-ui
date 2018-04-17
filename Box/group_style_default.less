@@ -97,6 +97,12 @@ vars:
     hover_shadow:
         type: css-shadow
         tab: hover
+    custom_rules:
+        type: text
+        code: true
+        tab: advanced
+        label: Произвольный LESS
+        eager: true
 container:
     lightness: background
     hover-lightness: hover_bg
@@ -123,6 +129,7 @@ export:
     @hover_shadow: none;
     @set_hover_border: 0;
     @breaks: none;
+    @custom_rules: "";
 ) 
 {
     margin:@margin;
@@ -197,6 +204,10 @@ export:
             text-align: right;
         }
     }
+
+    #__field {
+      display: block;
+    }
     
     align-items: @align_items;
     
@@ -206,7 +217,7 @@ export:
     
     .width(@width; @margin);
     
-    & when not(@width = none) and not(@width = layout) {
+    & when not(@width = none) and not(@width = layout) and not(@width = full) {
         .align-self(@justify_content);
     }
 
@@ -228,4 +239,6 @@ export:
         }
       }
     }
+
+    .apply-custom-rules(@custom_rules);
 }

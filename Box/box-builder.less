@@ -299,3 +299,27 @@
         border-radius: 20px;
     }
 }
+
+.floxim-ui-box-format {
+  border:1px solid #CCC;
+  border-radius:3px;
+  padding:3px;
+  display: inline-block;
+  background: #FFF;
+  &__ce {
+    &:empty:before {
+      content:'...';
+      color:#999;
+    }
+  }
+  &__val {
+    background:#e2e9fe;
+    font-size:13px;
+    display: inline-block;
+    margin:0 3px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    color: #666;
+    cursor: default;
+  }
+}

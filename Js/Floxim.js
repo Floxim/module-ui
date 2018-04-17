@@ -602,7 +602,7 @@ Floxim.prototype.handlePopState = function(e) {
     if (e.state) {
         setTitle(e.state.title);
     }
-    for (var i = 0; i < this.popStateListeners.length; i++) {
+    for (var i = 0; i < (this.popStateListeners || []).length; i++) {
         var listener = this.popStateListeners[i];
         var res = listener(e, prevState);
         if (res === false) {

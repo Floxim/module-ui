@@ -3,8 +3,9 @@
     {set $box = \Floxim\Ui\Box\Box::start($this) /}
     fx:e="{$box_element}{$box_id /}{/$}"
     fx:b="box" 
-    fx:template="box" 
-    fx:styled-inline>
+    fx:template="box"
+    fx:styled-inline
+    data-item="{$item | fx::void /}">
     {css}box.less{/css}
     {js}box.js{/js}
     
@@ -49,40 +50,14 @@
 </div>
 
 <div
-    fx:template="image_group_old"
-    fx:b="image-group"
-    fx:styled-inline
-    fx:style-params="
-        count_fields: {$fields | count /};
-    ">
-    <div fx:e="image">
-        {default $ratio = 1.5 /}
-        {default $image_fit = 'crop' /}
-        {set $img_width = $context->getContainerWidth() /}
-        
-        {if $ratio !== 'none' && $image_fit === 'crop'}
-            {set $img_height = $img_width / $ratio /}
-            {set $img_size = $img_width . '*' . $img_height /}
-        {else}
-            {set $img_size = 'max-width:' . $img_width /}
-        {/if}
-        {*<a fx:omit="$image_link === 'none'" href="{$item.url}" class="link">*}
-        <a fx:link fx:e="link">
-            <img fx:e="img" src="{$item[$group.keyword] | fx::image : $img_size /}" />
-        </a>
-        <div fx:e="box-wrapper" fx:hide-empty fx:link>
-            <div fx:e="box" fx:b="box" fx:hide-empty>
-                {apply groups with $groups = $group.groups /}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div
     class="" {* <- hack: add class first to make data from styled-inline available later *}
     fx:template="image_group"
-    fx:b="image-group size_{= $ratio == 'none' ? 'auto' : 'fixed' /}"
-    fx:styled-inline
+    fx:b="
+        image-group
+        size_{= $ratio == 'none' ? 'auto' : 'fixed' /}
+        fit_{$image_fit /}
+        {if $has_children}has-children{else}no-children{/if}"
+    fx:styled-inline="lightness_image: {$item[$group.keyword] /};"
     fx:link="tab: image;"
     {default $ratio = 1.5 /}
     {default $image_fit = 'crop' /}
@@ -93,22 +68,35 @@
     {else}
         {set $img_size = 'max-width:' . $img_width /}
     {/if}
-    style="background-image: url('{$item[$group.keyword] | fx::image : $img_size /}');">
+    {if $has_children}
+        style="background-image: url('{$item[$group.keyword] | fx::image : $img_size /}');"
+    {/if}>
+
+
+    {first}
+        {set $has_children = count( $group.groups ) > 0 /}
+    {/first}
 
     {css}image-group.less{/css}
 
-
-    <div fx:e="image-spacer">
-        <img src="{$item[$group.keyword] editable='false' | fx::image : $img_size /}" />
-    </div>
-    {*
-    <a fx:link="tab: image;" fx:e="image">
-        <img src="{$item[$group.keyword] | fx::image : $img_size /}" />
-    </a>
-    *}
-    <div fx:e="content" fx:link="tab: image;" fx:b="box" fx:hide-empty>
-        {apply groups with $groups = $group.groups /}
-    </div>
+    {if $has_children}
+        <div fx:e="image-spacer">
+            {if $image_fit == 'original'}
+                <img src="{$item[$group.keyword] /}" editable="false" />
+            {else}
+                <img src="{$item[$group.keyword] editable='false' | fx::image : $img_size /}" />
+            {/if}
+        </div>
+        <div fx:e="content" fx:b="box" fx:hide-empty>
+            {apply groups with $groups = $group.groups /}
+        </div>
+    {else}
+        {if $image_fit == 'original'}
+            <img fx:e="image" src="{$item[$group.keyword] /}" />
+        {else}
+            <img fx:e="image" src="{$item[$group.keyword] editable='false' | fx::image : $img_size /}" />
+        {/if}
+    {/if}
 </div>
 
 <div 
@@ -197,7 +185,13 @@
         {with $value}
             {apply box el field with $item = $value /}
         {/with}
+    {else}
+        {set $placeholders = $item.getAdderPlaceholders($field_view.keyword) /}
+        {each $placeholders as $item}
+            {apply box el field with $item = $item /}
+        {/each}
     {/if}
+
 {/template}
 
 <div 
@@ -243,6 +237,7 @@
     {first}
         {set $value = $item[$field_view.keyword] /}
         {set $field = $item.getField($field_view.keyword) /}
+
     {/first}
     {apply display_value /}
 </div>
@@ -309,19 +304,49 @@
      fx:b="floxim.main.text:text"
      fx:styled="label:Стиль; id:all"
      fx:aif="$value"
+     data-value-format="{%value_format type="fx-box-format" label="Формат" | json_encode /}"
      fx:nows>
     {first}
         {set $value = $item[$field_view.keyword] /}
         {set $field = $item.getField($field_view.keyword) /}
-        {default $value_prefix = $field.name /}
-        {@value_prefix label="До значения" /}
-        {@value_postfix label="После значения" /}
+        {@value_format label="Формат" type="fx-box-format" :default="['','']" /}
+        {set $value_prefix = $value_format[0] /}
+        {set $value_postfix = $value_format[1] /}
     {/first}
-    <span>{%value_prefix label="..." /}</span>
+    <span fx:if="$value_prefix">{$value_prefix /}</span>
     <span 
         fx:b="floxim.main.text:text"
         fx:styled="label:Стиль значения; id: val">
         {apply display_value /}
     </span>
-    <span>{%value_postfix label="..." /}</span>
+    <span fx:if="$value_postfix">{$value_postfix /}</span>
+</div>
+
+<div fx:template="formatted_header_value" fx:aif="$value" fx:nows fx:b="formatted-header-value">
+    {first}
+        {set $value = $item[$field_view.keyword] /}
+        {set $field = $item.getField($field_view.keyword) /}
+        {@value_format label="Формат" type="fx-box-format" :default="['','']" /}
+        {set $value_prefix = $value_format[0] /}
+        {set $value_postfix = $value_format[1] /}
+    {/first}
+    {set $header_value}
+        <span fx:e="prefix" fx:if="$value_prefix">{$value_prefix /}</span>
+        <span fx:link>{apply display_value /}</span>
+        <span fx:e="postfix" fx:if="$value_postfix">{$value_postfix /}</span>
+    {/set}
+    {apply
+        floxim.ui.header:header
+        with
+        $header = $header_value
+    /}
+</div>
+
+<div fx:template="file_value" fx:aif="$value">
+    {first}
+        {set $value = $item[$field_view.keyword] /}
+        {set $field = $item.getField($field_view.keyword) /}
+    {/first}
+    {set $file_instance = \Floxim\Ui\Box\BoxFile::create($value) /}
+    {apply box with $item = $file_instance, $box_id = 'filebox', $field_source = 'item', $url = $file_instance.url /}
 </div>
