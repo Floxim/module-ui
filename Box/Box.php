@@ -96,6 +96,7 @@ class Box {
             'name' => 'Колонки',
             'is_group' => true,
             'template' => 'columns',
+            'keyword' => '_columns',
             'columns' => [
                 [
                     'width' => 4,
@@ -118,7 +119,7 @@ class Box {
             'keyword' => '_free_text'
         ];
         $res []= [
-            'name' => 'Кнопкавв',
+            'name' => 'Кнопка',
             'template' => 'free_button',
             'keyword' => '_free_button'
         ];
@@ -497,6 +498,123 @@ class Box {
                 break;
         }
         return $groups;
+    }
+
+    /**
+     * Параметры для сортировочного поля
+     * Получаем базовый тип данных и поле-релейшн
+     * Возвращаем список полей для сортировки
+     */
+    public static function getSorterOptions($item, $field) {
+        static $cache = [];
+        if (! ($item instanceof \Floxim\Floxim\Component\Basic\Entity) || empty($field)) {
+            return null;
+        }
+        $hash = $item->getType().'@'.$field;
+        if (array_key_exists($hash, $cache)) {
+            return $cache[$hash];
+        }
+        $relField = $item->getField($field);
+        if (!$relField) {
+            $cache[$hash] = null;
+            return null;
+        }
+
+        $targetComName = $relField->getTargetName();
+        $targetCom = fx::getComponentByKeyword($targetComName);
+        $relTarget = $relField->getRelation()[2];
+        $targetFields = $targetCom->getAllFields()->find(function($f) use ($relTarget) {
+            return $f['keyword'] !== $relTarget;
+        });
+        $res = [
+            'sortable_fields' => self::getSortableFields($targetFields)
+        ];
+        $cache[$hash] = $res;
+        return $res;
+    }
+
+    /**
+     * @param $fields
+     * @param int $level
+     * @return array
+     */
+    protected static function getSortableFields($fields, $level = 0) {
+        $res = [];
+        $priorityMap = [
+            'string' => 1,
+            'link' => 0.5,
+            'int' => 2,
+            'float' => 3,
+            'datetime' => 4,
+            'priority' => 5
+        ];
+        foreach ($fields as $f) {
+            $priority = isset($priorityMap[$f['type']]) ? $priorityMap[$f['type']] : 0;
+            if ($priority === 0) {
+                continue;
+            }
+            if ($f instanceof \Floxim\Floxim\Field\FieldLink) {
+                if ($level >= 1) {
+                    continue;
+                }
+                $targetComName = $f->getTargetName();
+                $targetCom = fx::getComponentByKeyword($targetComName);
+                if (!$targetCom) {
+                    continue;
+                }
+                $targetFields = $targetCom->getAllFields();
+                if (!$targetFields) {
+                    continue;
+                }
+                $targetSortableFields = Box::getSortableFields($targetFields, $level + 1);
+                foreach ($targetSortableFields as &$tsf) {
+                    $tsf['id'] = $f->getFormat('prop_name').'.'.$tsf['id'];
+                }
+                $res []= [
+                    'id' => $f['keyword'],
+                    'name' => $f['name'],
+                    'expanded' => false,
+                    'disabled' => true,
+                    'children' => $targetSortableFields,
+                    'priority' => $priority
+                ];
+            } else {
+                $res[]= [
+                    'id' => $f['keyword'],
+                    'name' => $f['name'],
+                    'priority' => $priority,
+                    'sortable' => $f['type'] === 'priority' && $level === 0
+                ];
+            }
+        }
+        usort($res, function($a, $b) {
+            return $b['priority'] - $a['priority'] > 0 ? 1 : -1;
+        });
+        return $res;
+    }
+
+    public static function prepareLinkedList($list, $sort)
+    {
+        if ( ! ($list instanceof \Floxim\Floxim\System\Collection) || !$sort) {
+            return $list;
+        }
+        if (!is_array($sort) || !isset($sort['field'])) {
+            return $list;
+        }
+        $f = $sort['field'];
+        $dir = isset($sort['dir']) ? $sort['dir'] : 'asc';
+        $res = $list->copy();
+        $res->sort(
+            function($a, $b) use ($f, $dir) {
+                $fa = $a->dig($f);
+                $fb = $b->dig($f);
+                $r = $fa > $fb ? 1 : ($fa < $fb ? -1 : 0);
+                return $dir === 'asc' ? $r : $r * -1;
+            }
+        );
+        $res->is_sortable = isset($sort['sortable']) && $sort['sortable'] ? $f : false;
+        return $res;
+        //return $list;
     }
     
     protected function prepareGroups($groups)

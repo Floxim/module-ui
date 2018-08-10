@@ -94,7 +94,7 @@
         {if $image_fit == 'original'}
             <img fx:e="image" src="{$item[$group.keyword] /}" />
         {else}
-            <img fx:e="image" src="{$item[$group.keyword] editable='false' | fx::image : $img_size /}" />
+            <img fx:e="image theimg" src="{$item[$group.keyword] | fx::image : $img_size /}" />
         {/if}
     {/if}
 </div>
@@ -176,7 +176,14 @@
 
 {template id="list_value"}
     {set $value = $item[$field_view.keyword] /}
-    {apply floxim.ui.tiles:tiles el field with $items = $value /}
+    {set $sorted_value = \Floxim\Ui\Box\Box::prepareLinkedList($value, $link_sorting) /}
+    {@param
+        name="link_sorting"
+        label="Сортировка"
+        type="sort_picker"
+        :sorter_options="\Floxim\Ui\Box\Box::getSorterOptions($context->get('item'), $context->getFrom($context->get('field_view'), 'keyword'))" /}
+
+    {apply floxim.ui.tiles:tiles el field with $items = $sorted_value /}
 {/template}
 
 {template id="link_value"}

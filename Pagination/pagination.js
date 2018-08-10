@@ -66,7 +66,7 @@ Floxim.block(cl, function() {
 
 Floxim.onPopState(function(e, prev) {
     var state = e.state;
-    if (state.action === 'pagination') {
+    if (state && state.action === 'pagination') {
         var $ib = $('.fx_infoblock_'+state.infoblock.id),
             url = document.location.href;
         loadInfoblockPage($ib, url);
