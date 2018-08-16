@@ -13,9 +13,14 @@
     fx:b="level"
     fx:styled-inline="id:l{$lv};">
     {each $items as $item}
+        {set
+            $el = 'item' .
+                (fx::env()->isCurrentPage($item) ? ' item_current' : '') .
+                (fx::env()->isInPath($item) ? ' item_in-path' : '')
+        /}
         {apply 
             floxim.ui.box:box 
-            el item
+            el $el
             with 
                 $box_id = 'l' . $lv . 'box',
                 $box_label = 'Поля ' . $lv  . ' уровня',
